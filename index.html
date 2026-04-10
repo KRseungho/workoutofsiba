@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Work out of SIBA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f0d0a;
+  --surface:#1a1710;
+  --surface2:#231f15;
+  --border:#2e2920;
+  --accent:#e8863a;   /* 시바 주황 */
+  --accent2:#f2c46a;  /* 시바 황금 */
+  --accent3:#e8ff3c;  /* 라임 */
+  --red:#ff4c3b;
+  --teal:#4ecdc4;
+  --text:#f5ede0;
+  --muted:#6b5e4a;
+  --radius:14px;
+  --font-body:'Noto Sans KR',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;}
+
+/* ─── SHIBA SVG (reusable inline) ─── */
+.siba-icon{display:inline-block;vertical-align:middle;}
+
+/* ─── HEADER ─── */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 22px;
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  background:rgba(15,13,10,.97);
+  backdrop-filter:blur(20px);
+}
+.logo{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none;}
+.logo-mark{width:46px;height:46px;flex-shrink:0;}
+.logo-text{display:flex;flex-direction:column;gap:1px;}
+.logo-sub{font-family:'Bebas Neue',sans-serif;font-size:.62rem;letter-spacing:.3em;color:var(--muted);}
+.logo-name{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;line-height:1;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;}
+
+.nav-tabs{display:flex;gap:2px;background:var(--surface);padding:3px;border-radius:11px;border:1px solid var(--border);}
+.nav-tab{padding:7px 11px;border-radius:8px;border:none;background:transparent;color:var(--muted);
+  font-family:var(--font-body);font-size:.78rem;cursor:pointer;transition:all .2s;font-weight:500;
+  white-space:nowrap;}
+.nav-tab.active{background:var(--accent);color:#fff;font-weight:700;}
+
+/* ─── VIEWS ─── */
+.view{display:none;padding:22px;max-width:820px;margin:0 auto;}
+.view.active{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ─── CARD ─── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;margin-bottom:16px;
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2),transparent);
+  opacity:.5;
+}
+.card-title{
+  font-size:.68rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent2);margin-bottom:16px;
+  display:flex;align-items:center;gap:6px;
+}
+.card-title::before{content:'';display:inline-block;width:3px;height:10px;background:var(--accent);border-radius:2px;}
+
+/* ─── DATE ROW ─── */
+.date-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.date-block{}
+.date-big{
+  font-family:'Bebas Neue',sans-serif;font-size:3rem;line-height:1;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.date-sub{font-size:.78rem;color:var(--muted);margin-top:3px;}
+input[type="date"]{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  padding:8px 13px;border-radius:9px;font-family:var(--font-body);font-size:.82rem;
+  cursor:pointer;outline:none;transition:border-color .2s;
+}
+input[type="date"]:focus{border-color:var(--accent);}
+
+/* ─── STEP LABELS ─── */
+.step-label{
+  font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:7px;display:flex;align-items:center;gap:5px;
+}
+.step-label .step-num{
+  background:var(--accent);color:#fff;width:16px;height:16px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:.6rem;font-weight:900;flex-shrink:0;
+}
+
+/* ─── MUSCLE CHIPS ─── */
+.muscle-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.muscle-chip{
+  padding:6px 13px;border-radius:20px;border:1.5px solid var(--border);
+  background:transparent;color:var(--muted);font-family:var(--font-body);
+  font-size:.78rem;cursor:pointer;transition:all .18s;font-weight:500;
+}
+.muscle-chip:hover{border-color:var(--accent);color:var(--text);}
+.muscle-chip.selected{font-weight:700;}
+
+/* ─── EXERCISE BUTTONS ─── */
+.ex-buttons{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:7px;margin-bottom:14px;min-height:40px;}
+.ex-btn{
+  padding:9px 10px;border-radius:9px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--text);font-family:var(--font-body);
+  font-size:.8rem;cursor:pointer;transition:all .18s;text-align:left;line-height:1.3;
+}
+.ex-btn:hover{border-color:var(--accent);background:rgba(232,134,58,.06);}
+.ex-btn.selected{border-color:var(--accent);background:rgba(232,134,58,.12);color:var(--accent);font-weight:700;}
+.ex-placeholder{font-size:.8rem;color:var(--muted);padding:6px 0;}
+
+/* ─── TIP BOX ─── */
+.tip-box{
+  background:rgba(242,196,106,.06);border:1px solid rgba(242,196,106,.22);
+  border-radius:9px;padding:10px 13px;margin-bottom:12px;
+  display:flex;gap:8px;align-items:flex-start;animation:fadeUp .2s ease;
+}
+.tip-icon{font-size:.95rem;flex-shrink:0;margin-top:1px;}
+.tip-text{font-size:.76rem;color:var(--accent2);line-height:1.55;}
+
+/* ─── SET ROWS ─── */
+.set-rows-wrap{border-top:1px solid var(--border);padding-top:13px;margin-top:13px;}
+.set-rows-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.set-rows-title{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.set-col-heads{display:grid;gap:7px;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.set-col-heads div{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding-left:8px;}
+.set-row{display:grid;gap:7px;align-items:center;margin-bottom:6px;animation:fadeUp .18s ease;}
+.set-row input,.field input,.cardio-input{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  padding:8px 10px;border-radius:8px;font-family:var(--font-body);
+  font-size:.86rem;outline:none;transition:border-color .2s;width:100%;-webkit-appearance:none;
+}
+.set-row input:focus,.field input:focus,.cardio-input:focus{border-color:var(--accent);}
+.set-num{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--muted);text-align:center;}
+.btn-del-set{
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:.68rem;
+  transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.btn-del-set:hover{border-color:var(--red);color:var(--red);}
+.btn-del-set:disabled{opacity:.2;cursor:default;pointer-events:none;}
+
+.btn-add-set{
+  background:transparent;border:1px dashed rgba(232,134,58,.5);color:var(--accent);
+  font-size:.74rem;padding:4px 11px;border-radius:6px;cursor:pointer;
+  font-family:var(--font-body);transition:all .2s;
+}
+.btn-add-set:hover{background:rgba(232,134,58,.08);}
+
+/* ─── CARDIO INPUT ─── */
+.cardio-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:.64rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+
+/* ─── BTN PLAN ─── */
+.btn-plan{
+  width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;padding:12px;border-radius:10px;
+  font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.1em;
+  cursor:pointer;transition:all .2s;margin-top:6px;
+  box-shadow:0 4px 16px rgba(232,134,58,.25);
+}
+.btn-plan:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.btn-plan:disabled{opacity:.3;cursor:default;pointer-events:none;transform:none;box-shadow:none;}
+
+/* ─── PROGRESS ─── */
+.prog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.prog-label{font-size:.68rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);}
+.prog-label::before{content:'';display:inline-block;width:3px;height:10px;background:var(--accent);border-radius:2px;margin-right:6px;vertical-align:middle;}
+.prog-count{font-size:.74rem;color:var(--muted);}
+.prog-count strong{color:var(--accent);font-weight:700;}
+.prog-bar-wrap{height:5px;background:var(--border);border-radius:3px;margin-bottom:18px;overflow:hidden;}
+.prog-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s cubic-bezier(.34,1.2,.64,1);}
+
+/* ─── PLAN GROUPS ─── */
+.plan-group{margin-bottom:16px;}
+.plan-group-label{
+  font-size:.65rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:7px;
+}
+
+/* ─── PLAN ITEM ─── */
+.plan-item{
+  display:flex;align-items:flex-start;gap:11px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:12px 14px;margin-bottom:7px;
+  transition:all .22s;cursor:pointer;position:relative;overflow:hidden;
+}
+.plan-item::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  border-radius:3px 0 0 3px;background:var(--border);transition:background .22s;
+}
+.plan-item.done{background:rgba(232,134,58,.04);}
+.plan-item.done::before{background:var(--accent);}
+.plan-item.done .plan-item-name{text-decoration:line-through;color:var(--muted);}
+
+.check-circle{
+  width:22px;height:22px;border-radius:50%;border:2px solid var(--border);
+  flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;
+  transition:all .22s;font-size:.75rem;
+}
+.plan-item.done .check-circle{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+.plan-item-body{flex:1;min-width:0;}
+.plan-item-name{font-weight:700;font-size:.88rem;margin-bottom:4px;}
+.plan-set-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:3px;}
+.set-chip{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:20px;padding:2px 8px;font-size:.67rem;white-space:nowrap;
+}
+.set-chip span{color:var(--accent2);font-weight:700;}
+.set-chip.done-chip span{color:var(--muted);}
+.plan-kcal{font-size:.67rem;color:var(--red);margin-top:2px;}
+.plan-muscle-badge{
+  display:inline-block;font-size:.6rem;font-weight:700;
+  padding:1px 7px;border-radius:20px;border:1px solid;margin-bottom:4px;
+}
+.plan-cmp{font-size:.66rem;margin-top:3px;}
+
+.plan-item-actions{display:flex;gap:4px;flex-shrink:0;}
+.btn-ico{
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  width:27px;height:27px;border-radius:6px;cursor:pointer;font-size:.7rem;
+  transition:all .18s;display:flex;align-items:center;justify-content:center;
+}
+.btn-ico:hover{border-color:var(--accent);color:var(--accent);}
+.btn-ico.del:hover{border-color:var(--red);color:var(--red);}
+
+/* ─── KCAL BAR ─── */
+.kcal-bar{
+  background:var(--surface);border:1px solid rgba(255,76,59,.28);
+  border-radius:var(--radius);padding:11px 16px;
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+}
+.kcal-bar-label{font-size:.75rem;color:var(--muted);}
+.kcal-bar-val{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--red);}
+.kcal-badge{background:rgba(255,76,59,.12);border:1px solid rgba(255,76,59,.3);color:var(--red);font-size:.66rem;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+
+.btn-save-all{
+  width:100%;margin-top:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;padding:14px;border-radius:var(--radius);
+  font-family:'Bebas Neue',sans-serif;font-size:1.28rem;letter-spacing:.12em;
+  cursor:pointer;transition:all .22s;
+  box-shadow:0 4px 20px rgba(232,134,58,.3);
+}
+.btn-save-all:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 8px 28px rgba(232,134,58,.4);}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);border:1px dashed var(--border);border-radius:var(--radius);}
+.empty-icon{font-size:2.2rem;margin-bottom:10px;}
+.empty-text{font-size:.84rem;line-height:1.7;}
+
+/* ─── CALENDAR ─── */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-month{font-family:'Bebas Neue',sans-serif;font-size:2.1rem;letter-spacing:.05em;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.btn-nav{
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  width:36px;height:36px;border-radius:9px;cursor:pointer;font-size:.9rem;transition:all .2s;
+}
+.btn-nav:hover{border-color:var(--accent);color:var(--accent);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:24px;}
+.cal-day-label{text-align:center;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:6px 0;}
+.cal-day{
+  aspect-ratio:1;background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;cursor:pointer;transition:all .18s;font-size:.78rem;
+  position:relative;overflow:hidden;
+}
+.cal-day:hover{border-color:var(--accent);background:rgba(232,134,58,.05);}
+.cal-day.empty{background:transparent;border-color:transparent;cursor:default;pointer-events:none;}
+.cal-day.today{border-color:var(--accent2);color:var(--accent2);font-weight:700;}
+.cal-day.has-workout{background:rgba(232,134,58,.06);border-color:rgba(232,134,58,.35);}
+.cal-day.selected{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700;}
+.cal-day.selected .cal-siba{filter:brightness(10);}
+
+/* 달력 시바 미니 로고 */
+.cal-siba{
+  width:13px;height:13px;margin-top:2px;display:block;
+  opacity:.85;
+}
+
+/* ─── HISTORY ─── */
+.history-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.history-title{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--accent);}
+.btn-del-rec{
+  background:transparent;border:1px solid rgba(255,76,59,.4);color:var(--red);
+  font-size:.74rem;padding:5px 13px;border-radius:7px;cursor:pointer;
+  font-family:var(--font-body);transition:all .2s;font-weight:500;
+  display:flex;align-items:center;gap:4px;
+}
+.btn-del-rec:hover{background:rgba(255,76,59,.1);}
+.hist-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:13px 15px;margin-bottom:8px;
+  display:flex;flex-direction:column;gap:7px;
+}
+.hist-name{font-weight:700;font-size:.88rem;}
+.hist-detail{font-size:.74rem;color:var(--muted);}
+.no-history{text-align:center;padding:26px;color:var(--muted);font-size:.84rem;}
+
+/* ─── CONFIRM MODAL (기록 삭제용) ─── */
+.confirm-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:400;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.confirm-overlay.open{opacity:1;pointer-events:all;}
+.confirm-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px;padding:28px 24px;max-width:300px;width:90%;text-align:center;
+  animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+.confirm-title{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;color:var(--red);margin-bottom:8px;}
+.confirm-msg{font-size:.82rem;color:var(--muted);margin-bottom:20px;line-height:1.5;}
+.confirm-btns{display:flex;gap:8px;}
+.confirm-btns button{flex:1;padding:10px;border-radius:9px;border:none;cursor:pointer;font-family:var(--font-body);font-size:.85rem;font-weight:700;transition:all .18s;}
+.btn-confirm-cancel{background:var(--surface2);color:var(--text);border:1px solid var(--border) !important;}
+.btn-confirm-cancel:hover{border-color:var(--muted) !important;}
+.btn-confirm-ok{background:var(--red);color:#fff;}
+.btn-confirm-ok:hover{filter:brightness(1.1);}
+
+/* ─── STATS ─── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:16px;}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:17px;position:relative;overflow:hidden;
+}
+.stat-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:.4;
+}
+.stat-card-val{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;line-height:1;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.stat-card-label{font-size:.66rem;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.08em;}
+
+.muscle-row{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.muscle-label{width:44px;font-size:.68rem;font-weight:700;flex-shrink:0;}
+.muscle-bar-wrap{flex:1;height:17px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.muscle-bar{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:7px;min-width:28px;font-size:.6rem;font-weight:700;color:#000;white-space:nowrap;transition:width .5s cubic-bezier(.34,1.2,.64,1);}
+.muscle-count{font-family:'Bebas Neue',sans-serif;font-size:.9rem;width:26px;text-align:right;flex-shrink:0;}
+.muscle-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;padding-left:53px;margin-bottom:8px;}
+.muscle-tag-chip{font-size:.62rem;padding:2px 7px;border-radius:20px;border:1px solid;}
+.muscle-empty{text-align:center;padding:20px;color:var(--muted);font-size:.82rem;}
+.recent-item{display:flex;flex-direction:column;gap:5px;padding:11px 0;border-bottom:1px solid var(--border);}
+.recent-item:last-child{border-bottom:none;}
+
+/* ─── EDIT MODAL ─── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .22s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px 18px 0 0;width:100%;max-width:820px;
+  padding:22px 22px 40px;transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.34,1.2,.64,1);
+  max-height:84vh;overflow-y:auto;
+}
+.modal::before{
+  content:'';display:block;width:36px;height:3px;
+  background:var(--border);border-radius:2px;
+  margin:0 auto 18px;
+}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);}
+.btn-modal-close{background:transparent;border:1px solid var(--border);color:var(--muted);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:.9rem;transition:all .2s;}
+.btn-modal-close:hover{border-color:var(--red);color:var(--red);}
+.btn-modal-save{width:100%;margin-top:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:12px;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:1.12rem;letter-spacing:.08em;cursor:pointer;transition:all .2s;}
+.btn-modal-save:hover{filter:brightness(1.08);}
+
+/* ─── TOAST ─── */
+.toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;padding:10px 22px;border-radius:30px;font-weight:700;
+  font-size:.84rem;transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  z-index:999;pointer-events:none;box-shadow:0 4px 20px rgba(232,134,58,.4);
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ─── CONGRATS ─── */
+.congrats-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.congrats-overlay.show{opacity:1;pointer-events:all;}
+.congrats-box{
+  background:var(--surface);border:2px solid var(--accent);
+  border-radius:22px;padding:36px 28px;text-align:center;
+  max-width:310px;width:90%;animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+  position:relative;overflow:hidden;
+}
+.congrats-box::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%, rgba(232,134,58,.15), transparent 70%);
+}
+@keyframes popIn{from{transform:scale(.7);}to{transform:scale(1);}}
+.congrats-siba{margin:0 auto 12px;display:block;}
+.congrats-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;margin-bottom:8px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.congrats-sub{font-size:.84rem;color:var(--muted);line-height:1.65;margin-bottom:22px;white-space:pre-line;}
+.congrats-btn{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;padding:11px 28px;border-radius:10px;
+  font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.07em;
+  cursor:pointer;transition:all .2s;
+}
+.congrats-btn:hover{filter:brightness(1.1);}
+
+@media(max-width:580px){
+  header{padding:10px 14px;}
+  .nav-tab{padding:6px 10px;font-size:.76rem;}
+  .view{padding:13px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .date-big{font-size:2.4rem;}
+  .muscle-tags{padding-left:0;}
+  .ex-buttons{grid-template-columns:repeat(auto-fill,minmax(105px,1fr));}
+}
+
+/* ─── SPLASH ─── */
+#splash{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;
+  transition:opacity .5s ease, transform .5s ease;
+}
+#splash.hide{opacity:0;transform:scale(1.05);pointer-events:none;}
+.splash-logo{animation:splashPop .7s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes splashPop{from{opacity:0;transform:scale(.5) rotate(-8deg);}to{opacity:1;transform:scale(1) rotate(0deg);}}
+.splash-name{
+  font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:.12em;margin-top:14px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:fadeUp .6s .3s both;
+}
+.splash-sub{
+  font-size:.82rem;color:var(--muted);letter-spacing:.2em;margin-top:6px;
+  animation:fadeUp .6s .5s both;
+}
+.splash-tap{
+  margin-top:40px;font-size:.78rem;color:var(--muted);letter-spacing:.1em;
+  animation:blink 1.4s .9s infinite;
+}
+@keyframes blink{0%,100%{opacity:.3;}50%{opacity:1;}}
+
+/* ─── 계획 팁 토스트 ─── */
+.plan-tip-overlay{
+  position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.7);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .22s;
+}
+.plan-tip-overlay.open{opacity:1;pointer-events:all;}
+.plan-tip-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px 18px 0 0;width:100%;max-width:820px;
+  padding:24px 22px 38px;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);
+}
+.plan-tip-overlay.open .plan-tip-box{transform:translateY(0);}
+.plan-tip-box::before{content:'';display:block;width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
+.plan-tip-ex{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);margin-bottom:10px;}
+.plan-tip-content{font-size:.84rem;color:var(--text);line-height:1.7;background:rgba(242,196,106,.06);border:1px solid rgba(242,196,106,.2);border-radius:10px;padding:14px 16px;}
+.plan-tip-icon-wrap{display:flex;gap:6px;align-items:flex-start;}
+.plan-tip-icon-wrap .ti{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+
+/* ─── 달력 피드백 카드 ─── */
+.cal-feedback{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px;margin-top:14px;
+  animation:fadeUp .3s ease;
+}
+.cal-fb-muscles{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.cal-fb-msg{font-size:.84rem;color:var(--text);line-height:1.65;padding:12px 14px;background:rgba(232,134,58,.06);border:1px solid rgba(232,134,58,.2);border-radius:9px;}
+.cal-no-workout{
+  text-align:center;padding:28px 20px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);margin-top:14px;animation:fadeUp .3s ease;
+}
+.cal-no-icon{font-size:2.4rem;margin-bottom:10px;}
+.cal-no-msg{font-size:.84rem;color:var(--muted);line-height:1.65;}
+</style>
+</head>
+<body>
+
+<!-- ══════ SPLASH ══════ -->
+<div id="splash" onclick="hideSplash()">
+  <svg class="splash-logo" width="180" height="180" viewBox="0 0 180 165" fill="none">
+    <!-- 귀 -->
+    <path d="M32 64 Q20 22 44 19 Q56 17 59 50Z" fill="#b85a10"/>
+    <path d="M148 64 Q160 22 136 19 Q124 17 121 50Z" fill="#b85a10"/>
+    <path d="M35 62 Q25 28 46 25 Q56.5 23 58.5 49Z" fill="#e8743a" opacity=".62"/>
+    <path d="M145 62 Q155 28 134 25 Q123.5 23 121.5 49Z" fill="#e8743a" opacity=".62"/>
+    <!-- 머리 -->
+    <ellipse cx="90" cy="72" rx="52" ry="48" fill="#d4741a"/>
+    <!-- 주둥이 (아래끝 Y≈105) -->
+    <ellipse cx="90" cy="91" rx="33" ry="22" fill="#f5c896"/>
+    <!-- 눈 -->
+    <circle cx="65"  cy="66" r="13" fill="#1a0800"/>
+    <circle cx="115" cy="66" r="13" fill="#1a0800"/>
+    <circle cx="68.5" cy="62" r="5.5" fill="white"/>
+    <circle cx="118.5" cy="62" r="5.5" fill="white"/>
+    <circle cx="71" cy="65" r="2.5" fill="white" opacity=".5"/>
+    <circle cx="121" cy="65" r="2.5" fill="white" opacity=".5"/>
+    <!-- 눈썹 -->
+    <path d="M50 52 Q65 45 80 50"  stroke="#b85a10" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M100 50 Q115 45 130 52" stroke="#b85a10" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- 코 -->
+    <ellipse cx="90" cy="82" rx="11" ry="7.5" fill="#1a0800"/>
+    <ellipse cx="86" cy="80" rx="3.5" ry="2.5" fill="#3d1a00" opacity=".6"/>
+    <!-- 볼 홍조 -->
+    <circle cx="50"  cy="92" r="13" fill="#ff8866" opacity=".2"/>
+    <circle cx="130" cy="92" r="13" fill="#ff8866" opacity=".2"/>
+    <!-- 입 (Y=91~100) — 덤벨 바가 이 Y에 맞춰짐 -->
+    <path d="M90 91 L90 98" stroke="#b05020" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M73 100 Q90 110 107 100" stroke="#b05020" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- 덤벨 바 — Y=93 (입과 정확히 겹침) -->
+    <rect x="5" y="90" width="170" height="9" rx="4.5" fill="#f2c46a"/>
+    <!-- 왼쪽 원판 -->
+    <rect x="2"  y="78" width="20" height="33" rx="6" fill="#e8a830"/>
+    <rect x="6"  y="83" width="12" height="23" rx="4" fill="#f2c46a"/>
+    <!-- 오른쪽 원판 -->
+    <rect x="158" y="78" width="20" height="33" rx="6" fill="#e8a830"/>
+    <rect x="162" y="83" width="12" height="23" rx="4" fill="#f2c46a"/>
+    <!-- 이빨 (바 위에 딱 걸쳐 있음) -->
+    <rect x="68" y="89" width="9" height="7" rx="3" fill="white" opacity=".95"/>
+    <rect x="80" y="89" width="9" height="7" rx="3" fill="white" opacity=".95"/>
+    <rect x="92" y="89" width="9" height="7" rx="3" fill="white" opacity=".95"/>
+    <rect x="104" y="89" width="9" height="7" rx="3" fill="white" opacity=".95"/>
+    <!-- 반짝이 -->
+    <text x="8"   y="40" font-size="16" fill="#f2c46a" opacity=".9">✦</text>
+    <text x="150" y="38" font-size="16" fill="#f2c46a" opacity=".9">✦</text>
+    <text x="78"  y="16" font-size="13" fill="#e8863a" opacity=".85">★</text>
+    <text x="148" y="150" font-size="11" fill="#f2c46a" opacity=".7">✦</text>
+  </svg>
+  <div class="splash-name">Work out of SIBA</div>
+  <div class="splash-sub">WORKOUT WITH SHIBA</div>
+  <div class="splash-tap">탭해서 시작하기 ▼</div>
+</div>
+
+<!-- ══════ HEADER ══════ -->
+<header>
+  <div class="logo" onclick="showView('home')">
+    <!-- 시바견 얼굴 정면 + 덤벨이 입에 정확히 -->
+    <svg class="logo-mark" viewBox="0 0 56 52" fill="none">
+      <!-- 귀 -->
+      <path d="M10 21 Q6 7 16 6 Q21 5 22 17Z" fill="#b85a10"/>
+      <path d="M46 21 Q50 7 40 6 Q35 5 34 17Z" fill="#b85a10"/>
+      <path d="M11.5 20 Q8.5 9.5 17.5 8.5 Q21.5 8 22.5 16.5Z" fill="#e8743a" opacity=".6"/>
+      <path d="M44.5 20 Q47.5 9.5 38.5 8.5 Q34.5 8 33.5 16.5Z" fill="#e8743a" opacity=".6"/>
+      <!-- 머리 -->
+      <ellipse cx="28" cy="23" rx="17" ry="15.5" fill="#d4741a"/>
+      <!-- 주둥이 (아래 끝 Y≈35) -->
+      <ellipse cx="28" cy="30" rx="11" ry="7.5" fill="#f5c896"/>
+      <!-- 눈 -->
+      <circle cx="20" cy="21" r="4.5" fill="#1a0800"/>
+      <circle cx="36" cy="21" r="4.5" fill="#1a0800"/>
+      <circle cx="21.3" cy="19.5" r="1.7" fill="white"/>
+      <circle cx="37.3" cy="19.5" r="1.7" fill="white"/>
+      <!-- 눈썹 -->
+      <path d="M14 16 Q20 13 26 16" stroke="#b85a10" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M30 16 Q36 13 42 16" stroke="#b85a10" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- 코 -->
+      <ellipse cx="28" cy="26" rx="4" ry="2.8" fill="#1a0800"/>
+      <!-- 입 (Y=30~33) -->
+      <path d="M28 30 L28 33" stroke="#b05020" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M21 34.5 Q28 38.5 35 34.5" stroke="#b05020" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- 볼 홍조 -->
+      <circle cx="14" cy="28" r="4" fill="#ff8866" opacity=".2"/>
+      <circle cx="42" cy="28" r="4" fill="#ff8866" opacity=".2"/>
+      <!-- 덤벨 바 — Y=33 (입 선과 일치) -->
+      <rect x="3" y="31.5" width="50" height="4" rx="2" fill="#f2c46a"/>
+      <!-- 왼쪽 원판 -->
+      <rect x="0"   y="26" width="7"  height="14" rx="2.5" fill="#e8a830"/>
+      <rect x="1.5" y="28" width="4"  height="10" rx="1.5" fill="#f2c46a"/>
+      <!-- 오른쪽 원판 -->
+      <rect x="49"  y="26" width="7"  height="14" rx="2.5" fill="#e8a830"/>
+      <rect x="50.5" y="28" width="4" height="10" rx="1.5" fill="#f2c46a"/>
+      <!-- 이빨 (바 위에 딱 걸쳐 있는 표현) -->
+      <rect x="19.5" y="30.5" width="5" height="3.5" rx="1.5" fill="white" opacity=".95"/>
+      <rect x="26"   y="30.5" width="5" height="3.5" rx="1.5" fill="white" opacity=".95"/>
+      <rect x="32.5" y="30.5" width="5" height="3.5" rx="1.5" fill="white" opacity=".95"/>
+    </svg>
+    <div class="logo-text">
+      <span class="logo-sub">workout</span>
+      <span class="logo-name">Work out of SIBA</span>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab" onclick="showView('home')">홈</button>
+    <button class="nav-tab active" onclick="showView('record')">기록</button>
+    <button class="nav-tab" onclick="showView('calendar')">달력</button>
+    <button class="nav-tab" onclick="showView('stats')">통계</button>
+  </div>
+</header>
+
+<!-- ══════ HOME VIEW ══════ -->
+<div class="view" id="view-home">
+  <div style="text-align:center;padding:30px 0 20px">
+    <!-- 운동하는 시바견 큰 일러스트 -->
+    <svg width="200" height="220" viewBox="0 0 200 220" fill="none" style="margin:0 auto;display:block">
+      <!-- 바벨 (시바가 들고 있음) -->
+      <rect x="20" y="95" width="160" height="10" rx="5" fill="#f2c46a"/>
+      <rect x="8"  y="82" width="18" height="36" rx="5" fill="#e8a830"/>
+      <rect x="12" y="87" width="10" height="26" rx="3" fill="#f2c46a"/>
+      <rect x="174" y="82" width="18" height="36" rx="5" fill="#e8a830"/>
+      <rect x="178" y="87" width="10" height="26" rx="3" fill="#f2c46a"/>
+      <!-- 팔/앞발 (바벨 들고 있는 자세) -->
+      <path d="M55 130 Q45 115 40 100" stroke="#c0620e" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <path d="M145 130 Q155 115 160 100" stroke="#c0620e" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <path d="M55 130 Q45 115 40 100" stroke="#d4741a" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <path d="M145 130 Q155 115 160 100" stroke="#d4741a" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <!-- 발바닥 -->
+      <ellipse cx="38" cy="101" rx="9" ry="6" fill="#c0620e"/>
+      <ellipse cx="162" cy="101" rx="9" ry="6" fill="#c0620e"/>
+      <!-- 몸통 -->
+      <ellipse cx="100" cy="158" rx="38" ry="28" fill="#d4741a"/>
+      <!-- 뒷발 -->
+      <ellipse cx="68"  cy="185" rx="14" ry="9" fill="#c0620e"/>
+      <ellipse cx="132" cy="185" rx="14" ry="9" fill="#c0620e"/>
+      <ellipse cx="68"  cy="190" rx="12" ry="6" fill="#b85a10"/>
+      <ellipse cx="132" cy="190" rx="12" ry="6" fill="#b85a10"/>
+      <!-- 꼬리 (위로 말린) -->
+      <path d="M135 148 Q160 134 156 112 Q152 96 140 100" stroke="#c0620e" stroke-width="12" fill="none" stroke-linecap="round"/>
+      <path d="M135 148 Q160 134 156 112 Q152 96 140 100" stroke="#e8743a" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <!-- 귀 -->
+      <path d="M58 80 Q46 48 62 46 Q70 44 74 68 Z" fill="#b85a10"/>
+      <path d="M142 80 Q154 48 138 46 Q130 44 126 68 Z" fill="#b85a10"/>
+      <path d="M60 78 Q50 52 64 50 Q71 48 73 66 Z" fill="#e8743a" opacity=".65"/>
+      <path d="M140 78 Q150 52 136 50 Q129 48 127 66 Z" fill="#e8743a" opacity=".65"/>
+      <!-- 머리 -->
+      <ellipse cx="100" cy="104" rx="48" ry="44" fill="#d4741a"/>
+      <!-- 주둥이 -->
+      <ellipse cx="100" cy="118" rx="30" ry="20" fill="#f5c896"/>
+      <!-- 눈 (힘 줄 때 눈) -->
+      <ellipse cx="77"  cy="98" rx="12" ry="12" fill="#1a0800"/>
+      <ellipse cx="123" cy="98" rx="12" ry="12" fill="#1a0800"/>
+      <circle cx="80"  cy="95" r="4.5" fill="white"/>
+      <circle cx="126" cy="95" r="4.5" fill="white"/>
+      <circle cx="83"  cy="98" r="2" fill="white" opacity=".5"/>
+      <circle cx="129" cy="98" r="2" fill="white" opacity=".5"/>
+      <!-- 눈썹 찡그림 -->
+      <path d="M65 86 Q77 80 90 85"  stroke="#b85a10" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M110 85 Q123 80 135 86" stroke="#b85a10" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <!-- 코 -->
+      <ellipse cx="100" cy="110" rx="11" ry="8" fill="#1a0800"/>
+      <ellipse cx="96"  cy="108" rx="3.5" ry="2.5" fill="#3d1a00" opacity=".6"/>
+      <!-- 입 (힘줄 때 꽉 문 입) -->
+      <path d="M100 118 L100 124" stroke="#c05820" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M82 126 Q100 134 118 126" stroke="#c05820" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- 볼 홍조 -->
+      <circle cx="62"  cy="114" r="12" fill="#ff8866" opacity=".2"/>
+      <circle cx="138" cy="114" r="12" fill="#ff8866" opacity=".2"/>
+      <!-- 땀방울 (운동 중) -->
+      <path d="M152 68 Q156 60 160 68 Q160 74 156 73 Q152 74 152 68Z" fill="#4ecdc4" opacity=".8"/>
+      <path d="M40  72 Q44 64 48 72 Q48 78 44 77 Q40 78 40 72Z"  fill="#4ecdc4" opacity=".8"/>
+      <!-- 근육 불끈 표현 -->
+      <ellipse cx="46" cy="118" rx="8" ry="6" fill="#c0620e" opacity=".6"/>
+      <ellipse cx="154" cy="118" rx="8" ry="6" fill="#c0620e" opacity=".6"/>
+      <!-- 힘 반짝이 -->
+      <text x="155" y="58" font-size="18" fill="#f2c46a" opacity=".9">✦</text>
+      <text x="24"  y="55" font-size="14" fill="#e8863a" opacity=".85">★</text>
+      <text x="168" y="170" font-size="12" fill="#f2c46a" opacity=".7">✦</text>
+    </svg>
+
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.1em;margin-top:16px;
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+      Work out of SIBA
+    </div>
+    <div style="font-size:.82rem;color:var(--muted);margin-top:6px;letter-spacing:.12em;">WORKOUT WITH SHIBA 🐕</div>
+  </div>
+
+  <div class="card" style="text-align:center">
+    <div class="card-title" style="justify-content:center">오늘의 동기부여</div>
+    <div id="home-quote" style="font-size:.9rem;color:var(--text);line-height:1.75;padding:4px 0 8px"></div>
+    <div id="home-today" style="font-size:.78rem;color:var(--muted);margin-top:8px"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <button class="btn-plan" style="margin:0" onclick="showView('record')">📋 오늘 운동 기록</button>
+    <button class="btn-plan" style="margin:0;background:linear-gradient(135deg,var(--teal),#38b2a8)" onclick="showView('calendar')">📅 달력 보기</button>
+  </div>
+</div>
+
+<!-- ══════ RECORD VIEW ══════ -->
+<div class="view" id="view-record">
+  <div class="date-row">
+    <div class="date-block">
+      <div class="date-big" id="date-big">--</div>
+      <div class="date-sub" id="date-sub"></div>
+    </div>
+    <input type="date" id="record-date" onchange="updateDateDisplay()">
+  </div>
+
+  <div class="card">
+    <div class="card-title">운동 계획 추가</div>
+    <div class="step-label"><span class="step-num">1</span>부위 선택</div>
+    <div class="muscle-chips" id="muscle-chips"></div>
+    <div class="step-label"><span class="step-num">2</span>운동 선택</div>
+    <div class="ex-buttons" id="ex-buttons"><div class="ex-placeholder">부위를 먼저 선택해주세요</div></div>
+    <div id="tip-box" class="tip-box" style="display:none">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-text"></span>
+    </div>
+    <div id="input-area" style="display:none">
+      <div id="weight-area">
+        <div class="set-rows-wrap">
+          <div class="set-rows-header">
+            <div class="set-rows-title"><span class="step-num" style="background:var(--surface2);color:var(--accent);border:1px solid var(--accent)">3</span> 세트 입력</div>
+            <button class="btn-add-set" onclick="addSetRow()">+ 세트</button>
+          </div>
+          <div class="set-col-heads" id="set-col-heads"></div>
+          <div id="set-rows-container"></div>
+        </div>
+      </div>
+      <div id="cardio-area" style="display:none">
+        <div class="set-rows-wrap">
+          <div class="set-rows-header">
+            <div class="set-rows-title"><span class="step-num" style="background:var(--surface2);color:var(--accent);border:1px solid var(--accent)">3</span> 운동 정보</div>
+          </div>
+          <div class="cardio-grid">
+            <div class="field"><label>시간 (분)</label><input class="cardio-input" type="number" id="cardio-min" inputmode="numeric" placeholder="30" min="1"></div>
+            <div class="field"><label>칼로리 (kcal)</label><input class="cardio-input" type="number" id="cardio-kcal" inputmode="numeric" placeholder="300" min="0"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-plan" onclick="addPlanItem()">계획에 추가 →</button>
+    </div>
+  </div>
+
+  <!-- 계획 목록 -->
+  <div id="plan-section" style="display:none">
+    <div class="prog-header">
+      <div class="prog-label">오늘의 계획</div>
+      <div class="prog-count"><strong id="done-count">0</strong> / <span id="total-count">0</span> 완료</div>
+    </div>
+    <div class="prog-bar-wrap"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
+    <div class="kcal-bar" id="kcal-bar" style="display:none">
+      <span class="kcal-bar-label">🔥 완료 운동 소모 칼로리</span>
+      <span class="kcal-bar-val" id="kcal-bar-val">0 kcal</span>
+    </div>
+    <div id="plan-list"></div>
+    <button class="btn-save-all" onclick="saveWorkout()">💾 오늘 운동 저장</button>
+  </div>
+  <div id="plan-empty" class="empty-state">
+    <svg width="64" height="64" viewBox="0 0 48 48" fill="none" style="margin:0 auto 12px;display:block;opacity:.7">
+      <path d="M11 18 Q8 6 16 5 Q20 4 21 14 Z" fill="#b85a10"/>
+      <path d="M37 18 Q40 6 32 5 Q28 4 27 14 Z" fill="#b85a10"/>
+      <path d="M12.5 17 Q10 8 17 7 Q20.5 6.5 21.5 14 Z" fill="#e8743a" opacity=".65"/>
+      <path d="M35.5 17 Q38 8 31 7 Q27.5 6.5 26.5 14 Z" fill="#e8743a" opacity=".65"/>
+      <ellipse cx="24" cy="22" rx="15" ry="14" fill="#d4741a"/>
+      <ellipse cx="24" cy="27" rx="9.5" ry="7" fill="#f5c896"/>
+      <circle cx="17.5" cy="20" r="3.8" fill="#1a0800"/>
+      <circle cx="30.5" cy="20" r="3.8" fill="#1a0800"/>
+      <circle cx="18.8" cy="18.8" r="1.4" fill="white"/>
+      <circle cx="31.8" cy="18.8" r="1.4" fill="white"/>
+      <path d="M13 16 Q17.5 13.5 22 16" stroke="#b85a10" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <path d="M26 16 Q30.5 13.5 35 16" stroke="#b85a10" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="24" cy="24.5" rx="3.5" ry="2.5" fill="#1a0800"/>
+      <path d="M24 27 L24 29.5" stroke="#c05820" stroke-width="1" stroke-linecap="round"/>
+      <path d="M18 30 Q24 33 30 30" stroke="#c05820" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      <circle cx="13" cy="26" r="3.5" fill="#ff8866" opacity=".22"/>
+      <circle cx="35" cy="26" r="3.5" fill="#ff8866" opacity=".22"/>
+      <rect x="5" y="35" width="38" height="4" rx="2" fill="#f2c46a"/>
+      <rect x="2"  y="31" width="6" height="12" rx="2.5" fill="#e8a830"/>
+      <rect x="3.5" y="33" width="3" height="8" rx="1.5" fill="#f2c46a"/>
+      <rect x="40" y="31" width="6" height="12" rx="2.5" fill="#e8a830"/>
+      <rect x="41.5" y="33" width="3" height="8" rx="1.5" fill="#f2c46a"/>
+      <rect x="18" y="34" width="4" height="3" rx="1.2" fill="white" opacity=".92"/>
+      <rect x="23.5" y="34" width="4" height="3" rx="1.2" fill="white" opacity=".92"/>
+      <rect x="29" y="34" width="4" height="3" rx="1.2" fill="white" opacity=".92"/>
+    </svg>
+    <div class="empty-text">아직 계획이 없어요<br>위에서 운동을 추가해보세요!</div>
+  </div>
+</div>
+
+<!-- ══════ CALENDAR VIEW ══════ -->
+<div class="view" id="view-calendar">
+  <div class="cal-nav">
+    <button class="btn-nav" onclick="changeMonth(-1)">‹</button>
+    <div class="cal-month" id="cal-month"></div>
+    <button class="btn-nav" onclick="changeMonth(1)">›</button>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+  <div id="history-detail"><div class="no-history">날짜를 선택하면 운동 기록을 볼 수 있어요</div></div>
+</div>
+
+<!-- ══════ STATS VIEW ══════ -->
+<div class="view" id="view-stats">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-card-val" id="stat-total">0</div><div class="stat-card-label">총 운동일수</div></div>
+    <div class="stat-card"><div class="stat-card-val" id="stat-this-month">0</div><div class="stat-card-label">이번달</div></div>
+    <div class="stat-card"><div class="stat-card-val" id="stat-streak">0</div><div class="stat-card-label">연속 운동일</div></div>
+    <div class="stat-card" style="grid-column:1/-1;border-color:rgba(255,76,59,.25)">
+      <div class="stat-card-val" id="stat-total-kcal" style="color:var(--red)">0</div>
+      <div class="stat-card-label">🔥 누적 소모 칼로리 (kcal)</div>
+    </div>
+  </div>
+  <div class="card"><div class="card-title">이번달 부위별 운동</div><div id="muscle-chart"></div></div>
+  <div class="card"><div class="card-title">최근 운동 기록</div><div id="recent-list"><div class="no-history">아직 기록이 없어요</div></div></div>
+</div>
+
+<!-- ══════ EDIT MODAL ══════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="onOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">운동 수정</div>
+      <button class="btn-modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+    <button class="btn-modal-save" onclick="saveModal()">✅ 수정 완료</button>
+  </div>
+</div>
+
+<!-- ══════ PLAN TIP MODAL ══════ -->
+<div class="plan-tip-overlay" id="plan-tip-overlay" onclick="closePlanTip(event)">
+  <div class="plan-tip-box">
+    <div class="plan-tip-ex" id="plan-tip-ex"></div>
+    <div class="plan-tip-content">
+      <div class="plan-tip-icon-wrap">
+        <span class="ti">💡</span>
+        <span id="plan-tip-text"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ CONFIRM MODAL (삭제 확인) ══════ -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title">기록 삭제</div>
+    <div class="confirm-msg" id="confirm-msg">이 날의 운동 기록을 삭제할까요?<br>복구할 수 없어요.</div>
+    <div class="confirm-btns">
+      <button class="btn-confirm-cancel" onclick="closeConfirm()">취소</button>
+      <button class="btn-confirm-ok" id="btn-confirm-ok">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ CONGRATS ══════ -->
+<div class="congrats-overlay" id="congrats-overlay">
+  <div class="congrats-box">
+    <!-- 새 시바 SVG (얼굴 정면 + 덤벨) -->
+    <svg class="congrats-siba" width="90" height="90" viewBox="0 0 90 90" fill="none">
+      <!-- 귀 -->
+      <path d="M20 36 Q14 12 26 10 Q32 9 34 26 Z" fill="#b85a10"/>
+      <path d="M70 36 Q76 12 64 10 Q58 9 56 26 Z" fill="#b85a10"/>
+      <path d="M21.5 34 Q16 15 27 13 Q32.5 12 33.5 25 Z" fill="#e8743a" opacity=".65"/>
+      <path d="M68.5 34 Q74 15 63 13 Q57.5 12 56.5 25 Z" fill="#e8743a" opacity=".65"/>
+      <!-- 머리 -->
+      <ellipse cx="45" cy="42" rx="30" ry="28" fill="#d4741a"/>
+      <!-- 주둥이 -->
+      <ellipse cx="45" cy="52" rx="20" ry="14" fill="#f5c896"/>
+      <!-- 눈 -->
+      <circle cx="32" cy="38" r="7.5" fill="#1a0800"/>
+      <circle cx="58" cy="38" r="7.5" fill="#1a0800"/>
+      <circle cx="34.5" cy="35.5" r="3" fill="white"/>
+      <circle cx="60.5" cy="35.5" r="3" fill="white"/>
+      <!-- 눈썹 -->
+      <path d="M22 30 Q32 25 42 29" stroke="#b85a10" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M48 29 Q58 25 68 30" stroke="#b85a10" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <!-- 코 -->
+      <ellipse cx="45" cy="47" rx="7" ry="5" fill="#1a0800"/>
+      <!-- 행복한 입 (운동 완료!) -->
+      <path d="M45 52 L45 57" stroke="#c05820" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M33 59 Q45 67 57 59" stroke="#c05820" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <!-- 볼 홍조 -->
+      <circle cx="22" cy="50" r="7" fill="#ff8866" opacity=".22"/>
+      <circle cx="68" cy="50" r="7" fill="#ff8866" opacity=".22"/>
+      <!-- 덤벨 (아래에) -->
+      <rect x="10" y="74" width="70" height="6" rx="3" fill="#f2c46a"/>
+      <rect x="5"  y="68" width="10" height="18" rx="3.5" fill="#e8a830"/>
+      <rect x="6.5" y="71" width="7" height="12" rx="2.5" fill="#f2c46a"/>
+      <rect x="75" y="68" width="10" height="18" rx="3.5" fill="#e8a830"/>
+      <rect x="76.5" y="71" width="7" height="12" rx="2.5" fill="#f2c46a"/>
+      <!-- 반짝이 -->
+      <text x="2"  y="20" font-size="11" fill="#f2c46a" opacity=".9">✦</text>
+      <text x="74" y="18" font-size="11" fill="#f2c46a" opacity=".9">✦</text>
+      <text x="38" y="8"  font-size="9"  fill="#e8863a" opacity=".85">★</text>
+    </svg>
+    <div class="congrats-title" id="congrats-title">수고했어요!</div>
+    <div class="congrats-sub" id="congrats-sub"></div>
+    <button class="congrats-btn" id="congrats-close-btn">완료!</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════
+   DB
+══════════════════════════════════ */
+const EXERCISE_DB = {
+  '가슴':['벤치프레스','인클라인 벤치프레스','디클라인 벤치프레스','덤벨 플라이','인클라인 덤벨 플라이','케이블 크로스오버','체스트 프레스 머신','딥스','푸쉬업','펙 덱 플라이',
+    '스미스 벤치프레스','스미스 인클라인 벤치프레스'],
+  '등':['데드리프트','루마니안 데드리프트','바벨 로우','덤벨 로우','원암 로우 머신','케이블 로우','T바 로우','풀업','친업','랫 풀다운','시티드 케이블 로우','스트레이트 암 풀다운',
+    '스미스 데드리프트','스미스 로우'],
+  '하체':['스쿼트','프론트 스쿼트','레그프레스','런지','불가리안 스플릿 스쿼트','힙 쓰러스트','레그컬','레그 익스텐션','카프 레이즈','핵 스쿼트',
+    '스미스 스쿼트','스미스 런지','스미스 힙 쓰러스트','스미스 카프 레이즈'],
+  '어깨':['오버헤드프레스','덤벨 숄더프레스','머신 숄더프레스','사이드 레터럴 레이즈','프론트 레이즈','리어 델트 플라이','벤트 오버 레이즈','페이스풀','업라이트 로우',
+    '스미스 오버헤드프레스','스미스 업라이트 로우'],
+  '팔':['바벨 컬','덤벨 컬','해머 컬','인클라인 덤벨 컬','컨센트레이션 컬','케이블 컬','트라이셉 푸시다운','스컬크러셔','오버헤드 트라이셉 익스텐션','트라이셉 킥백','클로즈 그립 벤치프레스','딥스(팔)',
+    '스미스 클로즈 그립 벤치프레스'],
+  '복근':['크런치','레그레이즈','플랭크','케이블 크런치','싯업','바이시클 크런치'],
+  '유산소':['러닝','사이클','로잉머신','스텝밀','줄넘기','일립티컬','버피'],
+};
+const CARDIO_SET = new Set(EXERCISE_DB['유산소']);
+const BWNAME_SET = new Set(['풀업','친업','딥스','딥스(팔)','푸쉬업','크런치','싯업','레그레이즈','바이시클 크런치','버피','플랭크']);
+
+/* ── 칼로리 DB (MET 기반 최신화) ──
+   w  = 웨이트: kcal = reps × weight × v
+   bw = 자체중량: kcal = reps × v (체중 70kg 기준)
+   c  = 유산소: kcal = MET × 70 × (reps / 60)
+   단위: v = kcal/rep/kg (웨이트), kcal/rep (자체중량), MET (유산소)
+*/
+const CALORIE_DB = {
+  /* 가슴 */
+  '벤치프레스':{t:'w',v:.085},'인클라인 벤치프레스':{t:'w',v:.090},'디클라인 벤치프레스':{t:'w',v:.087},
+  '덤벨 플라이':{t:'w',v:.072},'인클라인 덤벨 플라이':{t:'w',v:.075},'케이블 크로스오버':{t:'w',v:.070},
+  '체스트 프레스 머신':{t:'w',v:.078},'딥스':{t:'bw',v:.55},'푸쉬업':{t:'bw',v:.45},'펙 덱 플라이':{t:'w',v:.070},
+  '스미스 벤치프레스':{t:'w',v:.083},'스미스 인클라인 벤치프레스':{t:'w',v:.087},
+  /* 등 */
+  '데드리프트':{t:'w',v:.105},'루마니안 데드리프트':{t:'w',v:.095},'바벨 로우':{t:'w',v:.092},
+  '덤벨 로우':{t:'w',v:.086},'원암 로우 머신':{t:'w',v:.080},'케이블 로우':{t:'w',v:.077},
+  'T바 로우':{t:'w',v:.095},'풀업':{t:'bw',v:.65},'친업':{t:'bw',v:.62},'랫 풀다운':{t:'w',v:.078},
+  '시티드 케이블 로우':{t:'w',v:.076},'스트레이트 암 풀다운':{t:'w',v:.067},
+  '스미스 데드리프트':{t:'w',v:.100},'스미스 로우':{t:'w',v:.088},
+  /* 하체 */
+  '스쿼트':{t:'w',v:.100},'프론트 스쿼트':{t:'w',v:.098},'레그프레스':{t:'w',v:.087},
+  '런지':{t:'w',v:.090},'불가리안 스플릿 스쿼트':{t:'w',v:.094},'힙 쓰러스트':{t:'w',v:.085},
+  '레그컬':{t:'w',v:.072},'레그 익스텐션':{t:'w',v:.070},'카프 레이즈':{t:'w',v:.050},'핵 스쿼트':{t:'w',v:.095},
+  '스미스 스쿼트':{t:'w',v:.096},'스미스 런지':{t:'w',v:.088},'스미스 힙 쓰러스트':{t:'w',v:.082},'스미스 카프 레이즈':{t:'w',v:.048},
+  /* 어깨 */
+  '오버헤드프레스':{t:'w',v:.083},'덤벨 숄더프레스':{t:'w',v:.080},'머신 숄더프레스':{t:'w',v:.078},
+  '사이드 레터럴 레이즈':{t:'w',v:.060},'프론트 레이즈':{t:'w',v:.060},'리어 델트 플라이':{t:'w',v:.063},
+  '벤트 오버 레이즈':{t:'w',v:.061},'페이스풀':{t:'w',v:.065},'업라이트 로우':{t:'w',v:.074},
+  '스미스 오버헤드프레스':{t:'w',v:.080},'스미스 업라이트 로우':{t:'w',v:.072},
+  /* 팔 */
+  '바벨 컬':{t:'w',v:.065},'덤벨 컬':{t:'w',v:.063},'해머 컬':{t:'w',v:.063},
+  '인클라인 덤벨 컬':{t:'w',v:.061},'컨센트레이션 컬':{t:'w',v:.061},'케이블 컬':{t:'w',v:.060},
+  '트라이셉 푸시다운':{t:'w',v:.063},'스컬크러셔':{t:'w',v:.067},'오버헤드 트라이셉 익스텐션':{t:'w',v:.065},
+  '트라이셉 킥백':{t:'w',v:.057},'클로즈 그립 벤치프레스':{t:'w',v:.080},'딥스(팔)':{t:'bw',v:.55},
+  '스미스 클로즈 그립 벤치프레스':{t:'w',v:.078},
+  /* 복근 */
+  '크런치':{t:'bw',v:.28},'레그레이즈':{t:'bw',v:.33},'플랭크':{t:'c',v:3.8},
+  '케이블 크런치':{t:'w',v:.052},'싯업':{t:'bw',v:.31},'바이시클 크런치':{t:'bw',v:.30},
+  /* 유산소 */
+  '러닝':{t:'c',v:10.0},'사이클':{t:'c',v:7.8},'로잉머신':{t:'c',v:8.8},'스텝밀':{t:'c',v:9.5},
+  '줄넘기':{t:'c',v:11.5},'일립티컬':{t:'c',v:6.5},'버피':{t:'bw',v:1.0},
+};
+
+const MUSCLE_MAP = {};
+Object.entries(EXERCISE_DB).forEach(([m,arr])=>arr.forEach(n=>MUSCLE_MAP[n]=m));
+
+const MC = {
+  '가슴':{bg:'rgba(255,107,107,.14)',bd:'rgba(255,107,107,.55)',tx:'#ff7070'},
+  '등':  {bg:'rgba(78,205,196,.12)', bd:'rgba(78,205,196,.5)',  tx:'#4ecdc4'},
+  '하체':{bg:'rgba(69,183,209,.12)', bd:'rgba(69,183,209,.5)',  tx:'#45b7d1'},
+  '어깨':{bg:'rgba(180,130,240,.12)',bd:'rgba(180,130,240,.5)', tx:'#b482f0'},
+  '팔':  {bg:'rgba(242,196,106,.12)',bd:'rgba(242,196,106,.5)', tx:'#f2c46a'},
+  '복근':{bg:'rgba(255,154,0,.12)',  bd:'rgba(255,154,0,.5)',   tx:'#ff9a00'},
+  '유산소':{bg:'rgba(0,212,136,.12)',bd:'rgba(0,212,136,.5)',   tx:'#00d488'},
+  '기타':{bg:'rgba(100,100,100,.12)',bd:'rgba(100,100,100,.4)', tx:'#888'},
+};
+
+const TIPS = {
+  '벤치프레스':'견갑골을 모으고 가슴으로 밀어내세요. 팔꿈치 각도는 약 75°가 어깨에 안전해요.',
+  '인클라인 벤치프레스':'30~45° 각도로 상부 가슴을 자극해요. 바를 쇄골 방향으로 내려주세요.',
+  '디클라인 벤치프레스':'하부 가슴 강화에 효과적이에요. 발을 확실히 고정하고 천천히 내려주세요.',
+  '덤벨 플라이':'팔꿈치를 살짝 구부린 채 호를 그리듯 내려요. 너무 깊이 내리면 어깨 부상 위험이 있어요.',
+  '인클라인 덤벨 플라이':'상부 가슴 스트레칭이 포인트예요. 내릴 때 가슴 근육이 늘어나는 느낌에 집중하세요.',
+  '케이블 크로스오버':'케이블 장력이 일정해 가슴 전체를 자극해요. 교차 포인트에서 1~2초 버텨보세요.',
+  '체스트 프레스 머신':'등을 패드에 밀착하고 팔꿈치가 90° 이하로 내려가지 않게 하세요.',
+  '딥스':'상체를 앞으로 기울이면 가슴, 수직이면 팔 위주 자극이에요.',
+  '딥스(팔)':'몸을 수직으로 유지하면 삼두근에 집중돼요. 팔꿈치가 벌어지지 않게 주의하세요.',
+  '푸쉬업':'코어를 단단히 잡고 몸통이 일직선이 되도록 유지하세요.',
+  '펙 덱 플라이':'머신 패드가 가슴 중앙에서 닿도록 조절하세요. 수축 시 1~2초 멈추면 효과가 배가돼요.',
+  '데드리프트':'허리를 중립으로 유지하는 게 핵심이에요. 바벨을 몸에 최대한 가깝게 당겨올리세요.',
+  '루마니안 데드리프트':'햄스트링 스트레칭이 포인트예요. 무릎을 살짝 구부리고 엉덩이를 뒤로 밀며 내려가세요.',
+  '바벨 로우':'등을 45° 기울이고 배꼽 방향으로 당겨요. 견갑골을 모으는 느낌이 중요해요.',
+  '덤벨 로우':'팔꿈치를 뒤로 당기는 느낌으로 등 자극을 높이세요.',
+  '원암 로우 머신':'팔이 아닌 등으로 당기는 느낌에 집중하세요. 동작 끝에서 견갑골을 1초 모아주세요.',
+  '케이블 로우':'몸통을 고정하고 팔꿈치를 옆구리 방향으로 당겨요.',
+  'T바 로우':'가슴을 패드에 고정하고 광배근 수축을 의식하며 천천히 내려주세요.',
+  '풀업':'데드행에서 출발해 완전히 당겨올리세요. 천천히 내려오는 게 근육 발달에 더 좋아요.',
+  '친업':'언더그립으로 이두박근과 등을 함께 자극해요. 턱이 바 위로 올라오게 당기세요.',
+  '랫 풀다운':'어깨를 먼저 내리고 팔꿈치를 가슴 윗부분으로 당기는 느낌으로 진행하세요.',
+  '시티드 케이블 로우':'허리를 곧게 세우고 팔꿈치를 옆구리 쪽으로 당겨요.',
+  '스트레이트 암 풀다운':'팔꿈치를 고정한 채 광배근으로만 당기는 격리 운동이에요.',
+  '스쿼트':'발끝과 무릎이 같은 방향을 향하도록 해요. 무릎이 발끝보다 많이 앞으로 나오지 않게 주의하세요.',
+  '프론트 스쿼트':'바벨을 앞 어깨에 얹고 팔꿈치를 높게 유지하세요. 상체가 곧게 서야 해요.',
+  '레그프레스':'발 위치를 높이면 햄스트링, 낮추면 대퇴사두근 위주 자극이에요.',
+  '런지':'앞무릎이 발끝을 넘지 않도록 하고, 뒷무릎은 바닥에서 살짝 떠 있게 유지해요.',
+  '불가리안 스플릿 스쿼트':'앞발이 충분히 앞에 있어야 무릎 보호가 돼요.',
+  '힙 쓰러스트':'정점에서 엉덩이를 1초 수축해보세요. 골반을 완전히 펴는 게 핵심이에요.',
+  '레그컬':'발목이 아닌 햄스트링으로 당기는 느낌에 집중해요.',
+  '레그 익스텐션':'천천히 내려오는 게 중요해요. 무릎 상태에 따라 가동 범위를 조절하세요.',
+  '카프 레이즈':'발볼로 밀어올려 최대 수축하고, 내릴 때는 완전히 늘려주세요.',
+  '핵 스쿼트':'발 위치로 자극 부위를 조절하세요. 무게보다 자세에 집중하면 무릎 보호에 좋아요.',
+  '오버헤드프레스':'코어를 잡고 허리 반동을 줄이세요. 바를 귀 옆으로 수직 이동하는 느낌으로 올리세요.',
+  '덤벨 숄더프레스':'팔꿈치가 90° 이하로 내려오지 않게 해요.',
+  '머신 숄더프레스':'등을 패드에 밀착하고 천장 방향으로 밀어올리세요.',
+  '사이드 레터럴 레이즈':'새끼손가락이 먼저 올라가도록 살짝 회전해요. 반동을 최소화하세요.',
+  '프론트 레이즈':'어깨 높이까지만 올리세요.',
+  '리어 델트 플라이':'팔꿈치를 살짝 구부려 후면 삼각근을 집중 자극해요.',
+  '벤트 오버 레이즈':'상체를 45~90° 숙이고 양옆으로 올려요. 후면 삼각근·능형근 발달에 탁월해요.',
+  '페이스풀':'얼굴 쪽으로 당기며 팔꿈치를 높게 유지해요. 회전근개 강화에 매우 효과적이에요.',
+  '업라이트 로우':'팔꿈치를 손목보다 높게 유지하며 턱 아래까지 당겨요.',
+  '바벨 컬':'팔꿈치를 옆구리에 고정하고 이두근만 사용해요.',
+  '덤벨 컬':'정점에서 손목을 바깥으로 비틀면 이두근 수축이 강해져요.',
+  '해머 컬':'중립 그립으로 전완근과 상완근도 함께 자극해요.',
+  '인클라인 덤벨 컬':'벤치를 45° 기울여 이두박근 장두 발달에 특히 효과적이에요.',
+  '컨센트레이션 컬':'팔꿈치를 무릎에 대고 이두근만 완전히 집중해요.',
+  '케이블 컬':'케이블 장력이 일정해 이두근 전체 운동 범위에 걸쳐 자극이 유지돼요.',
+  '트라이셉 푸시다운':'완전히 펴는 동작에서 수축을 느껴보세요.',
+  '스컬크러셔':'바를 이마 쪽으로 내릴 때 팔꿈치가 벌어지지 않게 주의하세요.',
+  '오버헤드 트라이셉 익스텐션':'팔꿈치를 귀 옆에 고정해요. 삼두근 장두를 최대로 늘려 자극할 수 있어요.',
+  '트라이셉 킥백':'팔꿈치를 어깨 높이로 고정하고 완전히 펴는 동작이 핵심이에요.',
+  '클로즈 그립 벤치프레스':'손 간격을 어깨너비로 좁혀요. 팔꿈치가 너무 벌어지지 않게 하세요.',
+  '크런치':'허리를 바닥에 붙이고 복근으로만 상체를 들어올려요.',
+  '레그레이즈':'다리를 내릴 때 허리가 뜨지 않도록 복근으로 버텨요.',
+  '플랭크':'엉덩이가 너무 높거나 낮지 않게 일직선을 유지해요. 호흡을 멈추지 마세요.',
+  '케이블 크런치':'골반을 고정하고 복근으로만 구부려요.',
+  '싯업':'목보다 복근에 힘이 들어가는지 확인하세요.',
+  '바이시클 크런치':'천천히 할수록 복사근 자극이 강해져요.',
+  '러닝':'처음 5~10분은 워밍업 페이스로 시작하세요. 중족부 착지가 무릎에 유리해요.',
+  '사이클':'안장 높이는 페달 최저점에서 무릎이 살짝 구부러지는 정도가 적당해요.',
+  '로잉머신':'다리 → 몸통 → 팔 순서로 당기고, 팔 → 몸통 → 다리 순서로 돌아오세요.',
+  '스텝밀':'손잡이에 기대지 않아야 운동 효과가 높아요. 코어를 세우고 발 전체로 딛어 올라가세요.',
+  '줄넘기':'발목을 이용해 가볍게 튕기듯 뛰어요. 손목으로 줄을 돌리세요.',
+  '일립티컬':'핸들을 함께 당기고 밀면 상체도 함께 운동할 수 있어요.',
+  '버피':'점프 후 착지 시 무릎을 살짝 구부려 충격을 흡수하세요.',
+  /* 스미스머신 */
+  '스미스 벤치프레스':'바가 고정되어 안전하게 가슴 훈련을 할 수 있어요. 발을 바닥에 단단히 고정하고 견갑골을 모아 주세요.',
+  '스미스 인클라인 벤치프레스':'상부 가슴 강화에 좋아요. 30~45° 각도로 설정하고 팔꿈치가 너무 벌어지지 않도록 주의하세요.',
+  '스미스 데드리프트':'바가 고정 궤도를 따르므로 등 하부 집중이 쉬워요. 허리를 중립으로 유지하고 천천히 내려주세요.',
+  '스미스 로우':'상체를 45° 기울여 광배근으로 당기는 느낌에 집중해요. 반동 없이 수축하는 게 핵심이에요.',
+  '스미스 스쿼트':'바가 고정되어 하체 집중에 유리해요. 발을 약간 앞으로 내밀어 무릎 부담을 줄이세요.',
+  '스미스 런지':'바 무게로 균형 잡기 쉬워요. 앞무릎이 발끝을 넘지 않도록 보폭을 조절하세요.',
+  '스미스 힙 쓰러스트':'바를 골반에 올리고 어깨를 벤치에 고정해요. 정점에서 1초 수축하면 효과가 배가돼요.',
+  '스미스 카프 레이즈':'발볼을 받침대 끝에 올리고 최대 범위로 수축·이완해요. 천천히 내려오는 게 중요해요.',
+  '스미스 오버헤드프레스':'바 궤도가 고정되어 어깨 집중에 유리해요. 코어를 잡고 허리 반동을 줄이세요.',
+  '스미스 업라이트 로우':'팔꿈치를 손목보다 높게 유지하며 어깨 높이까지 당겨요.',
+  '스미스 클로즈 그립 벤치프레스':'그립을 좁혀 삼두근에 집중해요. 팔꿈치가 벌어지지 않게 주의하세요.',
+};
+
+function getMuscle(n){return MUSCLE_MAP[n]||'기타';}
+function isCardio(n){return CARDIO_SET.has(n);}
+function isBW(n){return BWNAME_SET.has(n);}
+
+function calcKcal(item){
+  if(item.cardioKcal!=null) return item.cardioKcal;
+  const db=CALORIE_DB[item.name]; const arr=item.sets||[];
+  let total=0;
+  arr.forEach(s=>{
+    const w=s.weight!=null?+s.weight:20, r=s.reps!=null?+s.reps:8;
+    if(!db){if(w&&r)total+=Math.round(r*w*.07);return;}
+    if(db.t==='w')  total+=Math.round(r*w*db.v);
+    if(db.t==='bw') total+=Math.round(r*db.v);
+    if(db.t==='c')  total+=Math.round(db.v*70*(r/60));
+  });
+  return total>0?total:null;
+}
+
+/* ── 이전 기록 비교 ── */
+function getPrevRecord(name){
+  const today=document.getElementById('record-date').value;
+  const keys=Object.keys(workouts).sort().reverse();
+  for(const k of keys){
+    if(k>=today) continue;
+    const f=workouts[k].find(p=>p.name===name&&p.done&&p.sets);
+    if(f) return {date:k,sets:f.sets};
+  }
+  return null;
+}
+function formatCmp(curSets,prev){
+  if(!prev) return null;
+  const maxC=Math.max(...curSets.map(s=>s.weight||0));
+  const maxP=Math.max(...prev.sets.map(s=>s.weight||0));
+  const repC=curSets.reduce((s,r)=>s+(r.reps||0),0);
+  const repP=prev.sets.reduce((s,r)=>s+(r.reps||0),0);
+  const d=new Date(prev.date+'T00:00:00');
+  const parts=[];
+  if(maxC>0&&maxP>0){const diff=maxC-maxP;if(diff>0)parts.push(`무게 +${diff}kg↑`);else if(diff<0)parts.push(`무게 ${diff}kg↓`);else parts.push('무게 동일');}
+  if(repC>0&&repP>0){const diff=repC-repP;if(diff>0)parts.push(`횟수 +${diff}↑`);else if(diff<0)parts.push(`횟수 ${diff}↓`);}
+  if(!parts.length) return null;
+  return {text:`vs ${d.getMonth()+1}/${d.getDate()} — ${parts.join(' · ')}`,up:parts.some(p=>p.includes('↑')),dn:parts.some(p=>p.includes('↓'))&&!parts.some(p=>p.includes('↑'))};
+}
+
+/* ══════════════════════════════════
+   STATE
+══════════════════════════════════ */
+let workouts=JSON.parse(localStorage.getItem('worksiba')||'{}');
+let plan=[], calYear, calMonth;
+let selMuscle=null, selEx=null;
+let setRows=[{weight:'',reps:''}];
+let editIdx=-1, modalSetRows=[];
+let confirmCb=null;
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+function init(){
+  const t=new Date(); calYear=t.getFullYear(); calMonth=t.getMonth();
+  document.getElementById('record-date').value=toDateStr(t);
+  updateDateDisplay(); renderMuscleChips(); renderCalendar(); updateStats();
+  document.addEventListener('touchstart',e=>{if(!e.target.closest('input,select,textarea,button'))blurAll();},{passive:true});
+  document.addEventListener('click',e=>{if(!e.target.closest('input,select,textarea,button'))blurAll();});
+}
+function blurAll(){document.activeElement&&document.activeElement.blur();}
+function toDateStr(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+
+function updateDateDisplay(){
+  const val=document.getElementById('record-date').value; if(!val)return;
+  const d=new Date(val+'T00:00:00'), W=['일','월','화','수','목','금','토'];
+  document.getElementById('date-big').textContent=`${d.getMonth()+1}월 ${d.getDate()}일`;
+  document.getElementById('date-sub').textContent=`${d.getFullYear()}년 ${W[d.getDay()]}요일`;
+  plan=workouts[val]?JSON.parse(JSON.stringify(workouts[val])):[];
+  renderPlanList(); resetForm();
+}
+
+function showView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  const tabs=['home','record','calendar','stats'];
+  const idx=tabs.indexOf(v);
+  if(idx>=0) document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  if(v==='calendar')renderCalendar();
+  if(v==='stats')updateStats();
+  if(v==='home')renderHome();
+}
+
+function renderHome(){
+  const QUOTES=[
+    ['시바도 운동해요 💪','오늘 하루도 최선을 다해보세요!\n작은 습관이 큰 변화를 만들어요.'],
+    ['쉬는 날도 성장해요 🌙','근육은 운동할 때가 아닌 쉴 때 자라요.\n오늘도 수고했어요!'],
+    ['꾸준함이 최고 🏆','매일 조금씩, 그게 최고의 루틴이에요.\n오늘도 시바와 함께 화이팅!'],
+    ['포기하지 마세요 🔥','힘든 날도 있어요. 그래도 나온 것만으로 대단해요!\n시바가 응원하고 있어요!'],
+    ['목표를 향해 🎯','오늘의 운동이 내일의 나를 만들어요.\n한 세트, 한 걸음씩!'],
+  ];
+  const q=QUOTES[new Date().getDay()%QUOTES.length];
+  const el=document.getElementById('home-quote');
+  const todayEl=document.getElementById('home-today');
+  if(el) el.innerHTML=`<strong style="color:var(--accent)">${q[0]}</strong><br><span style="color:var(--muted)">${q[1].replace(/\n/,'<br>')}</span>`;
+  if(todayEl){
+    const today=toDateStr(new Date());
+    const todayPlan=workouts[today];
+    if(todayPlan&&todayPlan.length){
+      const done=todayPlan.filter(p=>p.done).length;
+      todayEl.innerHTML=`오늘 <strong style="color:var(--accent)">${done}/${todayPlan.length}</strong>개 운동 완료`;
+    } else {
+      todayEl.textContent='오늘 아직 운동 기록이 없어요. 지금 시작해볼까요?';
+    }
+  }
+}
+
+/* ══════════════════════════════════
+   MUSCLE / EX SELECT
+══════════════════════════════════ */
+function renderMuscleChips(){
+  document.getElementById('muscle-chips').innerHTML=Object.keys(EXERCISE_DB).map(m=>{
+    const c=MC[m]||MC['기타'], sel=selMuscle===m;
+    return `<button class="muscle-chip${sel?' selected':''}"
+      style="${sel?`background:${c.bg};border-color:${c.bd};color:${c.tx}`:''}"
+      onclick="selectMuscle('${m}')">${m}</button>`;
+  }).join('');
+}
+function selectMuscle(m){
+  selMuscle=m; selEx=null;
+  document.getElementById('input-area').style.display='none';
+  document.getElementById('tip-box').style.display='none';
+  renderMuscleChips(); renderExButtons();
+}
+function renderExButtons(){
+  const el=document.getElementById('ex-buttons');
+  if(!selMuscle){el.innerHTML='<div class="ex-placeholder">부위를 먼저 선택해주세요</div>';return;}
+  const c=MC[selMuscle]||MC['기타'];
+  el.innerHTML=(EXERCISE_DB[selMuscle]||[]).map(name=>{
+    const sel=selEx===name;
+    return `<button class="ex-btn${sel?' selected':''}"
+      style="${sel?`border-color:${c.bd};color:${c.tx};background:${c.bg}`:''}"
+      onclick="selectEx('${name}')">${name}</button>`;
+  }).join('');
+}
+function selectEx(name){
+  selEx=name; renderExButtons(); showInputArea(name);
+  const tip=TIPS[name], box=document.getElementById('tip-box');
+  if(tip){document.getElementById('tip-text').textContent=tip;box.style.display='flex';}
+  else box.style.display='none';
+}
+
+/* ══════════════════════════════════
+   INPUT AREA
+══════════════════════════════════ */
+function showInputArea(name){
+  document.getElementById('input-area').style.display='block';
+  const c=isCardio(name), bw=isBW(name);
+  document.getElementById('weight-area').style.display=c?'none':'block';
+  document.getElementById('cardio-area').style.display=c?'block':'none';
+  if(!c){
+    const hdr=document.getElementById('set-col-heads');
+    if(bw){hdr.style.gridTemplateColumns='28px 1fr 28px';hdr.innerHTML='<div></div><div>횟수 (회)</div><div></div>';}
+    else{hdr.style.gridTemplateColumns='28px 1fr 1fr 28px';hdr.innerHTML='<div></div><div>무게 (kg)</div><div>횟수 (회)</div><div></div>';}
+    setRows=[{weight:'',reps:''}]; renderSetRows(bw);
+  } else {
+    document.getElementById('cardio-min').value='';
+    document.getElementById('cardio-kcal').value='';
+  }
+}
+function renderSetRows(bw){
+  if(bw===undefined)bw=isBW(selEx);
+  const cols=bw?'28px 1fr 28px':'28px 1fr 1fr 28px';
+  document.getElementById('set-rows-container').innerHTML=setRows.map((s,i)=>`
+    <div class="set-row" style="grid-template-columns:${cols}">
+      <div class="set-num">${i+1}</div>
+      ${bw?'':`<input type="number" inputmode="decimal" placeholder="kg" min="0" step="0.5" value="${s.weight}" oninput="setRows[${i}].weight=this.value">`}
+      <input type="number" inputmode="numeric" placeholder="회" min="1" value="${s.reps}" oninput="setRows[${i}].reps=this.value">
+      <button class="btn-del-set" onclick="removeSetRow(${i})" ${setRows.length===1?'disabled':''}>✕</button>
+    </div>`).join('');
+}
+function addSetRow(){
+  const last=setRows[setRows.length-1]; setRows.push({weight:last.weight,reps:last.reps});
+  const bw=isBW(selEx); renderSetRows(bw);
+  setTimeout(()=>{const els=document.querySelectorAll(`#set-rows-container input[inputmode="${bw?'numeric':'decimal'}"]`);if(els.length)els[els.length-1].focus();},60);
+}
+function removeSetRow(i){if(setRows.length<=1)return;setRows.splice(i,1);renderSetRows();}
+
+/* ══════════════════════════════════
+   ADD TO PLAN
+══════════════════════════════════ */
+function addPlanItem(){
+  if(!selEx){showToast('운동을 선택해주세요');return;}
+  if(isCardio(selEx)){
+    const min=document.getElementById('cardio-min').value;
+    const kcal=document.getElementById('cardio-kcal').value;
+    plan.push({name:selEx,cardioMin:min?+min:null,cardioKcal:kcal?+kcal:null,done:false});
+  } else {
+    const bw=isBW(selEx);
+    plan.push({name:selEx,done:false,sets:setRows.map((s,i)=>({setNum:i+1,weight:bw?null:(s.weight!==''?+s.weight:null),reps:s.reps!==''?+s.reps:null}))});
+  }
+  renderPlanList(); resetForm(); blurAll(); showToast(`✅ ${selEx} 추가!`);
+}
+function resetForm(){
+  selMuscle=null; selEx=null; setRows=[{weight:'',reps:''}];
+  document.getElementById('input-area').style.display='none';
+  document.getElementById('tip-box').style.display='none';
+  renderMuscleChips(); renderExButtons();
+}
+
+/* ══════════════════════════════════
+   PLAN LIST
+══════════════════════════════════ */
+function renderPlanList(){
+  const has=plan.length>0;
+  document.getElementById('plan-section').style.display=has?'block':'none';
+  document.getElementById('plan-empty').style.display=has?'none':'block';
+  if(!has)return;
+  const done=plan.filter(p=>p.done).length;
+  document.getElementById('done-count').textContent=done;
+  document.getElementById('total-count').textContent=plan.length;
+  document.getElementById('prog-bar').style.width=(plan.length?Math.round(done/plan.length*100):0)+'%';
+  const totalKcal=plan.filter(p=>p.done).reduce((s,p)=>s+(calcKcal(p)||0),0);
+  const kb=document.getElementById('kcal-bar');
+  if(totalKcal>0){kb.style.display='flex';document.getElementById('kcal-bar-val').textContent=totalKcal+' kcal';}
+  else kb.style.display='none';
+  const groups={};
+  plan.forEach((item,idx)=>{const m=getMuscle(item.name);if(!groups[m])groups[m]=[];groups[m].push({item,idx});});
+  const ORDER=['가슴','등','하체','어깨','팔','복근','유산소','기타'];
+  document.getElementById('plan-list').innerHTML=ORDER.filter(m=>groups[m]).map(m=>{
+    const c=MC[m]||MC['기타'];
+    return `<div class="plan-group">
+      <div class="plan-group-label" style="background:${c.bg};border:1px solid ${c.bd};color:${c.tx}">${m}</div>
+      ${groups[m].map(({item,idx})=>renderPlanItem(item,idx)).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderPlanItem(item,idx){
+  const c=MC[getMuscle(item.name)]||MC['기타'], kcal=calcKcal(item);
+  let detail='';
+  if(item.cardioMin!=null||item.cardioKcal!=null){
+    const p=[]; if(item.cardioMin)p.push(`⏱ ${item.cardioMin}분`); if(item.cardioKcal)p.push(`🔥 ${item.cardioKcal} kcal`);
+    detail=`<div style="font-size:.74rem;color:var(--muted);margin-top:3px">${p.join('  ')}</div>`;
+  } else if(item.sets){
+    const chips=item.sets.map(s=>{
+      const p=[]; if(s.weight!=null)p.push(s.weight+'kg'); if(s.reps!=null)p.push(s.reps+'회');
+      return `<div class="set-chip${item.done?' done-chip':''}"><span>${s.setNum}세트</span> ${p.join(' × ')||'기록없음'}</div>`;
+    }).join('');
+    detail=`<div class="plan-set-chips">${chips}</div>`;
+    if(kcal) detail+=`<div class="plan-kcal">🔥 약 ${kcal} kcal</div>`;
+    const prev=getPrevRecord(item.name), cmp=prev?formatCmp(item.sets,prev):null;
+    if(cmp){
+      const col=cmp.up?'var(--teal)':cmp.dn?'var(--red)':'var(--muted)';
+      detail+=`<div class="plan-cmp" style="color:${col}">📊 ${cmp.text}</div>`;
+    }
+  }
+  return `<div class="plan-item${item.done?' done':''}" onclick="toggleDone(${idx})">
+    <div class="check-circle">${item.done?'✓':''}</div>
+    <div class="plan-item-body">
+      <div class="plan-item-name">${item.name}</div>${detail}
+    </div>
+    <div class="plan-item-actions" onclick="event.stopPropagation()">
+      <button class="btn-ico" onclick="showPlanTip('${item.name.replace(/'/g,"\\'")}')">💡</button>
+      <button class="btn-ico" onclick="openEditModal(${idx})">✏️</button>
+      <button class="btn-ico del" onclick="deletePlanItem(${idx})">✕</button>
+    </div>
+  </div>`;
+}
+
+function toggleDone(idx){
+  plan[idx].done=!plan[idx].done; renderPlanList();
+  if(plan.length>0&&plan.every(p=>p.done)){
+    const totalKcal=plan.reduce((s,p)=>s+(calcKcal(p)||0),0);
+    showCongrats(totalKcal);
+  }
+}
+function deletePlanItem(idx){plan.splice(idx,1);renderPlanList();}
+
+/* ══════════════════════════════════
+   SAVE
+══════════════════════════════════ */
+function saveWorkout(){
+  const date=document.getElementById('record-date').value;
+  if(!plan.length){showToast('계획을 먼저 추가해주세요');return;}
+  workouts[date]=JSON.parse(JSON.stringify(plan));
+  localStorage.setItem('worksiba',JSON.stringify(workouts));
+  showToast(`💾 ${plan.length}개 운동 저장 완료!`);
+}
+
+/* ══════════════════════════════════
+   EDIT MODAL
+══════════════════════════════════ */
+function openEditModal(idx){
+  editIdx=idx; const item=plan[idx];
+  document.getElementById('modal-title').textContent='수정: '+item.name;
+  const body=document.getElementById('modal-body');
+  if(isCardio(item.name)){
+    body.innerHTML=`<div class="cardio-grid">
+      <div class="field"><label>시간 (분)</label><input class="cardio-input" type="number" id="m-min" inputmode="numeric" value="${item.cardioMin||''}" placeholder="30"></div>
+      <div class="field"><label>칼로리 (kcal)</label><input class="cardio-input" type="number" id="m-kcal" inputmode="numeric" value="${item.cardioKcal||''}" placeholder="300"></div>
+    </div>`;
+  } else {
+    const bw=isBW(item.name);
+    const cols=bw?'28px 1fr 28px':'28px 1fr 1fr 28px';
+    const hdr=bw?'<div></div><div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding-left:8px">횟수 (회)</div><div></div>'
+      :'<div></div><div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding-left:8px">무게 (kg)</div><div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding-left:8px">횟수 (회)</div><div></div>';
+    modalSetRows=(item.sets||[]).map(s=>({weight:s.weight??'',reps:s.reps??''}));
+    body.innerHTML=`<div style="display:grid;grid-template-columns:${cols};gap:7px;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--border)">${hdr}</div>
+      <div id="modal-set-rows"></div>
+      <button class="btn-add-set" style="margin-top:5px" onclick="addModalSetRow()">+ 세트 추가</button>`;
+    renderModalSetRows(bw);
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function renderModalSetRows(bw){
+  if(bw===undefined)bw=isBW(editIdx>=0?plan[editIdx]?.name:'');
+  const cols=bw?'28px 1fr 28px':'28px 1fr 1fr 28px';
+  const el=document.getElementById('modal-set-rows'); if(!el)return;
+  el.innerHTML=modalSetRows.map((s,i)=>`
+    <div class="set-row" style="grid-template-columns:${cols}">
+      <div class="set-num">${i+1}</div>
+      ${bw?'':`<input type="number" inputmode="decimal" placeholder="kg" min="0" step="0.5" value="${s.weight}" oninput="modalSetRows[${i}].weight=this.value">`}
+      <input type="number" inputmode="numeric" placeholder="회" min="1" value="${s.reps}" oninput="modalSetRows[${i}].reps=this.value">
+      <button class="btn-del-set" onclick="removeModalSetRow(${i})" ${modalSetRows.length===1?'disabled':''}>✕</button>
+    </div>`).join('');
+}
+function addModalSetRow(){const last=modalSetRows[modalSetRows.length-1];modalSetRows.push({weight:last.weight,reps:last.reps});renderModalSetRows();}
+function removeModalSetRow(i){if(modalSetRows.length<=1)return;modalSetRows.splice(i,1);renderModalSetRows();}
+function saveModal(){
+  const item=plan[editIdx];
+  if(isCardio(item.name)){
+    item.cardioMin=+document.getElementById('m-min').value||null;
+    item.cardioKcal=+document.getElementById('m-kcal').value||null;
+  } else {
+    item.sets=modalSetRows.map((s,i)=>({setNum:i+1,weight:s.weight!==''?+s.weight:null,reps:s.reps!==''?+s.reps:null}));
+  }
+  renderPlanList(); closeModal(); showToast('✅ 수정 완료!');
+}
+function onOverlayClick(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');document.body.style.overflow='';editIdx=-1;}
+
+/* ══════════════════════════════════
+   CONFIRM MODAL (삭제용 - confirm() 대체)
+══════════════════════════════════ */
+function openConfirm(msg, cb){
+  document.getElementById('confirm-msg').textContent=msg;
+  confirmCb=cb;
+  document.getElementById('btn-confirm-ok').onclick=()=>{closeConfirm();cb();};
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){document.getElementById('confirm-overlay').classList.remove('open');confirmCb=null;}
+
+/* ══════════════════════════════════
+   CALENDAR
+══════════════════════════════════ */
+/* 미니 시바 SVG 문자열 */
+const MINI_SIBA = `<svg class="cal-siba" viewBox="0 0 20 20" fill="none">
+  <ellipse cx="10" cy="9" rx="6" ry="5.5" fill="#d4741a"/>
+  <polygon points="4,5 6.5,1.5 8,6" fill="#c0620e"/>
+  <polygon points="16,5 13.5,1.5 12,6" fill="#c0620e"/>
+  <ellipse cx="10" cy="11" rx="4" ry="2.8" fill="#f2a256"/>
+  <ellipse cx="10" cy="10" rx="1.5" ry="1.1" fill="#1a0800"/>
+  <ellipse cx="7.5" cy="7.5" rx="1.2" ry="1.3" fill="#1a0800"/>
+  <ellipse cx="12.5" cy="7.5" rx="1.2" ry="1.3" fill="#1a0800"/>
+  <circle cx="8" cy="7.1" r=".4" fill="white"/>
+  <circle cx="13" cy="7.1" r=".4" fill="white"/>
+  <path d="M8.5 12.5 Q10 13.8 11.5 12.5" stroke="#1a0a00" stroke-width=".7" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+function renderCalendar(){
+  const M=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('cal-month').textContent=`${calYear}년 ${M[calMonth]}`;
+  const todayStr=toDateStr(new Date()), W=['일','월','화','수','목','금','토'];
+  let html=W.map(l=>`<div class="cal-day-label">${l}</div>`).join('');
+  const first=new Date(calYear,calMonth,1).getDay(), days=new Date(calYear,calMonth+1,0).getDate();
+  for(let i=0;i<first;i++) html+=`<div class="cal-day empty"></div>`;
+  for(let d=1;d<=days;d++){
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=ds===todayStr, has=!!workouts[ds];
+    html+=`<div class="cal-day${isToday?' today':''}${has?' has-workout':''}" onclick="selectCalDay('${ds}',this)">
+      ${d}${has?MINI_SIBA:''}
+    </div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+}
+
+function selectCalDay(ds,el){
+  document.querySelectorAll('.cal-day').forEach(d=>d.classList.remove('selected'));
+  el.classList.add('selected'); showDayHistory(ds);
+}
+
+function showDayHistory(ds){
+  const det=document.getElementById('history-detail'), data=workouts[ds];
+  const d=new Date(ds+'T00:00:00'), W=['일','월','화','수','목','금','토'];
+  const label=`${d.getMonth()+1}월 ${d.getDate()}일 (${W[d.getDay()]})`;
+
+  // 운동 안 한 날
+  if(!data||!data.length){
+    const isToday=ds===toDateStr(new Date());
+    const noMsgs=[
+      ['🛋️','오늘은 쉬었군요!','휴식도 성장의 일부예요.\n내일 더 강하게 돌아오세요! 💪'],
+      ['😴','이날은 휴식일이었네요','몸이 회복하는 날도 중요해요.\n꾸준함이 최고의 루틴이에요 🐾'],
+      ['🌙','운동 기록이 없어요','가끔은 쉬어가는 것도 필요하죠.\n시바도 가끔은 낮잠을 자요 😴'],
+    ];
+    const pick=noMsgs[Math.floor(Math.random()*noMsgs.length)];
+    det.innerHTML=`
+      <div class="history-header"><div class="history-title">${label}</div></div>
+      <div class="cal-no-workout">
+        <div class="cal-no-icon">${pick[0]}</div>
+        <div style="font-weight:700;font-size:.9rem;margin-bottom:6px">${isToday?'오늘은 아직 기록이 없어요':pick[1]}</div>
+        <div class="cal-no-msg">${isToday?'기록 탭에서 오늘의 운동을 계획해보세요! 🏋️':pick[2]}</div>
+      </div>`;
+    return;
+  }
+
+  const done=data.filter(p=>p.done), totalKcal=done.reduce((s,p)=>s+(calcKcal(p)||0),0);
+  const muscles=[...new Set(done.map(p=>getMuscle(p.name)))];
+  const muscleTags=muscles.map(m=>{const c=MC[m]||MC['기타'];return`<span class="muscle-tag-chip" style="background:${c.bg};border-color:${c.bd};color:${c.tx}">${m}</span>`;}).join('');
+  const feedbackMsg=buildFeedback(muscles,done.length,data.length,totalKcal);
+
+  det.innerHTML=`
+    <div class="history-header">
+      <div class="history-title">${label}</div>
+      <button class="btn-del-rec" onclick="deleteRecord('${ds}')">🗑 삭제</button>
+    </div>
+    <div style="font-size:.78rem;color:var(--muted);margin-bottom:10px">
+      계획 ${data.length}개 · 완료 ${done.length}개${totalKcal>0?' · 🔥 '+totalKcal+' kcal':''}
+    </div>
+    ${muscles.length?`<div class="cal-fb-muscles">${muscleTags}</div>`:''}
+    ${feedbackMsg?`<div class="cal-fb-msg">${feedbackMsg}</div>`:''}
+    <div style="margin-top:14px">
+    ${data.map((item,i)=>{
+      const m=getMuscle(item.name), c=MC[m]||MC['기타'], kcal=calcKcal(item);
+      let detail='';
+      if(item.cardioMin||item.cardioKcal){
+        const p=[]; if(item.cardioMin)p.push(`⏱ ${item.cardioMin}분`); if(item.cardioKcal)p.push(`🔥 ${item.cardioKcal} kcal`);
+        detail=`<div class="hist-detail">${p.join('  ')}</div>`;
+      } else if(item.sets){
+        const chips=item.sets.map(s=>{const p=[];if(s.weight!=null)p.push(s.weight+'kg');if(s.reps!=null)p.push(s.reps+'회');return`<div class="set-chip"><span>${s.setNum}세트</span> ${p.join(' × ')||'-'}</div>`;}).join('');
+        detail=`<div class="plan-set-chips" style="margin-top:5px">${chips}</div>${kcal?`<div style="font-size:.66rem;color:var(--red);margin-top:2px">🔥 ${kcal} kcal</div>`:''}`;
+      }
+      return `<div class="hist-item" style="border-left:3px solid ${item.done?c.tx:c.bd}">
+        <div style="display:flex;align-items:center;gap:9px">
+          <div style="font-size:1.3rem;font-family:'Bebas Neue',sans-serif;color:var(--border)">${String(i+1).padStart(2,'0')}</div>
+          <div style="flex:1">
+            <div class="hist-name" style="${item.done?'':'opacity:.45'}">${item.done?'✓ ':' '}${item.name}</div>
+            <span class="plan-muscle-badge" style="background:${c.bg};border-color:${c.bd};color:${c.tx}">${m}</span>
+          </div>
+          ${kcal&&!item.cardioKcal?`<div class="kcal-badge">🔥 ${kcal}</div>`:''}
+        </div>${detail}
+      </div>`;
+    }).join('')}
+    </div>
+    ${totalKcal>0?`<div class="kcal-bar" style="margin-top:14px"><span class="kcal-bar-label">🔥 완료 운동 소모 칼로리</span><span class="kcal-bar-val">${totalKcal} kcal</span></div>`:''}`;
+}
+
+/* ── 기록 삭제 (confirm() 없이 모달 사용) ── */
+function deleteRecord(ds){
+  const d=new Date(ds+'T00:00:00'), W=['일','월','화','수','목','금','토'];
+  const label=`${d.getMonth()+1}월 ${d.getDate()}일 (${W[d.getDay()]})`;
+  openConfirm(`${label}의 운동 기록을 삭제할까요?\n복구할 수 없어요.`, ()=>{
+    delete workouts[ds];
+    localStorage.setItem('worksiba',JSON.stringify(workouts));
+    renderCalendar();
+    document.getElementById('history-detail').innerHTML=
+      `<div class="history-title">${label}</div><div class="no-history">기록이 삭제됐어요 🗑</div>`;
+    showToast('🗑 기록이 삭제됐어요');
+  });
+}
+
+function changeMonth(dir){
+  calMonth+=dir;
+  if(calMonth<0){calMonth=11;calYear--;} if(calMonth>11){calMonth=0;calYear++;}
+  renderCalendar();
+  document.getElementById('history-detail').innerHTML='<div class="no-history">날짜를 선택하면 운동 기록을 볼 수 있어요</div>';
+}
+
+/* ══════════════════════════════════
+   STATS
+══════════════════════════════════ */
+function updateStats(){
+  const keys=Object.keys(workouts).sort().reverse();
+  document.getElementById('stat-total').textContent=keys.length;
+  const now=new Date(), ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('stat-this-month').textContent=keys.filter(k=>k.startsWith(ym)).length;
+  let streak=0; const today=new Date();
+  for(let i=0;i<365;i++){const d=new Date(today);d.setDate(today.getDate()-i);if(workouts[toDateStr(d)])streak++;else break;}
+  document.getElementById('stat-streak').textContent=streak;
+  let totalKcal=0; keys.forEach(k=>workouts[k].forEach(p=>{totalKcal+=calcKcal(p)||0;}));
+  document.getElementById('stat-total-kcal').textContent=totalKcal.toLocaleString();
+
+  const mCount={}, mNames={};
+  keys.filter(k=>k.startsWith(ym)).forEach(k=>{
+    workouts[k].filter(p=>p.done).forEach(p=>{
+      const m=getMuscle(p.name), n=Array.isArray(p.sets)?p.sets.length:1;
+      mCount[m]=(mCount[m]||0)+n; if(!mNames[m])mNames[m]=new Set(); mNames[m].add(p.name);
+    });
+  });
+  const chartEl=document.getElementById('muscle-chart');
+  if(!Object.keys(mCount).length){chartEl.innerHTML='<div class="muscle-empty">이번달 완료한 운동이 없어요</div>';}
+  else{
+    const max=Math.max(...Object.values(mCount));
+    chartEl.innerHTML=['가슴','등','하체','어깨','팔','복근','유산소','기타'].filter(m=>mCount[m]).map(m=>{
+      const c=MC[m]||MC['기타'], pct=Math.round((mCount[m]/max)*100);
+      const chips=[...(mNames[m]||[])].map(n=>`<span class="muscle-tag-chip" style="background:${c.bg};border-color:${c.bd};color:${c.tx}">${n}</span>`).join('');
+      return `<div class="muscle-row">
+        <div class="muscle-label" style="color:${c.tx}">${m}</div>
+        <div class="muscle-bar-wrap"><div class="muscle-bar" style="width:${pct}%;background:${c.tx}">${mCount[m]}세트</div></div>
+        <div class="muscle-count" style="color:${c.tx}">${mCount[m]}</div>
+      </div><div class="muscle-tags">${chips}</div>`;
+    }).join('');
+  }
+  const recentEl=document.getElementById('recent-list');
+  if(!keys.length){recentEl.innerHTML='<div class="no-history">아직 기록이 없어요</div>';return;}
+  const W=['일','월','화','수','목','금','토'];
+  recentEl.innerHTML=keys.slice(0,10).map(k=>{
+    const d=new Date(k+'T00:00:00');
+    const dayKcal=workouts[k].filter(p=>p.done).reduce((s,p)=>s+(calcKcal(p)||0),0);
+    const muscles=[...new Set(workouts[k].filter(p=>p.done).map(p=>getMuscle(p.name)))];
+    const doneN=workouts[k].filter(p=>p.done).length;
+    const tags=muscles.map(m=>{const c=MC[m]||MC['기타'];return`<span style="font-size:.62rem;padding:2px 7px;border-radius:10px;background:${c.bg};border:1px solid ${c.bd};color:${c.tx}">${m}</span>`;}).join('');
+    return `<div class="recent-item">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:.85rem;font-weight:500">${d.getMonth()+1}월 ${d.getDate()}일 (${W[d.getDay()]})</div>
+        <div style="text-align:right">
+          <div style="font-size:.78rem;font-weight:500">${doneN}/${workouts[k].length} 완료</div>
+          ${dayKcal>0?`<div style="font-size:.7rem;color:var(--red)">🔥 ${dayKcal} kcal</div>`:''}
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">${tags}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════
+   SPLASH
+══════════════════════════════════ */
+function hideSplash(){
+  const s=document.getElementById('splash');
+  s.classList.add('hide');
+  setTimeout(()=>{s.style.display='none';showView('home');},550);
+}
+
+/* ══════════════════════════════════
+   FEEDBACK BUILDER
+══════════════════════════════════ */
+function buildFeedback(muscles,doneN,totalN,kcal){
+  if(!muscles.length) return null;
+  const ratio=totalN>0?doneN/totalN:0;
+  const muscleStr=muscles.join(', ')+' 운동';
+  const kcalStr=kcal>0?` 🔥 ${kcal} kcal 소모!`:'';
+
+  const byMuscle={
+    '가슴':['탄탄한 가슴 근육을 키워가고 있어요!','벤치프레스의 왕이 되는 날이 올 거예요 💪'],
+    '등': ['넓은 등판이 완성되어 가고 있어요!','광배근이 날개처럼 펼쳐지고 있어요 🦅'],
+    '하체':['하체는 운동의 기초! 탄탄한 기반을 쌓고 있어요','하체를 단련하는 당신, 진짜 고수예요 🏋️'],
+    '어깨':['어깨가 넓어질수록 실루엣이 달라져요!','볼더숄더를 향해 나아가고 있어요 💪'],
+    '팔':  ['팔 근육이 조금씩 자라고 있어요!','슬리브를 찢을 날이 머지않았어요 💥'],
+    '복근':['코어가 강해질수록 모든 운동이 강해져요!','탄탄한 복근을 향한 여정 중이에요 🔥'],
+    '유산소':['심폐 지구력을 키워가고 있어요!','꾸준한 유산소가 건강의 기반이에요 🏃'],
+  };
+
+  let msg='';
+  if(muscles.length===1){
+    const lines=byMuscle[muscles[0]]||['훌륭한 운동이었어요!','꾸준히 이어나가세요 💪'];
+    msg=`${muscleStr}을 했군요! ${lines[Math.floor(Math.random()*lines.length)]}`;
+  } else if(muscles.length<=3){
+    msg=`${muscleStr}을 했군요! 다양한 부위를 고루 단련하는 균형 잡힌 루틴이에요 👍`;
+  } else {
+    msg=`${muscles.length}개 부위를 모두 단련했네요! 오늘 완전한 전신 운동을 해냈어요 🏆`;
+  }
+
+  if(ratio===1) msg+='<br><br>✅ 계획한 운동을 모두 완료했어요! 대단해요!';
+  else if(ratio>=0.5) msg+=`<br><br>👍 ${doneN}/${totalN}개 완료! 절반 이상 해냈어요.`;
+  else if(doneN>0) msg+=`<br><br>💡 ${doneN}/${totalN}개 완료. 다음엔 더 많이 도전해봐요!`;
+
+  if(kcalStr) msg+=`<br>${kcalStr}`;
+  return msg;
+}
+
+/* ══════════════════════════════════
+   PLAN TIP MODAL
+══════════════════════════════════ */
+function showPlanTip(name){
+  const tip=TIPS[name]||'이 운동에 대한 팁을 준비 중이에요 🐾';
+  document.getElementById('plan-tip-ex').textContent=name;
+  document.getElementById('plan-tip-text').textContent=tip;
+  document.getElementById('plan-tip-overlay').classList.add('open');
+}
+function closePlanTip(e){
+  if(!e||e.target===document.getElementById('plan-tip-overlay'))
+    document.getElementById('plan-tip-overlay').classList.remove('open');
+}
+
+/* ══════════════════════════════════
+   CONGRATS
+══════════════════════════════════ */
+const MSGS=[
+  ['오늘도 완벽!','계획한 모든 운동을 해냈어요.\n꾸준함이 최고의 루틴이에요! 🐕'],
+  ['최고야!','모든 세트를 해냈네요.\n시바도 감동했어요! 🏆'],
+  ['불태웠다!','오늘 운동 전부 완료!\n이 에너지 그대로 내일도 GO! 🔥'],
+  ['완전 정복!','몸이 한 단계 성장하고 있어요.\n수고 많았어요 🎉'],
+  ['목표 달성!','오늘의 목표 완벽 달성!\n내일의 나를 위한 선물이에요 💪'],
+];
+function showCongrats(kcal){
+  const p=MSGS[Math.floor(Math.random()*MSGS.length)];
+  document.getElementById('congrats-title').textContent=p[0];
+  const sub=p[1]+(kcal>0?`\n\n🔥 총 ${kcal} kcal 소모!`:'');
+  document.getElementById('congrats-sub').textContent=sub;
+  const overlay=document.getElementById('congrats-overlay');
+  overlay.classList.add('show');
+  // 버튼에 직접 이벤트 바인딩 (onclick 인라인 대신 JS로)
+  document.getElementById('congrats-close-btn').onclick=closeCongrats;
+  // 오버레이 배경 클릭도 닫기
+  overlay.onclick=function(e){ if(e.target===overlay) closeCongrats(); };
+}
+function closeCongrats(){
+  document.getElementById('congrats-overlay').classList.remove('show');
+}
+
+/* ══════════════════════════════════
+   TOAST
+══════════════════════════════════ */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('modal-overlay').classList.contains('open'))closeModal();
+    if(document.getElementById('confirm-overlay').classList.contains('open'))closeConfirm();
+    if(document.getElementById('congrats-overlay').classList.contains('show'))closeCongrats();
+    if(document.getElementById('plan-tip-overlay').classList.contains('open'))closePlanTip();
+  }
+});
+
+init();
+</script>
+</body>
+</html>
