@@ -410,13 +410,17 @@ input[type="date"]:focus{border-color:var(--accent);}
 .congrats-box{
   background:var(--surface);border:2px solid var(--accent);
   border-radius:22px;padding:36px 28px;text-align:center;
-  max-width:310px;width:90%;animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+  max-width:310px;width:90%;
   position:relative;overflow:hidden;
+  z-index:301;
 }
 .congrats-box::before{
   content:'';position:absolute;inset:0;
   background:radial-gradient(circle at 50% 0%, rgba(232,134,58,.15), transparent 70%);
+  pointer-events:none;
+  z-index:0;
 }
+.congrats-box>*{position:relative;z-index:1;}
 @keyframes popIn{from{transform:scale(.7);}to{transform:scale(1);}}
 .congrats-siba{margin:0 auto 12px;display:block;}
 .congrats-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;margin-bottom:8px;
@@ -440,6 +444,79 @@ input[type="date"]:focus{border-color:var(--accent);}
   .muscle-tags{padding-left:0;}
   .ex-buttons{grid-template-columns:repeat(auto-fill,minmax(105px,1fr));}
 }
+
+/* ─── 루틴 모달 ─── */
+.routine-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:280;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;}
+.routine-overlay.open{opacity:1;pointer-events:all;}
+.routine-box{background:var(--surface);border:1px solid var(--border);border-radius:18px 18px 0 0;width:100%;max-width:820px;padding:22px 20px 40px;transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);max-height:88vh;overflow-y:auto;}
+.routine-overlay.open .routine-box{transform:translateY(0);}
+.routine-box::before{content:'';display:block;width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
+.routine-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent2);margin-bottom:4px;}
+.routine-sub{font-size:.76rem;color:var(--muted);margin-bottom:16px;}
+.routine-name-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:var(--font-body);font-size:.96rem;outline:none;transition:border-color .2s;-webkit-appearance:none;margin-bottom:12px;}
+.routine-name-input:focus{border-color:var(--accent2);}
+.btn-routine-save{width:100%;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;cursor:pointer;margin-bottom:20px;}
+.routine-list-title{font-size:.68rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.routine-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;margin-bottom:8px;cursor:pointer;transition:all .18s;position:relative;}
+.routine-item:hover{border-color:var(--accent2);background:rgba(242,196,106,.06);}
+.routine-item-name{font-weight:700;font-size:.9rem;color:var(--accent2);margin-bottom:5px;}
+.routine-item-meta{font-size:.74rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
+.routine-item-tag{font-size:.62rem;padding:2px 7px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--muted);}
+.routine-item-actions{position:absolute;top:10px;right:10px;display:flex;gap:5px;}
+.btn-routine-del{background:transparent;border:1px solid rgba(255,76,59,.35);color:var(--red);width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:.7rem;display:flex;align-items:center;justify-content:center;}
+.btn-routine-del:hover{background:rgba(255,76,59,.12);}
+.routine-empty{text-align:center;padding:24px;color:var(--muted);font-size:.84rem;}
+.gender-row{display:flex;gap:8px;margin-bottom:12px;}
+.gender-btn{flex:1;padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:.84rem;cursor:pointer;transition:all .18s;font-weight:500;}
+.gender-btn.sel-m{border-color:#4ecdc4;background:rgba(78,205,196,.12);color:#4ecdc4;font-weight:700;}
+.gender-btn.sel-f{border-color:#f472b6;background:rgba(244,114,182,.12);color:#f472b6;font-weight:700;}
+
+/* ─── 운동 추천 모달 ─── */
+.recommend-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:260;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;}
+.recommend-overlay.open{opacity:1;pointer-events:all;}
+.recommend-box{background:var(--surface);border:1px solid var(--border);border-radius:18px 18px 0 0;width:100%;max-width:820px;padding:22px 20px 40px;transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);max-height:88vh;overflow-y:auto;}
+.recommend-overlay.open .recommend-box{transform:translateY(0);}
+.recommend-box::before{content:'';display:block;width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
+.rec-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);margin-bottom:4px;}
+.rec-sub{font-size:.76rem;color:var(--muted);margin-bottom:16px;}
+.rec-muscle-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+.rec-muscle-chip{padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:.8rem;cursor:pointer;transition:all .18s;font-weight:500;}
+.rec-muscle-chip.sel{font-weight:700;}
+.rec-result{margin-top:4px;}
+.rec-program{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;}
+.rec-program-header{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.rec-ex-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);}
+.rec-ex-row:last-child{border-bottom:none;}
+.rec-ex-name{font-size:.86rem;font-weight:500;}
+.rec-ex-detail{font-size:.74rem;color:var(--muted);}
+.rec-add-btn{background:var(--accent);color:#fff;border:none;padding:5px 12px;border-radius:7px;font-size:.74rem;font-family:var(--font-body);font-weight:700;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.rec-add-btn:hover{filter:brightness(1.1);}
+.rec-add-all{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:12px;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;cursor:pointer;margin-top:12px;}
+
+/* ─── 슈퍼세트 모달 ─── */
+.ss-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:270;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;}
+.ss-overlay.open{opacity:1;pointer-events:all;}
+.ss-box{background:var(--surface);border:1px solid var(--border);border-radius:18px 18px 0 0;width:100%;max-width:820px;padding:22px 20px 40px;transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);max-height:90vh;overflow-y:auto;}
+.ss-overlay.open .ss-box{transform:translateY(0);}
+.ss-box::before{content:'';display:block;width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
+.ss-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--teal);margin-bottom:4px;}
+.ss-sub{font-size:.76rem;color:var(--muted);margin-bottom:16px;}
+.ss-step{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;margin-top:14px;}
+.ss-ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:7px;margin-bottom:4px;}
+.ss-ex-btn{padding:8px 10px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--font-body);font-size:.8rem;cursor:pointer;transition:all .18s;text-align:left;}
+.ss-ex-btn:hover{border-color:var(--teal);}
+.ss-ex-btn.sel{border-color:var(--teal);background:rgba(78,205,196,.12);color:var(--teal);font-weight:700;}
+.ss-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.ss-pair-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.ss-pair-name{font-size:.8rem;font-weight:700;color:var(--teal);margin-bottom:8px;}
+.ss-set-row{display:grid;grid-template-columns:22px 1fr 1fr 22px;gap:5px;align-items:center;margin-bottom:5px;}
+.ss-set-row input{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-family:var(--font-body);font-size:.82rem;outline:none;-webkit-appearance:none;width:100%;}
+.ss-set-row input:focus{border-color:var(--teal);}
+.ss-add-set-btn{background:transparent;border:1px dashed rgba(78,205,196,.5);color:var(--teal);font-size:.72rem;padding:3px 8px;border-radius:5px;cursor:pointer;font-family:var(--font-body);}
+.btn-ss-submit{width:100%;background:linear-gradient(135deg,var(--teal),#38b2a8);color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;cursor:pointer;margin-top:14px;}
+/* 슈퍼세트 plan-item 스타일 */
+.plan-item.superset{border-left:3px solid var(--teal) !important;background:rgba(78,205,196,.04);}
+.ss-badge{display:inline-block;font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(78,205,196,.15);border:1px solid rgba(78,205,196,.4);color:var(--teal);margin-left:5px;vertical-align:middle;}
 
 /* ─── SPLASH ─── */
 #splash{
@@ -507,55 +584,74 @@ input[type="date"]:focus{border-color:var(--accent);}
 </head>
 <body>
 
+<!-- ══ SIBA SVG 심볼 정의 (한 곳에만 정의, 모든 곳에서 use로 참조) ══ -->
+<!-- viewBox="0 0 120 90":
+     시바 얼굴 중심 cx=60, cy=40
+     덤벨 바 Y=62 (주둥이 아랫경계와 일치)
+     원판 Y=52~76  -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="siba-logo" viewBox="0 0 120 90">
+    <!-- ①귀 (머리보다 먼저) -->
+    <path d="M24 50 Q14 18 32 15 Q41 13.5 42 36Z" fill="#b85a10"/>
+    <path d="M96 50 Q106 18 88 15 Q79 13.5 78 36Z" fill="#b85a10"/>
+    <path d="M26.5 48 Q18 22 33.5 19 Q41.5 17.5 42.5 35Z" fill="#e07828" opacity=".75"/>
+    <path d="M93.5 48 Q102 22 86.5 19 Q78.5 17.5 77.5 35Z" fill="#e07828" opacity=".75"/>
+    <!-- ②머리 (원형, 시바 특유의 둥근 머리) -->
+    <circle cx="60" cy="40" r="32" fill="#d4741a"/>
+    <!-- 이마 하이라이트 -->
+    <ellipse cx="60" cy="28" rx="20" ry="10" fill="#e8823a" opacity=".45"/>
+    <!-- ③주둥이 (크림색, 입 위치 = Y중심55, 아래끝Y≈65) -->
+    <ellipse cx="60" cy="54" rx="20" ry="14" fill="#f5c896"/>
+    <!-- ④눈 (검정 → 홍채 → 반짝이 순) -->
+    <circle cx="44" cy="38" r="9" fill="#0d0600"/>
+    <circle cx="76" cy="38" r="9" fill="#0d0600"/>
+    <!-- 홍채 갈색 -->
+    <circle cx="44" cy="38" r="6" fill="#2a0e00"/>
+    <circle cx="76" cy="38" r="6" fill="#2a0e00"/>
+    <!-- 눈동자 -->
+    <circle cx="44" cy="38" r="3.5" fill="#0d0600"/>
+    <circle cx="76" cy="38" r="3.5" fill="#0d0600"/>
+    <!-- 반짝이 (크게 + 작게) -->
+    <circle cx="46.5" cy="35.5" r="2.5" fill="white"/>
+    <circle cx="78.5" cy="35.5" r="2.5" fill="white"/>
+    <circle cx="49"   cy="40"   r="1"   fill="white" opacity=".55"/>
+    <circle cx="81"   cy="40"   r="1"   fill="white" opacity=".55"/>
+    <!-- ⑤시바 특유의 눈썹 반점 (황금색 타원) -->
+    <ellipse cx="44" cy="28" rx="6.5" ry="3" fill="#f2c46a" opacity=".9"/>
+    <ellipse cx="76" cy="28" rx="6.5" ry="3" fill="#f2c46a" opacity=".9"/>
+    <!-- ⑥코 -->
+    <ellipse cx="60" cy="48" rx="8" ry="5.5" fill="#0d0600"/>
+    <!-- 콧구멍 하이라이트 -->
+    <ellipse cx="57" cy="47" rx="2.8" ry="2" fill="#2a0e00" opacity=".7"/>
+    <!-- ⑦볼 홍조 -->
+    <circle cx="36" cy="56" r="9" fill="#ff8866" opacity=".2"/>
+    <circle cx="84" cy="56" r="9" fill="#ff8866" opacity=".2"/>
+    <!-- ⑧덤벨 바 (Y=62, 주둥이 아래경계와 딱 일치) -->
+    <rect x="2"  y="60" width="116" height="8" rx="4" fill="#f2c46a"/>
+    <!-- 왼쪽 원판 외곽 -->
+    <rect x="0"   y="50" width="12" height="28" rx="4" fill="#d4920a"/>
+    <!-- 왼쪽 원판 내부 (밝음) -->
+    <rect x="2"   y="54" width="8"  height="20" rx="2.5" fill="#f2c46a"/>
+    <!-- 오른쪽 원판 외곽 -->
+    <rect x="108" y="50" width="12" height="28" rx="4" fill="#d4920a"/>
+    <!-- 오른쪽 원판 내부 -->
+    <rect x="110" y="54" width="8"  height="20" rx="2.5" fill="#f2c46a"/>
+    <!-- ⑨이빨 4개 (바 바로 위에 딱 걸침, Y=58~63) -->
+    <rect x="40" y="58.5" width="8" height="6" rx="2.5" fill="white" opacity=".97"/>
+    <rect x="51" y="58.5" width="8" height="6" rx="2.5" fill="white" opacity=".97"/>
+    <rect x="62" y="58.5" width="8" height="6" rx="2.5" fill="white" opacity=".97"/>
+    <rect x="73" y="58.5" width="8" height="6" rx="2.5" fill="white" opacity=".97"/>
+  </symbol>
+</svg>
+
 <!-- ══════ SPLASH ══════ -->
 <div id="splash" onclick="hideSplash()">
-  <svg class="splash-logo" width="180" height="180" viewBox="0 0 180 165" fill="none">
-    <!-- 귀 -->
-    <path d="M32 64 Q20 22 44 19 Q56 17 59 50Z" fill="#b85a10"/>
-    <path d="M148 64 Q160 22 136 19 Q124 17 121 50Z" fill="#b85a10"/>
-    <path d="M35 62 Q25 28 46 25 Q56.5 23 58.5 49Z" fill="#e8743a" opacity=".62"/>
-    <path d="M145 62 Q155 28 134 25 Q123.5 23 121.5 49Z" fill="#e8743a" opacity=".62"/>
-    <!-- 머리 -->
-    <ellipse cx="90" cy="72" rx="52" ry="48" fill="#d4741a"/>
-    <!-- 주둥이 (아래끝 Y≈105) -->
-    <ellipse cx="90" cy="91" rx="33" ry="22" fill="#f5c896"/>
-    <!-- 눈 -->
-    <circle cx="65"  cy="66" r="13" fill="#1a0800"/>
-    <circle cx="115" cy="66" r="13" fill="#1a0800"/>
-    <circle cx="68.5" cy="62" r="5.5" fill="white"/>
-    <circle cx="118.5" cy="62" r="5.5" fill="white"/>
-    <circle cx="71" cy="65" r="2.5" fill="white" opacity=".5"/>
-    <circle cx="121" cy="65" r="2.5" fill="white" opacity=".5"/>
-    <!-- 눈썹 -->
-    <path d="M50 52 Q65 45 80 50"  stroke="#b85a10" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <path d="M100 50 Q115 45 130 52" stroke="#b85a10" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <!-- 코 -->
-    <ellipse cx="90" cy="82" rx="11" ry="7.5" fill="#1a0800"/>
-    <ellipse cx="86" cy="80" rx="3.5" ry="2.5" fill="#3d1a00" opacity=".6"/>
-    <!-- 볼 홍조 -->
-    <circle cx="50"  cy="92" r="13" fill="#ff8866" opacity=".2"/>
-    <circle cx="130" cy="92" r="13" fill="#ff8866" opacity=".2"/>
-    <!-- 입 (Y=91~100) — 덤벨 바가 이 Y에 맞춰짐 -->
-    <path d="M90 91 L90 98" stroke="#b05020" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M73 100 Q90 110 107 100" stroke="#b05020" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <!-- 덤벨 바 — Y=93 (입과 정확히 겹침) -->
-    <rect x="5" y="90" width="170" height="9" rx="4.5" fill="#f2c46a"/>
-    <!-- 왼쪽 원판 -->
-    <rect x="2"  y="78" width="20" height="33" rx="6" fill="#e8a830"/>
-    <rect x="6"  y="83" width="12" height="23" rx="4" fill="#f2c46a"/>
-    <!-- 오른쪽 원판 -->
-    <rect x="158" y="78" width="20" height="33" rx="6" fill="#e8a830"/>
-    <rect x="162" y="83" width="12" height="23" rx="4" fill="#f2c46a"/>
-    <!-- 이빨 (바 위에 딱 걸쳐 있음) -->
-    <rect x="68" y="89" width="9" height="7" rx="3" fill="white" opacity=".95"/>
-    <rect x="80" y="89" width="9" height="7" rx="3" fill="white" opacity=".95"/>
-    <rect x="92" y="89" width="9" height="7" rx="3" fill="white" opacity=".95"/>
-    <rect x="104" y="89" width="9" height="7" rx="3" fill="white" opacity=".95"/>
+  <svg class="splash-logo" width="220" height="220" viewBox="0 0 120 90">
+    <use href="#siba-logo" x="0" y="0" width="120" height="90"/>
     <!-- 반짝이 -->
-    <text x="8"   y="40" font-size="16" fill="#f2c46a" opacity=".9">✦</text>
-    <text x="150" y="38" font-size="16" fill="#f2c46a" opacity=".9">✦</text>
-    <text x="78"  y="16" font-size="13" fill="#e8863a" opacity=".85">★</text>
-    <text x="148" y="150" font-size="11" fill="#f2c46a" opacity=".7">✦</text>
+    <text x="2"  y="14" font-size="7" fill="#f2c46a" opacity=".9">✦</text>
+    <text x="110" y="13" font-size="7" fill="#f2c46a" opacity=".9">✦</text>
+    <text x="54"  y="5"  font-size="5" fill="#e8863a" opacity=".85">★</text>
   </svg>
   <div class="splash-name">Work out of SIBA</div>
   <div class="splash-sub">WORKOUT WITH SHIBA</div>
@@ -565,45 +661,9 @@ input[type="date"]:focus{border-color:var(--accent);}
 <!-- ══════ HEADER ══════ -->
 <header>
   <div class="logo" onclick="showView('home')">
-    <!-- 시바견 얼굴 정면 + 덤벨이 입에 정확히 -->
-    <svg class="logo-mark" viewBox="0 0 56 52" fill="none">
-      <!-- 귀 -->
-      <path d="M10 21 Q6 7 16 6 Q21 5 22 17Z" fill="#b85a10"/>
-      <path d="M46 21 Q50 7 40 6 Q35 5 34 17Z" fill="#b85a10"/>
-      <path d="M11.5 20 Q8.5 9.5 17.5 8.5 Q21.5 8 22.5 16.5Z" fill="#e8743a" opacity=".6"/>
-      <path d="M44.5 20 Q47.5 9.5 38.5 8.5 Q34.5 8 33.5 16.5Z" fill="#e8743a" opacity=".6"/>
-      <!-- 머리 -->
-      <ellipse cx="28" cy="23" rx="17" ry="15.5" fill="#d4741a"/>
-      <!-- 주둥이 (아래 끝 Y≈35) -->
-      <ellipse cx="28" cy="30" rx="11" ry="7.5" fill="#f5c896"/>
-      <!-- 눈 -->
-      <circle cx="20" cy="21" r="4.5" fill="#1a0800"/>
-      <circle cx="36" cy="21" r="4.5" fill="#1a0800"/>
-      <circle cx="21.3" cy="19.5" r="1.7" fill="white"/>
-      <circle cx="37.3" cy="19.5" r="1.7" fill="white"/>
-      <!-- 눈썹 -->
-      <path d="M14 16 Q20 13 26 16" stroke="#b85a10" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      <path d="M30 16 Q36 13 42 16" stroke="#b85a10" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      <!-- 코 -->
-      <ellipse cx="28" cy="26" rx="4" ry="2.8" fill="#1a0800"/>
-      <!-- 입 (Y=30~33) -->
-      <path d="M28 30 L28 33" stroke="#b05020" stroke-width="1.2" stroke-linecap="round"/>
-      <path d="M21 34.5 Q28 38.5 35 34.5" stroke="#b05020" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      <!-- 볼 홍조 -->
-      <circle cx="14" cy="28" r="4" fill="#ff8866" opacity=".2"/>
-      <circle cx="42" cy="28" r="4" fill="#ff8866" opacity=".2"/>
-      <!-- 덤벨 바 — Y=33 (입 선과 일치) -->
-      <rect x="3" y="31.5" width="50" height="4" rx="2" fill="#f2c46a"/>
-      <!-- 왼쪽 원판 -->
-      <rect x="0"   y="26" width="7"  height="14" rx="2.5" fill="#e8a830"/>
-      <rect x="1.5" y="28" width="4"  height="10" rx="1.5" fill="#f2c46a"/>
-      <!-- 오른쪽 원판 -->
-      <rect x="49"  y="26" width="7"  height="14" rx="2.5" fill="#e8a830"/>
-      <rect x="50.5" y="28" width="4" height="10" rx="1.5" fill="#f2c46a"/>
-      <!-- 이빨 (바 위에 딱 걸쳐 있는 표현) -->
-      <rect x="19.5" y="30.5" width="5" height="3.5" rx="1.5" fill="white" opacity=".95"/>
-      <rect x="26"   y="30.5" width="5" height="3.5" rx="1.5" fill="white" opacity=".95"/>
-      <rect x="32.5" y="30.5" width="5" height="3.5" rx="1.5" fill="white" opacity=".95"/>
+    <!-- 헤더 로고: 심볼 재사용 -->
+    <svg class="logo-mark" viewBox="0 0 120 90">
+      <use href="#siba-logo" x="0" y="0" width="120" height="90"/>
     </svg>
     <div class="logo-text">
       <span class="logo-sub">workout</span>
@@ -620,93 +680,62 @@ input[type="date"]:focus{border-color:var(--accent);}
 
 <!-- ══════ HOME VIEW ══════ -->
 <div class="view" id="view-home">
-  <div style="text-align:center;padding:30px 0 20px">
-    <!-- 운동하는 시바견 큰 일러스트 -->
-    <svg width="200" height="220" viewBox="0 0 200 220" fill="none" style="margin:0 auto;display:block">
-      <!-- 바벨 (시바가 들고 있음) -->
-      <rect x="20" y="95" width="160" height="10" rx="5" fill="#f2c46a"/>
-      <rect x="8"  y="82" width="18" height="36" rx="5" fill="#e8a830"/>
-      <rect x="12" y="87" width="10" height="26" rx="3" fill="#f2c46a"/>
-      <rect x="174" y="82" width="18" height="36" rx="5" fill="#e8a830"/>
-      <rect x="178" y="87" width="10" height="26" rx="3" fill="#f2c46a"/>
-      <!-- 팔/앞발 (바벨 들고 있는 자세) -->
-      <path d="M55 130 Q45 115 40 100" stroke="#c0620e" stroke-width="14" fill="none" stroke-linecap="round"/>
-      <path d="M145 130 Q155 115 160 100" stroke="#c0620e" stroke-width="14" fill="none" stroke-linecap="round"/>
-      <path d="M55 130 Q45 115 40 100" stroke="#d4741a" stroke-width="8" fill="none" stroke-linecap="round"/>
-      <path d="M145 130 Q155 115 160 100" stroke="#d4741a" stroke-width="8" fill="none" stroke-linecap="round"/>
-      <!-- 발바닥 -->
-      <ellipse cx="38" cy="101" rx="9" ry="6" fill="#c0620e"/>
-      <ellipse cx="162" cy="101" rx="9" ry="6" fill="#c0620e"/>
-      <!-- 몸통 -->
-      <ellipse cx="100" cy="158" rx="38" ry="28" fill="#d4741a"/>
-      <!-- 뒷발 -->
-      <ellipse cx="68"  cy="185" rx="14" ry="9" fill="#c0620e"/>
-      <ellipse cx="132" cy="185" rx="14" ry="9" fill="#c0620e"/>
-      <ellipse cx="68"  cy="190" rx="12" ry="6" fill="#b85a10"/>
-      <ellipse cx="132" cy="190" rx="12" ry="6" fill="#b85a10"/>
-      <!-- 꼬리 (위로 말린) -->
-      <path d="M135 148 Q160 134 156 112 Q152 96 140 100" stroke="#c0620e" stroke-width="12" fill="none" stroke-linecap="round"/>
-      <path d="M135 148 Q160 134 156 112 Q152 96 140 100" stroke="#e8743a" stroke-width="6" fill="none" stroke-linecap="round"/>
-      <!-- 귀 -->
-      <path d="M58 80 Q46 48 62 46 Q70 44 74 68 Z" fill="#b85a10"/>
-      <path d="M142 80 Q154 48 138 46 Q130 44 126 68 Z" fill="#b85a10"/>
-      <path d="M60 78 Q50 52 64 50 Q71 48 73 66 Z" fill="#e8743a" opacity=".65"/>
-      <path d="M140 78 Q150 52 136 50 Q129 48 127 66 Z" fill="#e8743a" opacity=".65"/>
-      <!-- 머리 -->
-      <ellipse cx="100" cy="104" rx="48" ry="44" fill="#d4741a"/>
-      <!-- 주둥이 -->
-      <ellipse cx="100" cy="118" rx="30" ry="20" fill="#f5c896"/>
-      <!-- 눈 (힘 줄 때 눈) -->
-      <ellipse cx="77"  cy="98" rx="12" ry="12" fill="#1a0800"/>
-      <ellipse cx="123" cy="98" rx="12" ry="12" fill="#1a0800"/>
-      <circle cx="80"  cy="95" r="4.5" fill="white"/>
-      <circle cx="126" cy="95" r="4.5" fill="white"/>
-      <circle cx="83"  cy="98" r="2" fill="white" opacity=".5"/>
-      <circle cx="129" cy="98" r="2" fill="white" opacity=".5"/>
-      <!-- 눈썹 찡그림 -->
-      <path d="M65 86 Q77 80 90 85"  stroke="#b85a10" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-      <path d="M110 85 Q123 80 135 86" stroke="#b85a10" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-      <!-- 코 -->
-      <ellipse cx="100" cy="110" rx="11" ry="8" fill="#1a0800"/>
-      <ellipse cx="96"  cy="108" rx="3.5" ry="2.5" fill="#3d1a00" opacity=".6"/>
-      <!-- 입 (힘줄 때 꽉 문 입) -->
-      <path d="M100 118 L100 124" stroke="#c05820" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M82 126 Q100 134 118 126" stroke="#c05820" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <!-- 볼 홍조 -->
-      <circle cx="62"  cy="114" r="12" fill="#ff8866" opacity=".2"/>
-      <circle cx="138" cy="114" r="12" fill="#ff8866" opacity=".2"/>
-      <!-- 땀방울 (운동 중) -->
-      <path d="M152 68 Q156 60 160 68 Q160 74 156 73 Q152 74 152 68Z" fill="#4ecdc4" opacity=".8"/>
-      <path d="M40  72 Q44 64 48 72 Q48 78 44 77 Q40 78 40 72Z"  fill="#4ecdc4" opacity=".8"/>
-      <!-- 근육 불끈 표현 -->
-      <ellipse cx="46" cy="118" rx="8" ry="6" fill="#c0620e" opacity=".6"/>
-      <ellipse cx="154" cy="118" rx="8" ry="6" fill="#c0620e" opacity=".6"/>
-      <!-- 힘 반짝이 -->
-      <text x="155" y="58" font-size="18" fill="#f2c46a" opacity=".9">✦</text>
-      <text x="24"  y="55" font-size="14" fill="#e8863a" opacity=".85">★</text>
-      <text x="168" y="170" font-size="12" fill="#f2c46a" opacity=".7">✦</text>
+  <!-- 홈 상단: 로고 크게 + 앱 이름 -->
+  <div style="text-align:center;padding:20px 0 14px">
+    <svg width="180" height="135" viewBox="0 0 120 90" style="display:block;margin:0 auto">
+      <use href="#siba-logo" x="0" y="0" width="120" height="90"/>
+      <text x="2"  y="14" font-size="7" fill="#f2c46a" opacity=".85">✦</text>
+      <text x="110" y="13" font-size="7" fill="#f2c46a" opacity=".85">✦</text>
+      <text x="54"  y="5"  font-size="5" fill="#e8863a" opacity=".8">★</text>
     </svg>
-
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.1em;margin-top:16px;
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.1em;margin-top:8px;
       background:linear-gradient(90deg,var(--accent),var(--accent2));
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
       Work out of SIBA
     </div>
-    <div style="font-size:.82rem;color:var(--muted);margin-top:6px;letter-spacing:.12em;">WORKOUT WITH SHIBA 🐕</div>
+    <div style="font-size:.74rem;color:var(--muted);margin-top:3px;letter-spacing:.14em;">WORKOUT WITH SHIBA</div>
   </div>
 
-  <div class="card" style="text-align:center">
-    <div class="card-title" style="justify-content:center">오늘의 동기부여</div>
-    <div id="home-quote" style="font-size:.9rem;color:var(--text);line-height:1.75;padding:4px 0 8px"></div>
-    <div id="home-today" style="font-size:.78rem;color:var(--muted);margin-top:8px"></div>
+  <!-- 신체 정보 카드 -->
+  <div class="card">
+    <div class="card-title">내 신체 정보</div>
+    <div class="field" style="margin-bottom:10px">
+      <label>성별</label>
+      <div class="gender-row" style="margin-top:6px">
+        <button class="gender-btn" id="btn-male"   onclick="setGender('m')">♂ 남성</button>
+        <button class="gender-btn" id="btn-female" onclick="setGender('f')">♀ 여성</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div class="field">
+        <label>키 (cm)</label>
+        <input type="number" id="user-height" inputmode="decimal" placeholder="170" min="100" max="250"
+          style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:9px;font-family:var(--font-body);font-size:.92rem;outline:none;width:100%;-webkit-appearance:none;transition:border-color .2s;"
+          oninput="saveUserProfile()" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+      <div class="field">
+        <label>몸무게 (kg)</label>
+        <input type="number" id="user-weight" inputmode="decimal" placeholder="70" min="30" max="250" step="0.1"
+          style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:9px;font-family:var(--font-body);font-size:.92rem;outline:none;width:100%;-webkit-appearance:none;transition:border-color .2s;"
+          oninput="saveUserProfile()" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+    </div>
+    <div id="bmi-display" style="display:none;padding:10px 14px;background:rgba(232,134,58,.07);border:1px solid rgba(232,134,58,.2);border-radius:9px;font-size:.82rem;line-height:1.65"></div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-    <button class="btn-plan" style="margin:0" onclick="showView('record')">📋 오늘 운동 기록</button>
-    <button class="btn-plan" style="margin:0;background:linear-gradient(135deg,var(--teal),#38b2a8)" onclick="showView('calendar')">📅 달력 보기</button>
+  <!-- 오늘의 동기부여 -->
+  <div class="card">
+    <div class="card-title">오늘의 동기부여</div>
+    <div id="home-quote" style="font-size:.86rem;color:var(--text);line-height:1.82;padding:2px 0 6px"></div>
+    <div id="home-today" style="font-size:.76rem;color:var(--muted);margin-top:6px;padding-top:8px;border-top:1px solid var(--border)"></div>
+  </div>
+
+  <!-- 빠른 이동 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px">
+    <button class="btn-plan" style="margin:0;font-size:1rem" onclick="showView('record')">📋 운동 기록</button>
+    <button class="btn-plan" style="margin:0;font-size:1rem;background:linear-gradient(135deg,var(--teal),#38b2a8)" onclick="showView('calendar')">📅 달력 보기</button>
   </div>
 </div>
-
 <!-- ══════ RECORD VIEW ══════ -->
 <div class="view" id="view-record">
   <div class="date-row">
@@ -719,6 +748,18 @@ input[type="date"]:focus{border-color:var(--accent);}
 
   <div class="card">
     <div class="card-title">운동 계획 추가</div>
+    <!-- 빠른 기능 버튼 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px">
+      <button onclick="openRecommend()" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 4px;border-radius:9px;border:1.5px solid rgba(232,134,58,.5);background:rgba(232,134,58,.07);color:var(--accent);font-family:var(--font-body);font-size:.78rem;font-weight:700;cursor:pointer;">
+        ⚡ 운동 추천
+      </button>
+      <button onclick="openSuperset()" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 4px;border-radius:9px;border:1.5px solid rgba(78,205,196,.5);background:rgba(78,205,196,.07);color:var(--teal);font-family:var(--font-body);font-size:.78rem;font-weight:700;cursor:pointer;">
+        🔗 슈퍼세트
+      </button>
+      <button onclick="openRoutine()" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 4px;border-radius:9px;border:1.5px solid rgba(242,196,106,.5);background:rgba(242,196,106,.07);color:var(--accent2);font-family:var(--font-body);font-size:.78rem;font-weight:700;cursor:pointer;">
+        📁 루틴
+      </button>
+    </div>
     <div class="step-label"><span class="step-num">1</span>부위 선택</div>
     <div class="muscle-chips" id="muscle-chips"></div>
     <div class="step-label"><span class="step-num">2</span>운동 선택</div>
@@ -765,35 +806,15 @@ input[type="date"]:focus{border-color:var(--accent);}
       <span class="kcal-bar-val" id="kcal-bar-val">0 kcal</span>
     </div>
     <div id="plan-list"></div>
-    <button class="btn-save-all" onclick="saveWorkout()">💾 오늘 운동 저장</button>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px">
+      <button class="btn-save-all" style="margin:0" onclick="saveWorkout()">💾 오늘 운동 저장</button>
+      <button onclick="openSaveRoutine()" style="padding:14px 16px;border-radius:var(--radius);border:1.5px solid rgba(242,196,106,.5);background:rgba(242,196,106,.07);color:var(--accent2);font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.06em;cursor:pointer;white-space:nowrap;">📁 루틴 저장</button>
+    </div>
   </div>
+  <!-- empty-state — 심볼 재사용으로 완전 동기화 -->
   <div id="plan-empty" class="empty-state">
-    <svg width="64" height="64" viewBox="0 0 48 48" fill="none" style="margin:0 auto 12px;display:block;opacity:.7">
-      <path d="M11 18 Q8 6 16 5 Q20 4 21 14 Z" fill="#b85a10"/>
-      <path d="M37 18 Q40 6 32 5 Q28 4 27 14 Z" fill="#b85a10"/>
-      <path d="M12.5 17 Q10 8 17 7 Q20.5 6.5 21.5 14 Z" fill="#e8743a" opacity=".65"/>
-      <path d="M35.5 17 Q38 8 31 7 Q27.5 6.5 26.5 14 Z" fill="#e8743a" opacity=".65"/>
-      <ellipse cx="24" cy="22" rx="15" ry="14" fill="#d4741a"/>
-      <ellipse cx="24" cy="27" rx="9.5" ry="7" fill="#f5c896"/>
-      <circle cx="17.5" cy="20" r="3.8" fill="#1a0800"/>
-      <circle cx="30.5" cy="20" r="3.8" fill="#1a0800"/>
-      <circle cx="18.8" cy="18.8" r="1.4" fill="white"/>
-      <circle cx="31.8" cy="18.8" r="1.4" fill="white"/>
-      <path d="M13 16 Q17.5 13.5 22 16" stroke="#b85a10" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-      <path d="M26 16 Q30.5 13.5 35 16" stroke="#b85a10" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-      <ellipse cx="24" cy="24.5" rx="3.5" ry="2.5" fill="#1a0800"/>
-      <path d="M24 27 L24 29.5" stroke="#c05820" stroke-width="1" stroke-linecap="round"/>
-      <path d="M18 30 Q24 33 30 30" stroke="#c05820" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-      <circle cx="13" cy="26" r="3.5" fill="#ff8866" opacity=".22"/>
-      <circle cx="35" cy="26" r="3.5" fill="#ff8866" opacity=".22"/>
-      <rect x="5" y="35" width="38" height="4" rx="2" fill="#f2c46a"/>
-      <rect x="2"  y="31" width="6" height="12" rx="2.5" fill="#e8a830"/>
-      <rect x="3.5" y="33" width="3" height="8" rx="1.5" fill="#f2c46a"/>
-      <rect x="40" y="31" width="6" height="12" rx="2.5" fill="#e8a830"/>
-      <rect x="41.5" y="33" width="3" height="8" rx="1.5" fill="#f2c46a"/>
-      <rect x="18" y="34" width="4" height="3" rx="1.2" fill="white" opacity=".92"/>
-      <rect x="23.5" y="34" width="4" height="3" rx="1.2" fill="white" opacity=".92"/>
-      <rect x="29" y="34" width="4" height="3" rx="1.2" fill="white" opacity=".92"/>
+    <svg width="80" height="60" viewBox="0 0 120 90" style="margin:0 auto 14px;display:block;opacity:.7">
+      <use href="#siba-logo" x="0" y="0" width="120" height="90"/>
     </svg>
     <div class="empty-text">아직 계획이 없어요<br>위에서 운동을 추가해보세요!</div>
   </div>
@@ -837,6 +858,91 @@ input[type="date"]:focus{border-color:var(--accent);}
   </div>
 </div>
 
+<!-- ══════ 운동 추천 모달 ══════ -->
+<div class="recommend-overlay" id="recommend-overlay" onclick="closeRecommend(event)">
+  <div class="recommend-box">
+    <div class="rec-title">⚡ 운동 추천</div>
+    <div class="rec-sub">부위와 종목 수를 선택하면 루틴을 구성해드려요</div>
+    <div class="rec-muscle-chips" id="rec-muscle-chips"></div>
+    <!-- 종목 수 선택 -->
+    <div id="rec-count-row" style="display:none;margin-bottom:14px">
+      <div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px">종목 수</div>
+      <div style="display:flex;gap:6px">
+        <button id="rec-count-btn-3" onclick="setRecCount(3)"
+          style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .18s">3종목</button>
+        <button id="rec-count-btn-4" onclick="setRecCount(4)"
+          style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .18s">4종목</button>
+        <button id="rec-count-btn-5" onclick="setRecCount(5)"
+          style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .18s">5종목</button>
+        <button id="rec-count-btn-6" onclick="setRecCount(6)"
+          style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .18s">6종목</button>
+      </div>
+    </div>
+    <div id="rec-result"></div>
+  </div>
+</div>
+
+<!-- ══════ 슈퍼세트 모달 ══════ -->
+<div class="ss-overlay" id="ss-overlay" onclick="closeSupersetOverlay(event)">
+  <div class="ss-box">
+    <div class="ss-title">🔗 슈퍼세트</div>
+    <div class="ss-sub">두 가지 운동을 묶어 쉬는 시간 없이 연속으로 수행하는 고강도 세트예요</div>
+
+    <div class="ss-step">① 부위 선택</div>
+    <div class="rec-muscle-chips" id="ss-muscle-chips"></div>
+
+    <div id="ss-ex-area" style="display:none">
+      <div class="ss-step">② 운동 A 선택</div>
+      <div class="ss-ex-grid" id="ss-ex-a"></div>
+      <div class="ss-step">③ 운동 B 선택</div>
+      <div class="ss-ex-grid" id="ss-ex-b"></div>
+    </div>
+
+    <div id="ss-input-area" style="display:none">
+      <div class="ss-step" style="color:var(--teal);margin-bottom:12px">④ 세트 입력</div>
+
+      <!-- A/B 운동명 헤더 -->
+      <div id="ss-header" style="display:grid;grid-template-columns:28px 1fr 1fr;gap:8px;margin-bottom:6px;padding:8px 12px;background:rgba(78,205,196,.08);border:1px solid rgba(78,205,196,.25);border-radius:9px;">
+        <div></div>
+        <div id="ss-header-a" style="font-size:.72rem;font-weight:700;color:var(--teal);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+        <div id="ss-header-b" style="font-size:.72rem;font-weight:700;color:var(--teal);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+      </div>
+
+      <!-- 컬럼 라벨 -->
+      <div id="ss-col-labels" style="display:grid;gap:8px;margin-bottom:4px;padding:0 2px">
+      </div>
+
+      <!-- 세트 행 -->
+      <div id="ss-set-rows-wrap"></div>
+
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+        <button class="ss-add-set-btn" onclick="addSSSetRow()">+ 세트 추가</button>
+        <button onclick="removeSSSetRow()" style="background:transparent;border:1px solid rgba(255,76,59,.4);color:var(--red);font-size:.72rem;padding:3px 8px;border-radius:5px;cursor:pointer;font-family:var(--font-body);">- 세트 제거</button>
+        <span style="font-size:.72rem;color:var(--muted);margin-left:auto" id="ss-set-count"></span>
+      </div>
+      <button class="btn-ss-submit" onclick="addSupersetToPlan()">🔗 슈퍼세트로 추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ 루틴 모달 ══════ -->
+<div class="routine-overlay" id="routine-overlay" onclick="closeRoutineOverlay(event)">
+  <div class="routine-box">
+    <!-- 저장 섹션 (루틴 저장 버튼에서 열 때 표시) -->
+    <div id="routine-save-section" style="display:none">
+      <div class="routine-title">📁 루틴 저장</div>
+      <div class="routine-sub">현재 계획을 루틴으로 저장해요 (최대 10개)</div>
+      <input class="routine-name-input" id="routine-name-input" type="text" placeholder="루틴 이름 (예: 가슴·삼두 루틴)" maxlength="30">
+      <button class="btn-routine-save" onclick="saveRoutine()">💾 이 이름으로 저장</button>
+      <div style="height:1px;background:var(--border);margin-bottom:16px"></div>
+    </div>
+    <!-- 루틴 목록 (공통) -->
+    <div class="routine-title" id="routine-list-header">📁 내 루틴</div>
+    <div class="routine-sub">저장된 루틴을 선택하면 현재 계획에 불러와요</div>
+    <div id="routine-list"></div>
+  </div>
+</div>
+
 <!-- ══════ PLAN TIP MODAL ══════ -->
 <div class="plan-tip-overlay" id="plan-tip-overlay" onclick="closePlanTip(event)">
   <div class="plan-tip-box">
@@ -863,8 +969,8 @@ input[type="date"]:focus{border-color:var(--accent);}
 </div>
 
 <!-- ══════ CONGRATS ══════ -->
-<div class="congrats-overlay" id="congrats-overlay">
-  <div class="congrats-box">
+<div class="congrats-overlay" id="congrats-overlay" onclick="onCongratsOverlayClick(event)">
+  <div class="congrats-box" onclick="event.stopPropagation()">
     <!-- 새 시바 SVG (얼굴 정면 + 덤벨) -->
     <svg class="congrats-siba" width="90" height="90" viewBox="0 0 90 90" fill="none">
       <!-- 귀 -->
@@ -886,13 +992,13 @@ input[type="date"]:focus{border-color:var(--accent);}
       <path d="M48 29 Q58 25 68 30" stroke="#b85a10" stroke-width="2.2" fill="none" stroke-linecap="round"/>
       <!-- 코 -->
       <ellipse cx="45" cy="47" rx="7" ry="5" fill="#1a0800"/>
-      <!-- 행복한 입 (운동 완료!) -->
+      <!-- 행복한 입 -->
       <path d="M45 52 L45 57" stroke="#c05820" stroke-width="1.8" stroke-linecap="round"/>
       <path d="M33 59 Q45 67 57 59" stroke="#c05820" stroke-width="2.2" fill="none" stroke-linecap="round"/>
       <!-- 볼 홍조 -->
       <circle cx="22" cy="50" r="7" fill="#ff8866" opacity=".22"/>
       <circle cx="68" cy="50" r="7" fill="#ff8866" opacity=".22"/>
-      <!-- 덤벨 (아래에) -->
+      <!-- 덤벨 -->
       <rect x="10" y="74" width="70" height="6" rx="3" fill="#f2c46a"/>
       <rect x="5"  y="68" width="10" height="18" rx="3.5" fill="#e8a830"/>
       <rect x="6.5" y="71" width="7" height="12" rx="2.5" fill="#f2c46a"/>
@@ -905,7 +1011,7 @@ input[type="date"]:focus{border-color:var(--accent);}
     </svg>
     <div class="congrats-title" id="congrats-title">수고했어요!</div>
     <div class="congrats-sub" id="congrats-sub"></div>
-    <button class="congrats-btn" id="congrats-close-btn">완료!</button>
+    <button class="congrats-btn" onclick="closeCongrats()">완료!</button>
   </div>
 </div>
 
@@ -918,13 +1024,13 @@ input[type="date"]:focus{border-color:var(--accent);}
 const EXERCISE_DB = {
   '가슴':['벤치프레스','인클라인 벤치프레스','디클라인 벤치프레스','덤벨 플라이','인클라인 덤벨 플라이','케이블 크로스오버','체스트 프레스 머신','딥스','푸쉬업','펙 덱 플라이',
     '스미스 벤치프레스','스미스 인클라인 벤치프레스'],
-  '등':['데드리프트','루마니안 데드리프트','바벨 로우','덤벨 로우','원암 로우 머신','케이블 로우','T바 로우','풀업','친업','랫 풀다운','시티드 케이블 로우','스트레이트 암 풀다운',
+  '등':['데드리프트','루마니안 데드리프트','바벨 로우','덤벨 로우','원암 로우 머신','케이블 로우','T바 로우','풀업','친업','랫 풀다운','와이드 랫풀다운','시티드 케이블 로우','스트레이트 암 풀다운',
     '스미스 데드리프트','스미스 로우'],
   '하체':['스쿼트','프론트 스쿼트','레그프레스','런지','불가리안 스플릿 스쿼트','힙 쓰러스트','레그컬','레그 익스텐션','카프 레이즈','핵 스쿼트',
     '스미스 스쿼트','스미스 런지','스미스 힙 쓰러스트','스미스 카프 레이즈'],
   '어깨':['오버헤드프레스','덤벨 숄더프레스','머신 숄더프레스','사이드 레터럴 레이즈','프론트 레이즈','리어 델트 플라이','벤트 오버 레이즈','페이스풀','업라이트 로우',
     '스미스 오버헤드프레스','스미스 업라이트 로우'],
-  '팔':['바벨 컬','덤벨 컬','해머 컬','인클라인 덤벨 컬','컨센트레이션 컬','케이블 컬','트라이셉 푸시다운','스컬크러셔','오버헤드 트라이셉 익스텐션','트라이셉 킥백','클로즈 그립 벤치프레스','딥스(팔)',
+  '팔':['바벨 컬','덤벨 컬','해머 컬','이두 컬 머신','인클라인 덤벨 컬','컨센트레이션 컬','케이블 컬','트라이셉 푸시다운','스컬크러셔','오버헤드 트라이셉 익스텐션','트라이셉 킥백','클로즈 그립 벤치프레스','딥스(팔)',
     '스미스 클로즈 그립 벤치프레스'],
   '복근':['크런치','레그레이즈','플랭크','케이블 크런치','싯업','바이시클 크런치'],
   '유산소':['러닝','사이클','로잉머신','스텝밀','줄넘기','일립티컬','버피'],
@@ -950,6 +1056,7 @@ const CALORIE_DB = {
   'T바 로우':{t:'w',v:.095},'풀업':{t:'bw',v:.65},'친업':{t:'bw',v:.62},'랫 풀다운':{t:'w',v:.078},
   '시티드 케이블 로우':{t:'w',v:.076},'스트레이트 암 풀다운':{t:'w',v:.067},
   '스미스 데드리프트':{t:'w',v:.100},'스미스 로우':{t:'w',v:.088},
+  '와이드 랫풀다운':{t:'w',v:.080},'이두 컬 머신':{t:'w',v:.063},
   /* 하체 */
   '스쿼트':{t:'w',v:.100},'프론트 스쿼트':{t:'w',v:.098},'레그프레스':{t:'w',v:.087},
   '런지':{t:'w',v:.090},'불가리안 스플릿 스쿼트':{t:'w',v:.094},'힙 쓰러스트':{t:'w',v:.085},
@@ -1067,22 +1174,74 @@ const TIPS = {
   '스미스 오버헤드프레스':'바 궤도가 고정되어 어깨 집중에 유리해요. 코어를 잡고 허리 반동을 줄이세요.',
   '스미스 업라이트 로우':'팔꿈치를 손목보다 높게 유지하며 어깨 높이까지 당겨요.',
   '스미스 클로즈 그립 벤치프레스':'그립을 좁혀 삼두근에 집중해요. 팔꿈치가 벌어지지 않게 주의하세요.',
+  '와이드 랫풀다운':'그립을 어깨 1.5배 너비로 넓게 잡아요. 팔꿈치를 옆구리 바깥으로 당기며 광배근 외측을 자극해요.',
+  '이두 컬 머신':'팔꿈치 위치를 패드에 고정하고 손목을 중립으로 유지해요. 고립 운동으로 이두근 피크를 강화해요.',
 };
 
 function getMuscle(n){return MUSCLE_MAP[n]||'기타';}
 function isCardio(n){return CARDIO_SET.has(n);}
 function isBW(n){return BWNAME_SET.has(n);}
 
+/* ── 사용자 프로필 ── */
+function getUserWeight(){ return parseFloat(localStorage.getItem('siba_weight'))||70; }
+function getUserHeight(){ return parseFloat(localStorage.getItem('siba_height'))||170; }
+function getUserGender(){ return localStorage.getItem('siba_gender')||'m'; }
+
+function setGender(g){
+  localStorage.setItem('siba_gender', g);
+  document.getElementById('btn-male').className  = 'gender-btn' + (g==='m'?' sel-m':'');
+  document.getElementById('btn-female').className = 'gender-btn' + (g==='f'?' sel-f':'');
+  updateBMIDisplay();
+}
+
+function saveUserProfile(){
+  const h=document.getElementById('user-height')?.value;
+  const w=document.getElementById('user-weight')?.value;
+  if(h) localStorage.setItem('siba_height',h);
+  if(w) localStorage.setItem('siba_weight',w);
+  updateBMIDisplay();
+}
+
+function updateBMIDisplay(){
+  const h=getUserHeight(), w=getUserWeight(), g=getUserGender();
+  const bmi=w/((h/100)**2);
+  const el=document.getElementById('bmi-display'); if(!el) return;
+  let cat='', col='';
+  if(bmi<18.5){cat='저체중';col='#4ecdc4';}
+  else if(bmi<23){cat='정상';col='#00d488';}
+  else if(bmi<25){cat='과체중';col='#f2c46a';}
+  else if(bmi<30){cat='비만';col='#e8863a';}
+  else{cat='고도비만';col='#ff4c3b';}
+  // Mifflin-St Jeor BMR (성별 반영)
+  const bmr = g==='m'
+    ? Math.round(10*w + 6.25*h - 5*30 + 5)
+    : Math.round(10*w + 6.25*h - 5*30 - 161);
+  const tdee = Math.round(bmr*1.55);
+  const gLabel = g==='m' ? '남성' : '여성';
+  el.style.display='block';
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+      <span style="font-weight:700;color:${col}">BMI ${bmi.toFixed(1)}</span>
+      <span style="background:${col}22;border:1px solid ${col}44;color:${col};font-size:.72rem;padding:2px 8px;border-radius:20px;font-weight:700">${cat}</span>
+      <span style="color:var(--muted);font-size:.74rem">${gLabel} · 체중 ${w}kg · 키 ${h}cm</span>
+    </div>
+    <div style="font-size:.78rem;color:var(--muted);line-height:1.7">
+      기초대사량(BMR) <strong style="color:var(--accent2)">${bmr.toLocaleString()} kcal</strong>
+      &nbsp;·&nbsp; 1일 권장 칼로리(중등도) <strong style="color:var(--accent)">${tdee.toLocaleString()} kcal</strong>
+    </div>`;
+}
+
 function calcKcal(item){
   if(item.cardioKcal!=null) return item.cardioKcal;
   const db=CALORIE_DB[item.name]; const arr=item.sets||[];
+  const BW=getUserWeight();
   let total=0;
   arr.forEach(s=>{
     const w=s.weight!=null?+s.weight:20, r=s.reps!=null?+s.reps:8;
     if(!db){if(w&&r)total+=Math.round(r*w*.07);return;}
     if(db.t==='w')  total+=Math.round(r*w*db.v);
-    if(db.t==='bw') total+=Math.round(r*db.v);
-    if(db.t==='c')  total+=Math.round(db.v*70*(r/60));
+    if(db.t==='bw') total+=Math.round(r*db.v*(BW/70));
+    if(db.t==='c')  total+=Math.round(db.v*BW*(r/60));
   });
   return total>0?total:null;
 }
@@ -1157,25 +1316,46 @@ function showView(v){
 }
 
 function renderHome(){
+  // 저장된 프로필 값 복원
+  const savedH=localStorage.getItem('siba_height');
+  const savedW=localStorage.getItem('siba_weight');
+  const savedG=getUserGender();
+  const hEl=document.getElementById('user-height');
+  const wEl=document.getElementById('user-weight');
+  if(hEl&&savedH) hEl.value=savedH;
+  if(wEl&&savedW) wEl.value=savedW;
+  // 성별 버튼 상태 복원
+  const bm=document.getElementById('btn-male');
+  const bf=document.getElementById('btn-female');
+  if(bm) bm.className='gender-btn'+(savedG==='m'?' sel-m':'');
+  if(bf) bf.className='gender-btn'+(savedG==='f'?' sel-f':'');
+  if(savedH&&savedW) updateBMIDisplay();
+
+  // 전문적인 동기부여 멘트
   const QUOTES=[
-    ['시바도 운동해요 💪','오늘 하루도 최선을 다해보세요!\n작은 습관이 큰 변화를 만들어요.'],
-    ['쉬는 날도 성장해요 🌙','근육은 운동할 때가 아닌 쉴 때 자라요.\n오늘도 수고했어요!'],
-    ['꾸준함이 최고 🏆','매일 조금씩, 그게 최고의 루틴이에요.\n오늘도 시바와 함께 화이팅!'],
-    ['포기하지 마세요 🔥','힘든 날도 있어요. 그래도 나온 것만으로 대단해요!\n시바가 응원하고 있어요!'],
-    ['목표를 향해 🎯','오늘의 운동이 내일의 나를 만들어요.\n한 세트, 한 걸음씩!'],
+    ['점진적 과부하의 원칙 🏋️','매 세션마다 무게·횟수·세트 중 하나를 조금씩 늘려보세요.\n근비대의 핵심은 지속적인 자극 증가입니다.'],
+    ['근육 회복의 과학 🔬','근섬유는 운동 중 미세하게 손상되고, 휴식 중 더 강하게 재건됩니다.\n충분한 수면(7~9시간)과 단백질 섭취가 성장의 열쇠예요.'],
+    ['복합 운동의 효율 💡','스쿼트·데드리프트·벤치프레스 같은 다관절 운동은\n단시간에 더 많은 근육 섬유를 동원합니다.'],
+    ['마음-근육 연결 🧠','운동 중 해당 근육을 의식적으로 수축하면 EMG 활성도가 최대 35% 증가합니다.\n자세보다 자극에 집중해보세요.'],
+    ['일관성의 힘 📈','연구에 따르면 주 3회 6개월 꾸준한 훈련이\n산발적인 고강도 훈련보다 더 큰 근력 향상을 가져옵니다.'],
+    ['영양 타이밍 🥩','운동 후 30분 이내 단백질 섭취(0.3~0.5g/kg)가\n근단백질 합성을 최대화합니다.'],
+    ['코어의 중요성 🎯','강한 코어는 모든 운동의 기반입니다.\n복압을 높여 척추를 안정시키면 더 무거운 무게를 안전하게 다룰 수 있어요.'],
   ];
   const q=QUOTES[new Date().getDay()%QUOTES.length];
-  const el=document.getElementById('home-quote');
+  const qEl=document.getElementById('home-quote');
   const todayEl=document.getElementById('home-today');
-  if(el) el.innerHTML=`<strong style="color:var(--accent)">${q[0]}</strong><br><span style="color:var(--muted)">${q[1].replace(/\n/,'<br>')}</span>`;
+  if(qEl) qEl.innerHTML=`<strong style="color:var(--accent2);display:block;margin-bottom:5px">${q[0]}</strong>${q[1].replace(/\n/g,'<br>')}`;
+
   if(todayEl){
     const today=toDateStr(new Date());
-    const todayPlan=workouts[today];
-    if(todayPlan&&todayPlan.length){
-      const done=todayPlan.filter(p=>p.done).length;
-      todayEl.innerHTML=`오늘 <strong style="color:var(--accent)">${done}/${todayPlan.length}</strong>개 운동 완료`;
+    const tp=workouts[today];
+    if(tp&&tp.length){
+      const done=tp.filter(p=>p.done).length;
+      const kcal=tp.filter(p=>p.done).reduce((s,p)=>s+(calcKcal(p)||0),0);
+      const pct=Math.round(done/tp.length*100);
+      todayEl.innerHTML=`오늘 진행률 <strong style="color:var(--accent)">${pct}%</strong> (${done}/${tp.length}종목 완료)${kcal>0?` · 🔥 <strong style="color:var(--red)">${kcal} kcal</strong> 소모`:''}`;
     } else {
-      todayEl.textContent='오늘 아직 운동 기록이 없어요. 지금 시작해볼까요?';
+      todayEl.textContent='아직 오늘의 운동 계획이 없어요. 기록 탭에서 시작해볼까요?';
     }
   }
 }
@@ -1274,8 +1454,313 @@ function resetForm(){
 }
 
 /* ══════════════════════════════════
-   PLAN LIST
+   운동 추천 DB (부위별 4~5종목, 1시간 루틴)
 ══════════════════════════════════ */
+const RECOMMEND_DB = {
+  '가슴':[
+    {name:'벤치프레스',     sets:4,reps:'8~10',rest:'90초'},
+    {name:'인클라인 덤벨 플라이',sets:3,reps:'12~15',rest:'60초'},
+    {name:'체스트 프레스 머신',  sets:3,reps:'10~12',rest:'60초'},
+    {name:'케이블 크로스오버',  sets:3,reps:'12~15',rest:'60초'},
+    {name:'딥스',          sets:3,reps:'10~12',rest:'60초'},
+  ],
+  '등':[
+    {name:'데드리프트',       sets:4,reps:'6~8', rest:'120초'},
+    {name:'바벨 로우',        sets:4,reps:'8~10',rest:'90초'},
+    {name:'와이드 랫풀다운',   sets:3,reps:'10~12',rest:'60초'},
+    {name:'시티드 케이블 로우', sets:3,reps:'12~15',rest:'60초'},
+    {name:'스트레이트 암 풀다운',sets:3,reps:'12~15',rest:'60초'},
+  ],
+  '하체':[
+    {name:'스쿼트',          sets:4,reps:'8~10',rest:'120초'},
+    {name:'레그프레스',       sets:4,reps:'10~12',rest:'90초'},
+    {name:'루마니안 데드리프트',sets:3,reps:'10~12',rest:'90초'},
+    {name:'레그컬',           sets:3,reps:'12~15',rest:'60초'},
+    {name:'카프 레이즈',      sets:4,reps:'15~20',rest:'45초'},
+  ],
+  '어깨':[
+    {name:'오버헤드프레스',   sets:4,reps:'8~10', rest:'90초'},
+    {name:'사이드 레터럴 레이즈',sets:4,reps:'12~15',rest:'60초'},
+    {name:'리어 델트 플라이', sets:3,reps:'12~15',rest:'60초'},
+    {name:'페이스풀',        sets:3,reps:'12~15',rest:'60초'},
+    {name:'업라이트 로우',    sets:3,reps:'10~12',rest:'60초'},
+  ],
+  '팔':[
+    {name:'바벨 컬',            sets:4,reps:'8~10', rest:'60초'},
+    {name:'이두 컬 머신',        sets:3,reps:'10~12',rest:'60초'},
+    {name:'트라이셉 푸시다운',   sets:4,reps:'10~12',rest:'60초'},
+    {name:'해머 컬',             sets:3,reps:'10~12',rest:'60초'},
+    {name:'스컬크러셔',          sets:3,reps:'10~12',rest:'60초'},
+  ],
+  '복근':[
+    {name:'크런치',          sets:4,reps:'15~20',rest:'45초'},
+    {name:'레그레이즈',      sets:4,reps:'12~15',rest:'45초'},
+    {name:'플랭크',          sets:3,reps:'45~60초',rest:'45초'},
+    {name:'바이시클 크런치', sets:3,reps:'20~24',rest:'45초'},
+  ],
+  '유산소':[
+    {name:'러닝',      sets:1,reps:'30~40분',rest:'-'},
+    {name:'사이클',    sets:1,reps:'30~40분',rest:'-'},
+    {name:'로잉머신',  sets:1,reps:'20~30분',rest:'-'},
+    {name:'줄넘기',    sets:5,reps:'3분',   rest:'1분'},
+  ],
+};
+
+/* ═══ 운동 추천 모달 ═══ */
+let recSelMuscle=null;
+let currentRecList=[];
+let currentRecMuscle='';
+let currentRecCount=4; // 기본 4종목
+
+function openRecommend(){
+  recSelMuscle=null; currentRecList=[]; currentRecCount=4;
+  document.getElementById('rec-result').innerHTML='';
+  document.getElementById('rec-count-row').style.display='none';
+  document.getElementById('rec-muscle-chips').innerHTML=Object.keys(RECOMMEND_DB).map(m=>{
+    const c=MC[m]||MC['기타'];
+    return `<button class="rec-muscle-chip" id="recchip-${m}" onclick="selectRecMuscle('${m}')">${m}</button>`;
+  }).join('');
+  document.getElementById('recommend-overlay').classList.add('open');
+}
+function closeRecommend(e){
+  if(!e||e.target===document.getElementById('recommend-overlay'))
+    document.getElementById('recommend-overlay').classList.remove('open');
+}
+function selectRecMuscle(m){
+  recSelMuscle=m; currentRecList=[];
+  document.querySelectorAll('#rec-muscle-chips .rec-muscle-chip').forEach(el=>{
+    el.className='rec-muscle-chip';
+    el.style.background=''; el.style.borderColor=''; el.style.color='';
+  });
+  const c=MC[m]||MC['기타'];
+  const chip=document.getElementById('recchip-'+m);
+  if(chip){chip.className='rec-muscle-chip sel';chip.style.background=c.bg;chip.style.borderColor=c.bd;chip.style.color=c.tx;}
+  document.getElementById('rec-count-row').style.display='block';
+  setRecCount(currentRecCount, false);
+}
+
+function setRecCount(n, skipRender){
+  currentRecCount=n;
+  // 버튼 스타일
+  [3,4,5,6].forEach(v=>{
+    const btn=document.getElementById(`rec-count-btn-${v}`);
+    if(!btn) return;
+    if(v===n){btn.style.borderColor='var(--accent)';btn.style.background='rgba(232,134,58,.12)';btn.style.color='var(--accent)';}
+    else{btn.style.borderColor='var(--border)';btn.style.background='transparent';btn.style.color='var(--muted)';}
+  });
+  if(!skipRender && recSelMuscle) buildRecList(recSelMuscle, n);
+}
+
+function buildRecList(m, count){
+  currentRecMuscle=m;
+  const template=RECOMMEND_DB[m]||[];
+  const allEx=(EXERCISE_DB[m]||[]).filter(n=>!isCardio(n));
+  // 추천 DB에서 count개 가져오기, 부족하면 allEx에서 랜덤 보충
+  let list=[...template];
+  if(list.length>count) list=list.slice(0,count);
+  else if(list.length<count){
+    const extra=allEx.filter(n=>!list.find(e=>e.name===n));
+    const shuffled=extra.sort(()=>Math.random()-.5);
+    shuffled.slice(0,count-list.length).forEach(n=>list.push({name:n,sets:3,reps:'10~12',rest:'60초',_muscle:m}));
+  }
+  currentRecList=list.map(ex=>({...ex,_muscle:m}));
+  renderRecResult(m);
+}
+
+function renderRecResult(m){
+  const c=MC[m]||MC['기타'];
+  const totalSets=currentRecList.reduce((s,e)=>s+e.sets,0);
+  const allEx=(EXERCISE_DB[m]||[]).filter(n=>!isCardio(n));
+  const estMin=Math.round(totalSets*3)+10; // 세트당 약 3분 + 워밍업
+  document.getElementById('rec-result').innerHTML=`
+    <div class="rec-program">
+      <div class="rec-program-header">
+        <span style="background:${c.bg};border:1px solid ${c.bd};color:${c.tx};padding:2px 9px;border-radius:20px">${m}</span>
+        ${currentRecList.length}종목 · ${totalSets}세트 · 약 ${estMin}~${estMin+10}분
+      </div>
+      ${currentRecList.map((ex,i)=>`
+        <div class="rec-ex-row">
+          <div style="flex:1;min-width:0">
+            <div class="rec-ex-name">${i+1}. ${ex.name}</div>
+            <div class="rec-ex-detail">${ex.sets}세트 × ${ex.reps} · 휴식 ${ex.rest}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:8px">
+            <button class="rec-add-btn" onclick="addRecItemToPlan('${ex.name.replace(/'/g,"\\'")}',${ex.sets})">+ 추가</button>
+            <button onclick="swapRecItem(${i})"
+              style="padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.72rem;cursor:pointer;font-family:var(--font-body);white-space:nowrap;">🔀 변경</button>
+          </div>
+        </div>`).join('')}
+    </div>
+    <button class="rec-add-all" onclick="addAllRecToPlan()">✅ 전체 루틴 추가</button>`;
+}
+
+function swapRecItem(i){
+  const m=currentRecMuscle;
+  const allEx=(EXERCISE_DB[m]||[]).filter(n=>!isCardio(n));
+  // 현재 목록에 없는 종목 중 랜덤 선택
+  const usedNames=currentRecList.map(e=>e.name);
+  const candidates=allEx.filter(n=>!usedNames.includes(n));
+  if(!candidates.length){showToast('더 이상 교체할 운동이 없어요');return;}
+  const picked=candidates[Math.floor(Math.random()*candidates.length)];
+  const old=currentRecList[i];
+  currentRecList[i]={...old,name:picked};
+  renderRecResult(m);
+  showToast(`🔀 ${picked}으로 변경됐어요`);
+}
+
+function addRecItemToPlan(name,numSets){
+  const bw=isBW(name), cardio=isCardio(name);
+  if(cardio){
+    plan.push({name,cardioMin:30,cardioKcal:null,done:false});
+  } else {
+    const sets=Array.from({length:numSets},(_,i)=>({setNum:i+1,weight:null,reps:null}));
+    plan.push({name,done:false,sets});
+  }
+  renderPlanList();
+  showToast(`✅ ${name} 추가됨!`);
+}
+function addAllRecToPlan(){
+  const list=currentRecList.length?currentRecList:[];
+  if(!list.length){showToast('먼저 부위를 선택해주세요');return;}
+  list.forEach(ex=>addRecItemToPlan(ex.name,ex.sets));
+  currentRecList=[];
+  document.getElementById('recommend-overlay').classList.remove('open');
+  showToast(`⚡ ${list.length}종목 추가!`);
+}
+
+/* ═══ 슈퍼세트 모달 ═══ */
+let ssMuscle=null, ssExA=null, ssExB=null, ssSetRows=[{wA:'',rA:'',wB:'',rB:''}];
+function openSuperset(){
+  ssMuscle=null; ssExA=null; ssExB=null; ssSetRows=[{wA:'',rA:'',wB:'',rB:''}];
+  document.getElementById('ss-ex-area').style.display='none';
+  document.getElementById('ss-input-area').style.display='none';
+  // 부위 칩
+  document.getElementById('ss-muscle-chips').innerHTML=Object.keys(EXERCISE_DB).filter(m=>m!=='유산소').map(m=>{
+    const c=MC[m]||MC['기타'];
+    return `<button class="rec-muscle-chip" id="sschip-${m}"
+      onclick="selectSSMuscle('${m}')">${m}</button>`;
+  }).join('');
+  document.getElementById('ss-overlay').classList.add('open');
+}
+function closeSupersetOverlay(e){
+  if(!e||e.target===document.getElementById('ss-overlay'))
+    document.getElementById('ss-overlay').classList.remove('open');
+}
+function selectSSMuscle(m){
+  ssMuscle=m; ssExA=null; ssExB=null;
+  // 클래스와 인라인 스타일 모두 초기화
+  document.querySelectorAll('#ss-muscle-chips .rec-muscle-chip').forEach(el=>{
+    el.className='rec-muscle-chip';
+    el.style.background='';
+    el.style.borderColor='';
+    el.style.color='';
+  });
+  const c=MC[m]||MC['기타'];
+  const chip=document.getElementById('sschip-'+m);
+  if(chip){chip.className='rec-muscle-chip sel';chip.style.background=c.bg;chip.style.borderColor=c.bd;chip.style.color=c.tx;}
+  document.getElementById('ss-input-area').style.display='none';
+  renderSSExButtons();
+  document.getElementById('ss-ex-area').style.display='block';
+}
+function renderSSExButtons(){
+  const exList=EXERCISE_DB[ssMuscle]||[];
+  ['a','b'].forEach(which=>{
+    const sel=which==='a'?ssExA:ssExB;
+    document.getElementById(`ss-ex-${which}`).innerHTML=exList.map(name=>{
+      const isSel=sel===name;
+      return `<button class="ss-ex-btn${isSel?' sel':''}"
+        onclick="selectSSEx('${which}','${name.replace(/'/g,"\\'")}')">${name}</button>`;
+    }).join('');
+  });
+}
+function selectSSEx(which,name){
+  if(which==='a') ssExA=name; else ssExB=name;
+  renderSSExButtons();
+  if(ssExA&&ssExB){
+    ssSetRows=[{wA:'',rA:'',wB:'',rB:''}];
+    document.getElementById('ss-input-area').style.display='block';
+    renderSSSetRows();
+    // 입력 영역으로 스크롤
+    setTimeout(()=>{
+      const el=document.getElementById('ss-input-area');
+      if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+    },100);
+  }
+}
+function renderSSSetRows(){
+  const bwA=isBW(ssExA), bwB=isBW(ssExB);
+  const lastIdx=ssSetRows.length-1;
+
+  document.getElementById('ss-header-a').textContent='A. '+ssExA;
+  document.getElementById('ss-header-b').textContent='B. '+ssExB;
+
+  const gridCols=`28px ${bwA?'':'1fr '}1fr ${bwB?'':'1fr '}1fr`;
+  document.getElementById('ss-col-labels').style.gridTemplateColumns=gridCols;
+  document.getElementById('ss-col-labels').innerHTML=`
+    <div style="font-size:.6rem;color:var(--muted);text-align:center">세트</div>
+    ${!bwA?'<div style="font-size:.6rem;color:var(--muted);text-align:center">A·무게(kg)</div>':''}
+    <div style="font-size:.6rem;color:var(--muted);text-align:center">A·횟수</div>
+    ${!bwB?'<div style="font-size:.6rem;color:var(--muted);text-align:center">B·무게(kg)</div>':''}
+    <div style="font-size:.6rem;color:var(--muted);text-align:center">B·횟수</div>`;
+
+  const inputStyle=`background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 8px;border-radius:8px;font-size:.88rem;outline:none;width:100%;-webkit-appearance:none;text-align:center;transition:border-color .18s;`;
+  const inputStyleTeal=`background:var(--surface2);border:1px solid rgba(78,205,196,.3);color:var(--text);padding:9px 8px;border-radius:8px;font-size:.88rem;outline:none;width:100%;-webkit-appearance:none;text-align:center;transition:border-color .18s;`;
+
+  document.getElementById('ss-set-rows-wrap').innerHTML=ssSetRows.map((s,i)=>{
+    const isLast=i===lastIdx;
+    return `
+    <div style="display:grid;grid-template-columns:${gridCols};gap:6px;align-items:center;margin-bottom:6px">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid rgba(78,205,196,.3);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--teal)">${i+1}</div>
+      ${!bwA?`<input type="number" inputmode="decimal" placeholder="kg" value="${s.wA}" step="0.5" enterkeyhint="next"
+        style="${inputStyle}"
+        onfocus="this.style.borderColor='rgba(78,205,196,.6)'" onblur="this.style.borderColor='var(--border)'"
+        oninput="ssSetRows[${i}].wA=this.value">`:'' }
+      <input type="number" inputmode="numeric" placeholder="회" value="${s.rA}" enterkeyhint="${(!bwB&&isLast)||isLast?'done':'next'}"
+        style="${inputStyleTeal}"
+        onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='rgba(78,205,196,.3)'"
+        oninput="ssSetRows[${i}].rA=this.value"
+        ${isLast&&bwB?`onkeydown="if(event.key==='Enter'||event.key==='Go'){this.blur();event.preventDefault();}"`:''}>
+      ${!bwB?`<input type="number" inputmode="decimal" placeholder="kg" value="${s.wB}" step="0.5" enterkeyhint="next"
+        style="${inputStyle}"
+        onfocus="this.style.borderColor='rgba(78,205,196,.6)'" onblur="this.style.borderColor='var(--border)'"
+        oninput="ssSetRows[${i}].wB=this.value">`:'' }
+      <input type="number" inputmode="numeric" placeholder="회" value="${s.rB}"
+        enterkeyhint="${isLast?'done':'next'}"
+        style="${inputStyleTeal}"
+        onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='rgba(78,205,196,.3)'"
+        oninput="ssSetRows[${i}].rB=this.value"
+        ${isLast?`onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault();}"`:''}>
+    </div>`;
+  }).join('');
+
+  document.getElementById('ss-set-count').textContent=`${ssSetRows.length}세트`;
+}
+function addSSSetRow(){
+  // 마지막 세트 값 복사 (이전 세트 무게 자동 채움)
+  const last=ssSetRows[ssSetRows.length-1];
+  ssSetRows.push({wA:last.wA,rA:last.rA,wB:last.wB,rB:last.rB});
+  renderSSSetRows();
+}
+function removeSSSetRow(){
+  if(ssSetRows.length<=1){showToast('최소 1세트는 필요해요');return;}
+  ssSetRows.pop();
+  renderSSSetRows();
+}
+function addSupersetToPlan(){
+  if(!ssExA||!ssExB){showToast('운동 A와 B를 모두 선택해주세요');return;}
+  const bwA=isBW(ssExA), bwB=isBW(ssExB);
+  const setsA=ssSetRows.map((s,i)=>({setNum:i+1,weight:bwA?null:(s.wA!==''?+s.wA:null),reps:s.rA!==''?+s.rA:null}));
+  const setsB=ssSetRows.map((s,i)=>({setNum:i+1,weight:bwB?null:(s.wB!==''?+s.wB:null),reps:s.rB!==''?+s.rB:null}));
+  // 슈퍼세트는 ssPartner로 연결
+  const pairId='ss_'+Date.now();
+  plan.push({name:ssExA,done:false,sets:setsA,superset:true,pairId,pairRole:'A',pairName:ssExB});
+  plan.push({name:ssExB,done:false,sets:setsB,superset:true,pairId,pairRole:'B',pairName:ssExA});
+  renderPlanList();
+  document.getElementById('ss-overlay').classList.remove('open');
+  showToast(`🔗 슈퍼세트 추가! ${ssExA} + ${ssExB}`);
+}
+
+/* ═══ renderPlanList — 슈퍼세트 그룹핑 ═══ */
 function renderPlanList(){
   const has=plan.length>0;
   document.getElementById('plan-section').style.display=has?'block':'none';
@@ -1289,20 +1774,45 @@ function renderPlanList(){
   const kb=document.getElementById('kcal-bar');
   if(totalKcal>0){kb.style.display='flex';document.getElementById('kcal-bar-val').textContent=totalKcal+' kcal';}
   else kb.style.display='none';
-  const groups={};
-  plan.forEach((item,idx)=>{const m=getMuscle(item.name);if(!groups[m])groups[m]=[];groups[m].push({item,idx});});
+
+  // 슈퍼세트 쌍 + 일반 그룹 분리
+  const rendered=new Set();
+  const ssBlocks=[], normalGroups={};
+  plan.forEach((item,idx)=>{
+    if(rendered.has(idx)) return;
+    if(item.superset&&item.pairRole==='A'){
+      const bIdx=plan.findIndex((p,i)=>i>idx&&p.pairId===item.pairId&&p.pairRole==='B');
+      if(bIdx>=0){rendered.add(idx);rendered.add(bIdx);ssBlocks.push({idxA:idx,idxB:bIdx,itemA:item,itemB:plan[bIdx]});return;}
+    }
+    rendered.add(idx);
+    const m=getMuscle(item.name);
+    if(!normalGroups[m]) normalGroups[m]=[];
+    normalGroups[m].push({item,idx});
+  });
   const ORDER=['가슴','등','하체','어깨','팔','복근','유산소','기타'];
-  document.getElementById('plan-list').innerHTML=ORDER.filter(m=>groups[m]).map(m=>{
+  let html='';
+  if(ssBlocks.length){
+    html+=ssBlocks.map(b=>`
+      <div style="margin-bottom:14px">
+        <div style="font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:7px;background:rgba(78,205,196,.12);border:1px solid rgba(78,205,196,.35);color:var(--teal)">🔗 슈퍼세트</div>
+        ${renderPlanItem(b.itemA,b.idxA)}
+        <div style="text-align:center;font-size:.7rem;color:var(--teal);margin:-3px 0 3px;opacity:.75">↕ 쉬지 않고</div>
+        ${renderPlanItem(b.itemB,b.idxB)}
+      </div>`).join('');
+  }
+  html+=ORDER.filter(m=>normalGroups[m]).map(m=>{
     const c=MC[m]||MC['기타'];
     return `<div class="plan-group">
       <div class="plan-group-label" style="background:${c.bg};border:1px solid ${c.bd};color:${c.tx}">${m}</div>
-      ${groups[m].map(({item,idx})=>renderPlanItem(item,idx)).join('')}
+      ${normalGroups[m].map(({item,idx})=>renderPlanItem(item,idx)).join('')}
     </div>`;
   }).join('');
+  document.getElementById('plan-list').innerHTML=html;
 }
 
 function renderPlanItem(item,idx){
   const c=MC[getMuscle(item.name)]||MC['기타'], kcal=calcKcal(item);
+  const ssBadge=item.superset?`<span class="ss-badge">SS·${item.pairRole}</span>`:'';
   let detail='';
   if(item.cardioMin!=null||item.cardioKcal!=null){
     const p=[]; if(item.cardioMin)p.push(`⏱ ${item.cardioMin}분`); if(item.cardioKcal)p.push(`🔥 ${item.cardioKcal} kcal`);
@@ -1320,10 +1830,10 @@ function renderPlanItem(item,idx){
       detail+=`<div class="plan-cmp" style="color:${col}">📊 ${cmp.text}</div>`;
     }
   }
-  return `<div class="plan-item${item.done?' done':''}" onclick="toggleDone(${idx})">
+  return `<div class="plan-item${item.done?' done':''}${item.superset?' superset':''}" onclick="toggleDone(${idx})">
     <div class="check-circle">${item.done?'✓':''}</div>
     <div class="plan-item-body">
-      <div class="plan-item-name">${item.name}</div>${detail}
+      <div class="plan-item-name">${item.name}${ssBadge}</div>${detail}
     </div>
     <div class="plan-item-actions" onclick="event.stopPropagation()">
       <button class="btn-ico" onclick="showPlanTip('${item.name.replace(/'/g,"\\'")}')">💡</button>
@@ -1334,23 +1844,186 @@ function renderPlanItem(item,idx){
 }
 
 function toggleDone(idx){
-  plan[idx].done=!plan[idx].done; renderPlanList();
+  plan[idx].done=!plan[idx].done;
+  // 슈퍼세트는 파트너도 함께 done 처리
+  if(plan[idx].superset){
+    const pairId=plan[idx].pairId;
+    const partner=plan.find((p,i)=>i!==idx&&p.pairId===pairId);
+    if(partner) partner.done=plan[idx].done;
+  }
+  renderPlanList();
   if(plan.length>0&&plan.every(p=>p.done)){
     const totalKcal=plan.reduce((s,p)=>s+(calcKcal(p)||0),0);
     showCongrats(totalKcal);
   }
 }
-function deletePlanItem(idx){plan.splice(idx,1);renderPlanList();}
+function deletePlanItem(idx){
+  // 슈퍼세트는 파트너도 같이 삭제
+  if(plan[idx]?.superset){
+    const pairId=plan[idx].pairId;
+    // 인덱스 큰 것부터 삭제 (앞에서 지우면 뒤 인덱스 밀림)
+    const idxs=plan.map((p,i)=>p.pairId===pairId?i:-1).filter(i=>i>=0).sort((a,b)=>b-a);
+    idxs.forEach(i=>plan.splice(i,1));
+  } else {
+    plan.splice(idx,1);
+  }
+  renderPlanList();
+}
 
 /* ══════════════════════════════════
-   SAVE
+   루틴 저장 / 불러오기
+══════════════════════════════════ */
+const ROUTINE_KEY = 'worksiba_routines';
+const MAX_ROUTINES = 10;
+
+function getRoutines(){
+  try { return JSON.parse(localStorage.getItem(ROUTINE_KEY)||'[]'); }
+  catch { return []; }
+}
+function saveRoutines(list){ localStorage.setItem(ROUTINE_KEY, JSON.stringify(list)); }
+
+/* 루틴 모달 열기 (목록만) */
+function openRoutine(){
+  document.getElementById('routine-save-section').style.display='none';
+  document.getElementById('routine-list-header').textContent='📁 내 루틴';
+  renderRoutineList(false);
+  document.getElementById('routine-overlay').classList.add('open');
+}
+
+/* 루틴 저장 모달 열기 (저장 + 목록) */
+function openSaveRoutine(){
+  if(!plan.length){ showToast('저장할 계획이 없어요'); return; }
+  document.getElementById('routine-save-section').style.display='block';
+  document.getElementById('routine-list-header').textContent='기존 루틴';
+  document.getElementById('routine-name-input').value='';
+  renderRoutineList(true);
+  document.getElementById('routine-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('routine-name-input').focus(), 300);
+}
+
+function closeRoutineOverlay(e){
+  if(!e || e.target===document.getElementById('routine-overlay'))
+    document.getElementById('routine-overlay').classList.remove('open');
+}
+
+/* 현재 plan을 루틴으로 저장 */
+function saveRoutine(){
+  const nameEl = document.getElementById('routine-name-input');
+  const name = nameEl.value.trim();
+  if(!name){ showToast('루틴 이름을 입력해주세요'); nameEl.focus(); return; }
+
+  const list = getRoutines();
+  if(list.length >= MAX_ROUTINES){
+    showToast(`루틴은 최대 ${MAX_ROUTINES}개까지 저장할 수 있어요`);
+    return;
+  }
+
+  // 같은 이름 있으면 덮어쓰기 여부 확인 (confirm 대신 그냥 덮어씀 + 알림)
+  const existIdx = list.findIndex(r=>r.name===name);
+
+  const muscles = [...new Set(plan.map(p=>getMuscle(p.name)))];
+  const routine = {
+    id: existIdx>=0 ? list[existIdx].id : 'rt_'+Date.now(),
+    name,
+    createdAt: new Date().toISOString().slice(0,10),
+    muscles,
+    items: JSON.parse(JSON.stringify(plan))  // 깊은 복사, done 상태 포함
+  };
+
+  if(existIdx>=0){
+    list[existIdx] = routine;
+    saveRoutines(list);
+    showToast(`🔄 "${name}" 루틴을 업데이트했어요`);
+  } else {
+    list.unshift(routine); // 최신이 맨 위
+    saveRoutines(list);
+    showToast(`💾 "${name}" 루틴 저장 완료!`);
+  }
+  nameEl.value='';
+  renderRoutineList(true);
+}
+
+/* 루틴 목록 렌더 */
+function renderRoutineList(isSaveMode){
+  const list = getRoutines();
+  const el = document.getElementById('routine-list');
+
+  if(!list.length){
+    el.innerHTML=`<div class="routine-empty">저장된 루틴이 없어요<br><span style="font-size:.76rem">루틴을 저장하면 언제든 불러올 수 있어요</span></div>`;
+    return;
+  }
+
+  el.innerHTML = list.map((r,i)=>{
+    const muscleTags = r.muscles.map(m=>{
+      const c=MC[m]||MC['기타'];
+      return `<span class="routine-item-tag" style="background:${c.bg};border-color:${c.bd};color:${c.tx}">${m}</span>`;
+    }).join('');
+    const exCount = r.items.length;
+    const setCount = r.items.reduce((s,it)=>s+(it.sets?.length||1),0);
+    return `
+      <div class="routine-item" onclick="loadRoutine('${r.id}')">
+        <div class="routine-item-actions" onclick="event.stopPropagation()">
+          <button class="btn-routine-del" onclick="deleteRoutine('${r.id}')" title="삭제">✕</button>
+        </div>
+        <div class="routine-item-name">${r.name}</div>
+        <div class="routine-item-meta">
+          <span style="font-size:.72rem;color:var(--muted)">${r.createdAt} · ${exCount}종목 · ${setCount}세트</span>
+          ${muscleTags}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* 루틴 불러오기 */
+function loadRoutine(id){
+  const list = getRoutines();
+  const routine = list.find(r=>r.id===id);
+  if(!routine){ showToast('루틴을 찾을 수 없어요'); return; }
+
+  if(plan.length){
+    openConfirm(
+      `현재 계획(${plan.length}개)을 지우고\n"${routine.name}" 루틴을 불러올까요?`,
+      ()=>{ _applyRoutine(routine); }
+    );
+  } else {
+    _applyRoutine(routine);
+  }
+}
+
+function _applyRoutine(routine){
+  // done 상태 초기화하고 불러옴
+  plan = JSON.parse(JSON.stringify(routine.items)).map(it=>({...it, done:false}));
+  renderPlanList();
+  document.getElementById('routine-overlay').classList.remove('open');
+  showToast(`📁 "${routine.name}" 루틴을 불러왔어요!`);
+}
+
+/* 루틴 삭제 */
+function deleteRoutine(id){
+  const list = getRoutines();
+  const r = list.find(rt=>rt.id===id);
+  if(!r) return;
+  openConfirm(
+    `"${r.name}" 루틴을 삭제할까요?\n복구할 수 없어요.`,
+    ()=>{
+      const newList = list.filter(rt=>rt.id!==id);
+      saveRoutines(newList);
+      renderRoutineList(document.getElementById('routine-save-section').style.display!=='none');
+      showToast(`🗑 루틴 삭제됨`);
+    }
+  );
+}
+
+/* ══════════════════════════════════
+   SAVE (오늘 운동 저장)
 ══════════════════════════════════ */
 function saveWorkout(){
   const date=document.getElementById('record-date').value;
   if(!plan.length){showToast('계획을 먼저 추가해주세요');return;}
+  const isUpdate=!!workouts[date];
   workouts[date]=JSON.parse(JSON.stringify(plan));
   localStorage.setItem('worksiba',JSON.stringify(workouts));
-  showToast(`💾 ${plan.length}개 운동 저장 완료!`);
+  showToast(isUpdate?`🔄 ${plan.length}개 운동 업데이트 완료!`:`💾 ${plan.length}개 운동 저장 완료!`);
 }
 
 /* ══════════════════════════════════
@@ -1614,34 +2287,56 @@ function hideSplash(){
 function buildFeedback(muscles,doneN,totalN,kcal){
   if(!muscles.length) return null;
   const ratio=totalN>0?doneN/totalN:0;
-  const muscleStr=muscles.join(', ')+' 운동';
-  const kcalStr=kcal>0?` 🔥 ${kcal} kcal 소모!`:'';
 
   const byMuscle={
-    '가슴':['탄탄한 가슴 근육을 키워가고 있어요!','벤치프레스의 왕이 되는 날이 올 거예요 💪'],
-    '등': ['넓은 등판이 완성되어 가고 있어요!','광배근이 날개처럼 펼쳐지고 있어요 🦅'],
-    '하체':['하체는 운동의 기초! 탄탄한 기반을 쌓고 있어요','하체를 단련하는 당신, 진짜 고수예요 🏋️'],
-    '어깨':['어깨가 넓어질수록 실루엣이 달라져요!','볼더숄더를 향해 나아가고 있어요 💪'],
-    '팔':  ['팔 근육이 조금씩 자라고 있어요!','슬리브를 찢을 날이 머지않았어요 💥'],
-    '복근':['코어가 강해질수록 모든 운동이 강해져요!','탄탄한 복근을 향한 여정 중이에요 🔥'],
-    '유산소':['심폐 지구력을 키워가고 있어요!','꾸준한 유산소가 건강의 기반이에요 🏃'],
+    '가슴':[
+      '대흉근 훈련 완료! 근섬유 회복을 위해 48~72시간의 휴식을 권장합니다.',
+      '가슴 훈련은 견갑골 안정화가 핵심입니다. 다음 세션엔 수축 정점에서 1초 유지를 시도해보세요.',
+    ],
+    '등':[
+      '광배근과 능형근을 자극했어요. 등 훈련은 어깨 건강과 자세 교정에도 직결됩니다.',
+      '풀계열 운동 후 팔꿈치 굴근의 피로가 누적될 수 있어요. 전완 스트레칭을 잊지 마세요.',
+    ],
+    '하체':[
+      '하체는 전신 근육의 60% 이상을 차지합니다. 오늘 훈련은 기초대사량 향상에 크게 기여해요.',
+      '복합 하체 운동은 테스토스테론·성장호르몬 분비를 촉진합니다. 좋은 선택이에요.',
+    ],
+    '어깨':[
+      '삼각근 훈련 완료. 회전근개 안정성을 위해 페이스풀과 외회전 운동을 병행하면 부상 예방에 효과적입니다.',
+      '어깨는 구조상 불안정한 관절이에요. 충분한 워밍업과 점진적 중량 증가가 중요합니다.',
+    ],
+    '팔':[
+      '이두·삼두 훈련 완료. 팔 운동은 수축 정점의 마인드-머슬 커넥션이 성장에 결정적입니다.',
+      '팔꿈치 완전 신전보다 약 5° 미만의 잠금 해제 상태로 훈련하면 관절 보호에 유리합니다.',
+    ],
+    '복근':[
+      '코어 훈련 완료. 복횡근과 심부 안정화 근육까지 자극하려면 호흡 패턴에 집중하세요.',
+      '복근 훈련은 척추 중립 유지가 핵심입니다. 허리에 과도한 아치가 생기지 않도록 주의하세요.',
+    ],
+    '유산소':[
+      '유산소 훈련은 VO₂max 향상과 지방 산화 촉진에 효과적입니다. 심박수 존을 다양하게 활용해보세요.',
+      '유산소 후 근육 글리코겐이 고갈돼 있어요. 탄수화물과 단백질을 2:1 비율로 보충하는 것을 권장합니다.',
+    ],
   };
 
   let msg='';
   if(muscles.length===1){
-    const lines=byMuscle[muscles[0]]||['훌륭한 운동이었어요!','꾸준히 이어나가세요 💪'];
-    msg=`${muscleStr}을 했군요! ${lines[Math.floor(Math.random()*lines.length)]}`;
+    const lines=byMuscle[muscles[0]]||['좋은 훈련이었습니다. 표적 근육의 충분한 회복을 위해 48시간 휴식을 권장합니다.'];
+    msg=`<strong>${muscles[0]} 훈련 완료.</strong> ${lines[Math.floor(Math.random()*lines.length)]}`;
   } else if(muscles.length<=3){
-    msg=`${muscleStr}을 했군요! 다양한 부위를 고루 단련하는 균형 잡힌 루틴이에요 👍`;
+    msg=`<strong>${muscles.join(' · ')} 복합 훈련 완료.</strong> 다부위 훈련은 근육 간 신경근 협응 능력을 향상시킵니다. 세션 간 단백질 섭취 최적화를 권장합니다.`;
   } else {
-    msg=`${muscles.length}개 부위를 모두 단련했네요! 오늘 완전한 전신 운동을 해냈어요 🏆`;
+    msg=`<strong>전신 ${muscles.length}부위 훈련 완료.</strong> 오늘처럼 고볼륨 세션 이후에는 48~72시간의 충분한 회복이 필수적입니다. 수면 질을 높이고 단백질 1.6~2.2g/kg 섭취를 유지하세요.`;
   }
 
-  if(ratio===1) msg+='<br><br>✅ 계획한 운동을 모두 완료했어요! 대단해요!';
-  else if(ratio>=0.5) msg+=`<br><br>👍 ${doneN}/${totalN}개 완료! 절반 이상 해냈어요.`;
-  else if(doneN>0) msg+=`<br><br>💡 ${doneN}/${totalN}개 완료. 다음엔 더 많이 도전해봐요!`;
+  if(ratio===1) msg+='<br><br>✅ <strong>계획 100% 달성.</strong> 프로그램에 대한 높은 준수율은 장기 성과에 직결됩니다.';
+  else if(ratio>=0.7) msg+=`<br><br>📊 ${doneN}/${totalN} 완료 (${Math.round(ratio*100)}%). 잔여 세트는 차주에 반영해 볼륨을 조정하세요.`;
+  else if(doneN>0) msg+=`<br><br>💡 ${doneN}/${totalN} 완료. 완수 비율이 낮을 경우 운동 볼륨이나 강도 조정이 필요할 수 있어요.`;
 
-  if(kcalStr) msg+=`<br>${kcalStr}`;
+  if(kcal>0){
+    const w=getUserWeight();
+    msg+=`<br>🔥 추정 소모 칼로리 <strong style="color:var(--red)">${kcal} kcal</strong> (체중 ${w}kg 기준)`;
+  }
   return msg;
 }
 
@@ -1672,14 +2367,11 @@ const MSGS=[
 function showCongrats(kcal){
   const p=MSGS[Math.floor(Math.random()*MSGS.length)];
   document.getElementById('congrats-title').textContent=p[0];
-  const sub=p[1]+(kcal>0?`\n\n🔥 총 ${kcal} kcal 소모!`:'');
-  document.getElementById('congrats-sub').textContent=sub;
-  const overlay=document.getElementById('congrats-overlay');
-  overlay.classList.add('show');
-  // 버튼에 직접 이벤트 바인딩 (onclick 인라인 대신 JS로)
-  document.getElementById('congrats-close-btn').onclick=closeCongrats;
-  // 오버레이 배경 클릭도 닫기
-  overlay.onclick=function(e){ if(e.target===overlay) closeCongrats(); };
+  document.getElementById('congrats-sub').textContent=p[1]+(kcal>0?`\n\n🔥 총 ${kcal} kcal 소모!`:'');
+  document.getElementById('congrats-overlay').classList.add('show');
+}
+function onCongratsOverlayClick(e){
+  if(e.target===document.getElementById('congrats-overlay')) closeCongrats();
 }
 function closeCongrats(){
   document.getElementById('congrats-overlay').classList.remove('show');
@@ -1700,6 +2392,9 @@ document.addEventListener('keydown',e=>{
     if(document.getElementById('confirm-overlay').classList.contains('open'))closeConfirm();
     if(document.getElementById('congrats-overlay').classList.contains('show'))closeCongrats();
     if(document.getElementById('plan-tip-overlay').classList.contains('open'))closePlanTip();
+    if(document.getElementById('recommend-overlay').classList.contains('open'))document.getElementById('recommend-overlay').classList.remove('open');
+    if(document.getElementById('ss-overlay').classList.contains('open'))document.getElementById('ss-overlay').classList.remove('open');
+    if(document.getElementById('routine-overlay').classList.contains('open'))document.getElementById('routine-overlay').classList.remove('open');
   }
 });
 
