@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Work out of SIBA</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -445,6 +448,51 @@ input[type="date"]:focus{border-color:var(--accent);}
   .ex-buttons{grid-template-columns:repeat(auto-fill,minmax(105px,1fr));}
 }
 
+/* ─── 세트 완료 버튼 ─── */
+.set-complete-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.set-complete-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);
+  background:var(--surface2);color:var(--muted);
+  font-family:var(--font-body);font-size:.76rem;font-weight:600;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.set-complete-btn.done{
+  background:var(--accent);border-color:var(--accent);color:#fff;
+  text-decoration:line-through;opacity:.8;
+}
+.set-complete-btn:active{transform:scale(.95);}
+
+/* ─── 휴식 타이머 설정 ─── */
+.rest-row{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.rest-label{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.rest-chips{display:flex;gap:5px;flex-wrap:wrap;}
+.rest-chip{padding:4px 11px;border-radius:16px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:.76rem;cursor:pointer;transition:all .18s;}
+.rest-chip.sel{border-color:var(--teal);background:rgba(78,205,196,.12);color:var(--teal);font-weight:700;}
+
+/* ─── 타이머 플로팅 바 ─── */
+#rest-timer-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:500;
+  background:var(--surface);border-top:2px solid var(--teal);
+  padding:14px 20px 18px;
+  display:none;
+  flex-direction:column;align-items:center;gap:6px;
+  box-shadow:0 -8px 32px rgba(78,205,196,.18);
+  animation:slideUp .3s cubic-bezier(.34,1.2,.64,1);
+}
+#rest-timer-bar.active{display:flex;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.timer-label{font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+.timer-display{font-family:'Bebas Neue',sans-serif;font-size:3.2rem;line-height:1;color:var(--teal);letter-spacing:.05em;}
+.timer-display.urgent{color:var(--red);animation:pulse .5s infinite alternate;}
+@keyframes pulse{from{opacity:1;}to{opacity:.5;}}
+.timer-progress-wrap{width:100%;max-width:300px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.timer-progress{height:100%;background:linear-gradient(90deg,var(--teal),#38b2a8);border-radius:2px;transition:width .9s linear;}
+.timer-btns{display:flex;gap:10px;}
+.btn-timer-skip{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 18px;border-radius:20px;font-family:var(--font-body);font-size:.78rem;cursor:pointer;}
+.btn-timer-skip:hover{border-color:var(--teal);color:var(--teal);}
+.btn-timer-stop{background:transparent;border:1px solid rgba(255,76,59,.4);color:var(--red);padding:6px 18px;border-radius:20px;font-family:var(--font-body);font-size:.78rem;cursor:pointer;}
+
 /* ─── 루틴 모달 ─── */
 .routine-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:280;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;}
 .routine-overlay.open{opacity:1;pointer-events:all;}
@@ -778,6 +826,18 @@ input[type="date"]:focus{border-color:var(--accent);}
           <div class="set-col-heads" id="set-col-heads"></div>
           <div id="set-rows-container"></div>
         </div>
+        <!-- 휴식 시간 선택 -->
+        <div class="rest-row">
+          <span class="rest-label">🕐 휴식</span>
+          <div class="rest-chips">
+            <button class="rest-chip" onclick="setRestSec(0)">없음</button>
+            <button class="rest-chip" onclick="setRestSec(30)">30초</button>
+            <button class="rest-chip sel" onclick="setRestSec(60)">1분</button>
+            <button class="rest-chip" onclick="setRestSec(90)">90초</button>
+            <button class="rest-chip" onclick="setRestSec(120)">2분</button>
+            <button class="rest-chip" onclick="setRestSec(180)">3분</button>
+          </div>
+        </div>
       </div>
       <div id="cardio-area" style="display:none">
         <div class="set-rows-wrap">
@@ -1012,6 +1072,19 @@ input[type="date"]:focus{border-color:var(--accent);}
     <div class="congrats-title" id="congrats-title">수고했어요!</div>
     <div class="congrats-sub" id="congrats-sub"></div>
     <button class="congrats-btn" onclick="closeCongrats()">완료!</button>
+  </div>
+</div>
+
+<!-- ══════ 휴식 타이머 바 ══════ -->
+<div id="rest-timer-bar">
+  <div class="timer-label" id="timer-label">다음 세트까지 휴식</div>
+  <div class="timer-display" id="timer-display">1:00</div>
+  <div class="timer-progress-wrap">
+    <div class="timer-progress" id="timer-progress" style="width:100%"></div>
+  </div>
+  <div class="timer-btns">
+    <button class="btn-timer-skip" onclick="skipTimer()">건너뛰기 →</button>
+    <button class="btn-timer-stop" onclick="stopTimer()">✕ 취소</button>
   </div>
 </div>
 
@@ -1280,6 +1353,7 @@ let selMuscle=null, selEx=null;
 let setRows=[{weight:'',reps:''}];
 let editIdx=-1, modalSetRows=[];
 let confirmCb=null;
+let selRestSec=60; // 기본 휴식 1분
 
 /* ══════════════════════════════════
    INIT
@@ -1408,6 +1482,8 @@ function showInputArea(name){
     if(bw){hdr.style.gridTemplateColumns='28px 1fr 28px';hdr.innerHTML='<div></div><div>횟수 (회)</div><div></div>';}
     else{hdr.style.gridTemplateColumns='28px 1fr 1fr 28px';hdr.innerHTML='<div></div><div>무게 (kg)</div><div>횟수 (회)</div><div></div>';}
     setRows=[{weight:'',reps:''}]; renderSetRows(bw);
+    // 현재 selRestSec에 맞게 chip 표시
+    setRestSec(selRestSec);
   } else {
     document.getElementById('cardio-min').value='';
     document.getElementById('cardio-kcal').value='';
@@ -1442,7 +1518,16 @@ function addPlanItem(){
     plan.push({name:selEx,cardioMin:min?+min:null,cardioKcal:kcal?+kcal:null,done:false});
   } else {
     const bw=isBW(selEx);
-    plan.push({name:selEx,done:false,sets:setRows.map((s,i)=>({setNum:i+1,weight:bw?null:(s.weight!==''?+s.weight:null),reps:s.reps!==''?+s.reps:null}))});
+    plan.push({
+      name:selEx,done:false,
+      restSec:selRestSec,
+      sets:setRows.map((s,i)=>({
+        setNum:i+1,
+        weight:bw?null:(s.weight!==''?+s.weight:null),
+        reps:s.reps!==''?+s.reps:null,
+        done:false
+      }))
+    });
   }
   renderPlanList(); resetForm(); blurAll(); showToast(`✅ ${selEx} 추가!`);
 }
@@ -1760,7 +1845,91 @@ function addSupersetToPlan(){
   showToast(`🔗 슈퍼세트 추가! ${ssExA} + ${ssExB}`);
 }
 
-/* ═══ renderPlanList — 슈퍼세트 그룹핑 ═══ */
+/* ══════════════════════════════════
+   휴식 시간 선택
+══════════════════════════════════ */
+function setRestSec(sec){
+  selRestSec=sec;
+  document.querySelectorAll('.rest-chip').forEach(el=>{
+    const v=parseInt(el.getAttribute('onclick').match(/\d+/)?.[0]??'-1');
+    el.className='rest-chip'+(v===sec?' sel':'');
+  });
+}
+
+/* ══════════════════════════════════
+   타이머
+══════════════════════════════════ */
+let timerInterval=null, timerTotal=0, timerLeft=0;
+
+function startRestTimer(sec, label){
+  if(!sec){ return; }
+  stopTimer();
+  timerTotal=sec; timerLeft=sec;
+  const bar=document.getElementById('rest-timer-bar');
+  document.getElementById('timer-label').textContent=label||'다음 세트까지 휴식';
+  bar.classList.add('active');
+  updateTimerDisplay();
+  timerInterval=setInterval(()=>{
+    timerLeft--;
+    updateTimerDisplay();
+    if(timerLeft<=0){ stopTimer(); showToast('⏰ 휴식 완료! 다음 세트 시작하세요'); }
+  },1000);
+}
+function updateTimerDisplay(){
+  const m=Math.floor(timerLeft/60), s=timerLeft%60;
+  const txt=`${m}:${String(s).padStart(2,'0')}`;
+  const disp=document.getElementById('timer-display');
+  disp.textContent=txt;
+  disp.className='timer-display'+(timerLeft<=10?' urgent':'');
+  const pct=timerTotal>0?Math.max(0,(timerLeft/timerTotal)*100):0;
+  document.getElementById('timer-progress').style.width=pct+'%';
+}
+function skipTimer(){ stopTimer(); showToast('⏭ 휴식 건너뜀'); }
+function stopTimer(){
+  if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
+  document.getElementById('rest-timer-bar').classList.remove('active');
+}
+
+/* ══════════════════════════════════
+   세트별 완료
+══════════════════════════════════ */
+function completeSet(planIdx, setIdx){
+  const item=plan[planIdx];
+  if(!item||!item.sets) return;
+  const s=item.sets[setIdx];
+  s.done=!s.done;
+  // 모든 세트 완료 시 운동 전체 done 처리
+  const allSetsDone=item.sets.every(st=>st.done);
+  if(allSetsDone && !item.done){
+    item.done=true;
+    // 슈퍼세트 파트너도 확인
+    if(item.superset){
+      const partner=plan.find((p,i)=>i!==planIdx&&p.pairId===item.pairId);
+      if(partner&&partner.sets&&partner.sets.every(st=>st.done)) partner.done=true;
+    }
+    // 휴식 타이머 (마지막 세트 완료 후에는 타이머 없음)
+    // 전체 운동 완료 확인
+    if(plan.every(p=>p.done)){
+      stopTimer();
+      const totalKcal=plan.reduce((s,p)=>s+(calcKcal(p)||0),0);
+      setTimeout(()=>showCongrats(totalKcal),300);
+    }
+  } else if(s.done && !allSetsDone && item.restSec){
+    // 세트 완료 → 다음 세트 휴식 타이머 시작
+    const remaining=item.sets.filter(st=>!st.done).length;
+    startRestTimer(item.restSec, `${item.name} — 다음 세트까지 (${remaining}세트 남음)`);
+  } else if(s.done && !allSetsDone && !item.restSec){
+    // 휴식 없음
+  } else if(!s.done){
+    // 취소 시 타이머 멈춤
+    stopTimer();
+  }
+  renderPlanList();
+}
+
+/* ══════════════════════════════════
+   PLAN LIST
+══════════════════════════════════ */
 function renderPlanList(){
   const has=plan.length>0;
   document.getElementById('plan-section').style.display=has?'block':'none';
@@ -1814,15 +1983,37 @@ function renderPlanItem(item,idx){
   const c=MC[getMuscle(item.name)]||MC['기타'], kcal=calcKcal(item);
   const ssBadge=item.superset?`<span class="ss-badge">SS·${item.pairRole}</span>`:'';
   let detail='';
+
   if(item.cardioMin!=null||item.cardioKcal!=null){
     const p=[]; if(item.cardioMin)p.push(`⏱ ${item.cardioMin}분`); if(item.cardioKcal)p.push(`🔥 ${item.cardioKcal} kcal`);
     detail=`<div style="font-size:.74rem;color:var(--muted);margin-top:3px">${p.join('  ')}</div>`;
+
   } else if(item.sets){
-    const chips=item.sets.map(s=>{
+    const doneSets=item.sets.filter(s=>s.done).length;
+    const totalSets=item.sets.length;
+
+    // 세트별 완료 버튼
+    const setButtons=item.sets.map((s,si)=>{
       const p=[]; if(s.weight!=null)p.push(s.weight+'kg'); if(s.reps!=null)p.push(s.reps+'회');
-      return `<div class="set-chip${item.done?' done-chip':''}"><span>${s.setNum}세트</span> ${p.join(' × ')||'기록없음'}</div>`;
+      const label=p.length?p.join('×'):`${si+1}세트`;
+      const isDone=!!s.done;
+      return `<button class="set-complete-btn${isDone?' done':''}"
+        onclick="event.stopPropagation();completeSet(${idx},${si})">
+        ${isDone?'✓ ':''}<span style="font-size:.65rem;opacity:.7">${si+1}세트</span> ${label}
+      </button>`;
     }).join('');
-    detail=`<div class="plan-set-chips">${chips}</div>`;
+
+    // 진행 상태 텍스트
+    const progressTxt = doneSets>0
+      ? `<span style="font-size:.7rem;color:var(--accent);margin-left:4px">${doneSets}/${totalSets} 완료</span>`
+      : '';
+
+    detail=`<div class="set-complete-row">${setButtons}</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+        ${progressTxt}
+        ${item.restSec?`<span style="font-size:.68rem;color:var(--teal)">🕐 ${item.restSec<60?item.restSec+'초':Math.floor(item.restSec/60)+'분'} 휴식</span>`:''}
+      </div>`;
+
     if(kcal) detail+=`<div class="plan-kcal">🔥 약 ${kcal} kcal</div>`;
     const prev=getPrevRecord(item.name), cmp=prev?formatCmp(item.sets,prev):null;
     if(cmp){
@@ -1830,6 +2021,7 @@ function renderPlanItem(item,idx){
       detail+=`<div class="plan-cmp" style="color:${col}">📊 ${cmp.text}</div>`;
     }
   }
+
   return `<div class="plan-item${item.done?' done':''}${item.superset?' superset':''}" onclick="toggleDone(${idx})">
     <div class="check-circle">${item.done?'✓':''}</div>
     <div class="plan-item-body">
