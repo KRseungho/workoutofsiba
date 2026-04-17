@@ -55,7 +55,7 @@ header{
 .nav-tab.active{background:var(--accent);color:#fff;font-weight:700;}
 
 /* ─── VIEWS ─── */
-.view{display:none;padding:22px;max-width:820px;margin:0 auto;}
+.view{display:none;padding:22px;padding-bottom:120px;max-width:820px;margin:0 auto;}
 .view.active{display:block;animation:fadeUp .3s ease;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
@@ -778,6 +778,12 @@ input[type="date"]:focus{border-color:var(--accent);}
     <div id="home-today" style="font-size:.76rem;color:var(--muted);margin-top:6px;padding-top:8px;border-top:1px solid var(--border)"></div>
   </div>
 
+  <!-- 이번주 운동 요약 -->
+  <div class="card" id="home-week-card">
+    <div class="card-title">이번주 운동 요약</div>
+    <div id="home-week-summary"></div>
+  </div>
+
   <!-- 빠른 이동 -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px">
     <button class="btn-plan" style="margin:0;font-size:1rem" onclick="showView('record')">📋 운동 기록</button>
@@ -902,6 +908,19 @@ input[type="date"]:focus{border-color:var(--accent);}
       <div class="stat-card-label">🔥 누적 소모 칼로리 (kcal)</div>
     </div>
   </div>
+
+  <!-- 총 중량 추세 그래프 -->
+  <div class="card">
+    <div class="card-title">총 중량 추세</div>
+    <!-- 부위 선택 탭 -->
+    <div id="chart-filter-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px"></div>
+    <!-- SVG 그래프 -->
+    <div id="vol-chart-wrap" style="position:relative;width:100%;overflow-x:auto">
+      <svg id="vol-chart-svg" style="display:block;width:100%;min-width:260px" height="160"></svg>
+    </div>
+    <div id="vol-chart-empty" style="display:none;text-align:center;padding:28px 0;font-size:.82rem;color:var(--muted)">아직 기록이 없어요</div>
+  </div>
+
   <div class="card"><div class="card-title">이번달 부위별 운동</div><div id="muscle-chart"></div></div>
   <div class="card"><div class="card-title">최근 운동 기록</div><div id="recent-list"><div class="no-history">아직 기록이 없어요</div></div></div>
 </div>
@@ -1107,21 +1126,21 @@ input[type="date"]:focus{border-color:var(--accent);}
    DB
 ══════════════════════════════════ */
 const EXERCISE_DB = {
-  '가슴':['벤치프레스','인클라인 벤치프레스','디클라인 벤치프레스','덤벨 플라이','인클라인 덤벨 플라이','케이블 크로스오버','체스트 프레스 머신','딥스','푸쉬업','펙 덱 플라이',
+  '가슴':['벤치프레스','인클라인 벤치프레스','디클라인 벤치프레스','덤벨 플라이','인클라인 덤벨 플라이','케이블 크로스오버','체스트 프레스 머신','딥스','푸시업','펙 덱 플라이',
     '스미스 벤치프레스','스미스 인클라인 벤치프레스'],
-  '등':['데드리프트','루마니안 데드리프트','바벨 로우','덤벨 로우','원암 로우 머신','케이블 로우','T바 로우','풀업','친업','랫 풀다운','와이드 랫풀다운','시티드 케이블 로우','스트레이트 암 풀다운',
+  '등':['데드리프트','루마니안 데드리프트','바벨 로우','덤벨 로우','원암 덤벨 로우','원암 로우 머신','케이블 로우','T바 로우','풀업','친업','랫 풀다운','와이드 랫 풀다운','시티드 케이블 로우','시티드 로우 머신','스트레이트 암 풀다운',
     '스미스 데드리프트','스미스 로우'],
-  '하체':['스쿼트','프론트 스쿼트','레그프레스','런지','불가리안 스플릿 스쿼트','힙 쓰러스트','레그컬','레그 익스텐션','카프 레이즈','핵 스쿼트',
+  '하체':['스쿼트','프론트 스쿼트','레그프레스','런지','불가리안 스플릿 스쿼트','힙 쓰러스트','레그 컬','레그 익스텐션','카프 레이즈','핵 스쿼트',
     '스미스 스쿼트','스미스 런지','스미스 힙 쓰러스트','스미스 카프 레이즈'],
-  '어깨':['오버헤드프레스','덤벨 숄더프레스','머신 숄더프레스','사이드 레터럴 레이즈','프론트 레이즈','리어 델트 플라이','벤트 오버 레이즈','페이스풀','업라이트 로우',
-    '스미스 오버헤드프레스','스미스 업라이트 로우'],
-  '팔':['바벨 컬','덤벨 컬','해머 컬','이두 컬 머신','인클라인 덤벨 컬','컨센트레이션 컬','케이블 컬','트라이셉 푸시다운','스컬크러셔','오버헤드 트라이셉 익스텐션','트라이셉 킥백','클로즈 그립 벤치프레스','딥스(팔)',
+  '어깨':['오버헤드 프레스','덤벨 숄더 프레스','머신 숄더 프레스','사이드 레터럴 레이즈','프론트 레이즈','리어 델트 플라이','벤트 오버 레이즈','페이스 풀','업라이트 로우',
+    '스미스 오버헤드 프레스','스미스 업라이트 로우'],
+  '팔':['바벨 컬','덤벨 컬','해머 컬','이두 컬 머신','인클라인 덤벨 컬','컨센트레이션 컬','케이블 컬','트라이셉 푸시다운','스컬 크러셔','오버헤드 트라이셉 익스텐션','트라이셉 킥백','클로즈 그립 벤치프레스','딥스(팔)',
     '스미스 클로즈 그립 벤치프레스'],
-  '복근':['크런치','레그레이즈','플랭크','케이블 크런치','싯업','바이시클 크런치'],
+  '복근':['크런치','레그 레이즈','플랭크','케이블 크런치','싯업','바이시클 크런치'],
   '유산소':['러닝','사이클','로잉머신','스텝밀','줄넘기','일립티컬','버피'],
 };
 const CARDIO_SET = new Set(EXERCISE_DB['유산소']);
-const BWNAME_SET = new Set(['풀업','친업','딥스','딥스(팔)','푸쉬업','크런치','싯업','레그레이즈','바이시클 크런치','버피','플랭크']);
+const BWNAME_SET = new Set(['풀업','친업','딥스','딥스(팔)','푸시업','크런치','싯업','레그 레이즈','바이시클 크런치','버피','플랭크']);
 
 /* ── 칼로리 DB (MET 기반 최신화) ──
    w  = 웨이트: kcal = reps × weight × v
@@ -1145,25 +1164,28 @@ const CALORIE_DB = {
   /* 하체 */
   '스쿼트':{t:'w',v:.100},'프론트 스쿼트':{t:'w',v:.098},'레그프레스':{t:'w',v:.087},
   '런지':{t:'w',v:.090},'불가리안 스플릿 스쿼트':{t:'w',v:.094},'힙 쓰러스트':{t:'w',v:.085},
-  '레그컬':{t:'w',v:.072},'레그 익스텐션':{t:'w',v:.070},'카프 레이즈':{t:'w',v:.050},'핵 스쿼트':{t:'w',v:.095},
+  '레그 컬':{t:'w',v:.072},'레그 익스텐션':{t:'w',v:.070},'카프 레이즈':{t:'w',v:.050},'핵 스쿼트':{t:'w',v:.095},
   '스미스 스쿼트':{t:'w',v:.096},'스미스 런지':{t:'w',v:.088},'스미스 힙 쓰러스트':{t:'w',v:.082},'스미스 카프 레이즈':{t:'w',v:.048},
   /* 어깨 */
-  '오버헤드프레스':{t:'w',v:.083},'덤벨 숄더프레스':{t:'w',v:.080},'머신 숄더프레스':{t:'w',v:.078},
+  '오버헤드 프레스':{t:'w',v:.083},'덤벨 숄더 프레스':{t:'w',v:.080},'머신 숄더 프레스':{t:'w',v:.078},
   '사이드 레터럴 레이즈':{t:'w',v:.060},'프론트 레이즈':{t:'w',v:.060},'리어 델트 플라이':{t:'w',v:.063},
-  '벤트 오버 레이즈':{t:'w',v:.061},'페이스풀':{t:'w',v:.065},'업라이트 로우':{t:'w',v:.074},
-  '스미스 오버헤드프레스':{t:'w',v:.080},'스미스 업라이트 로우':{t:'w',v:.072},
+  '벤트 오버 레이즈':{t:'w',v:.061},'페이스 풀':{t:'w',v:.065},'업라이트 로우':{t:'w',v:.074},
+  '스미스 오버헤드 프레스':{t:'w',v:.080},'스미스 업라이트 로우':{t:'w',v:.072},
   /* 팔 */
   '바벨 컬':{t:'w',v:.065},'덤벨 컬':{t:'w',v:.063},'해머 컬':{t:'w',v:.063},
   '인클라인 덤벨 컬':{t:'w',v:.061},'컨센트레이션 컬':{t:'w',v:.061},'케이블 컬':{t:'w',v:.060},
-  '트라이셉 푸시다운':{t:'w',v:.063},'스컬크러셔':{t:'w',v:.067},'오버헤드 트라이셉 익스텐션':{t:'w',v:.065},
+  '트라이셉 푸시다운':{t:'w',v:.063},'스컬 크러셔':{t:'w',v:.067},'오버헤드 트라이셉 익스텐션':{t:'w',v:.065},
   '트라이셉 킥백':{t:'w',v:.057},'클로즈 그립 벤치프레스':{t:'w',v:.080},'딥스(팔)':{t:'bw',v:.55},
   '스미스 클로즈 그립 벤치프레스':{t:'w',v:.078},
   /* 복근 */
-  '크런치':{t:'bw',v:.28},'레그레이즈':{t:'bw',v:.33},'플랭크':{t:'c',v:3.8},
+  '크런치':{t:'bw',v:.28},'레그 레이즈':{t:'bw',v:.33},'플랭크':{t:'c',v:3.8},
   '케이블 크런치':{t:'w',v:.052},'싯업':{t:'bw',v:.31},'바이시클 크런치':{t:'bw',v:.30},
   /* 유산소 */
   '러닝':{t:'c',v:10.0},'사이클':{t:'c',v:7.8},'로잉머신':{t:'c',v:8.8},'스텝밀':{t:'c',v:9.5},
   '줄넘기':{t:'c',v:11.5},'일립티컬':{t:'c',v:6.5},'버피':{t:'bw',v:1.0},
+  /* 등 추가 */
+  '와이드 랫 풀다운':{t:'w',v:.080},'이두 컬 머신':{t:'w',v:.063},'시티드 로우 머신':{t:'w',v:.077},
+  '원암 덤벨 로우':{t:'w',v:.086},'푸시업':{t:'bw',v:.45},
 };
 
 const MUSCLE_MAP = {};
@@ -1429,6 +1451,90 @@ function init(){
 function blurAll(){document.activeElement&&document.activeElement.blur();}
 function toDateStr(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 
+function renderWeekSummary(){
+  const el=document.getElementById('home-week-summary'); if(!el) return;
+  // 이번주 월~일 범위 계산
+  const today=new Date();
+  const dow=today.getDay(); // 0=일
+  const monday=new Date(today); monday.setDate(today.getDate()-(dow===0?6:dow-1));
+  const sunday=new Date(monday); sunday.setDate(monday.getDate()+6);
+  const W=['일','월','화','수','목','금','토'];
+  const DAY_LABELS=['월','화','수','목','금','토','일'];
+
+  // 7일치 데이터
+  const days=Array.from({length:7},(_,i)=>{
+    const d=new Date(monday); d.setDate(monday.getDate()+i);
+    return toDateStr(d);
+  });
+  const todayStr=toDateStr(today);
+
+  let weekDays=0, weekKcal=0, weekVolW=0, weekVolBW=0;
+  const dayData=days.map((ds,i)=>{
+    const data=workouts[ds];
+    if(!data||!data.length) return {ds,label:DAY_LABELS[i],done:false,kcal:0,vol:0,isToday:ds===todayStr};
+    const done=data.filter(p=>p.done);
+    const kcal=done.reduce((s,p)=>s+(calcKcal(p)||0),0);
+    let vol=0;
+    done.forEach(p=>{const v=calcVolume(p);if(v&&!v.isBW){vol+=v.val;weekVolW+=v.val;}if(v&&v.isBW)weekVolBW+=v.val;});
+    if(done.length) weekDays++;
+    weekKcal+=kcal;
+    weekVolW-=(done.reduce((s,p)=>{const v=calcVolume(p);return s+(v&&!v.isBW?v.val:0);},0)); // 중복 방지 재집계
+    return {ds,label:DAY_LABELS[i],done:done.length>0,kcal,vol,muscles:[...new Set(done.map(p=>getMuscle(p.name)))],isToday:ds===todayStr,count:done.length,total:data.length};
+  });
+
+  // 정확한 주간 합산
+  weekVolW=0; weekVolBW=0; weekKcal=0; weekDays=0;
+  dayData.forEach(d=>{
+    if(!workouts[d.ds]) return;
+    const done=workouts[d.ds].filter(p=>p.done);
+    if(done.length) weekDays++;
+    done.forEach(p=>{
+      weekKcal+=calcKcal(p)||0;
+      const v=calcVolume(p);
+      if(v){ if(v.isBW) weekVolBW+=v.val; else weekVolW+=v.val; }
+    });
+  });
+
+  // 요일별 도트 바
+  const dotBar=dayData.map(d=>{
+    const isToday=d.isToday;
+    const hasDone=d.done;
+    const bg=hasDone?'var(--accent)':(isToday?'var(--border)':'var(--surface2)');
+    const border=isToday?'2px solid var(--accent)':'1px solid var(--border)';
+    const muscles=d.muscles||[];
+    const tip=muscles.length?muscles.join('·'):'';
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:28px;height:28px;border-radius:50%;background:${bg};border:${border};display:flex;align-items:center;justify-content:center;font-size:.6rem;color:${hasDone?'#fff':isToday?'var(--accent)':'var(--muted)'}">
+        ${hasDone?'✓':isToday?'●':''}
+      </div>
+      <div style="font-size:.62rem;color:${isToday?'var(--accent)':'var(--muted)'};font-weight:${isToday?700:400}">${d.label}</div>
+      ${tip?`<div style="font-size:.54rem;color:var(--muted);text-align:center;line-height:1.2;max-width:36px">${tip}</div>`:''}
+    </div>`;
+  }).join('');
+
+  const volLine=[];
+  if(weekVolW>0) volLine.push(`🏋️ ${weekVolW.toLocaleString()}kg`);
+  if(weekVolBW>0) volLine.push(`🤸 ${weekVolBW.toLocaleString()}회`);
+
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-around;margin-bottom:12px">${dotBar}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent)">${weekDays}</div>
+        <div style="font-size:.64rem;color:var(--muted)">운동일</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--red)">${weekKcal>0?weekKcal.toLocaleString():'-'}</div>
+        <div style="font-size:.64rem;color:var(--muted)">소모 kcal</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent2)">${weekVolW>0?(weekVolW>=1000?(weekVolW/1000).toFixed(1)+'t':weekVolW.toLocaleString()+''):'-'}</div>
+        <div style="font-size:.64rem;color:var(--muted)">${weekVolW>=1000?'총 중량(t)':'총 중량(kg)'}</div>
+      </div>
+    </div>
+    ${weekDays===0?`<div style="font-size:.78rem;color:var(--muted);text-align:center;margin-top:10px">이번주 운동을 시작해볼까요? 💪</div>`:''}`;
+}
+
 function updateDateDisplay(){
   const val=document.getElementById('record-date').value; if(!val)return;
   const d=new Date(val+'T00:00:00'), W=['일','월','화','수','목','금','토'];
@@ -1466,7 +1572,8 @@ function renderHome(){
   if(bf) bf.className='gender-btn'+(savedG==='f'?' sel-f':'');
   if(savedH&&savedW) updateBMIDisplay();
 
-  // 전문적인 동기부여 멘트
+  // 이번주 요약
+  renderWeekSummary();
   const QUOTES=[
     ['점진적 과부하의 원칙 🏋️','매 세션마다 무게·횟수·세트 중 하나를 조금씩 늘려보세요.\n근비대의 핵심은 지속적인 자극 증가입니다.'],
     ['근육 회복의 과학 🔬','근섬유는 운동 중 미세하게 손상되고, 휴식 중 더 강하게 재건됩니다.\n충분한 수면(7~9시간)과 단백질 섭취가 성장의 열쇠예요.'],
@@ -2534,7 +2641,126 @@ function changeMonth(dir){
 /* ══════════════════════════════════
    STATS
 ══════════════════════════════════ */
+/* ══════════════════════════════════
+   총 중량 추세 SVG 그래프
+══════════════════════════════════ */
+let chartFilterMuscle = '전체';
+
+function renderVolChart(muscle){
+  chartFilterMuscle = muscle||'전체';
+  const keys=Object.keys(workouts).sort();
+  // 최근 30일만
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-29);
+  const cutoffStr=toDateStr(cutoff);
+  const filtered=keys.filter(k=>k>=cutoffStr);
+
+  // 필터 탭 렌더
+  const tabsEl=document.getElementById('chart-filter-tabs');
+  if(tabsEl){
+    const muscles=['전체','가슴','등','하체','어깨','팔','복근'];
+    tabsEl.innerHTML=muscles.map(m=>{
+      const c=MC[m]||{bg:'rgba(232,134,58,.12)',bd:'rgba(232,134,58,.5)',tx:'var(--accent)'};
+      const sel=chartFilterMuscle===m;
+      return `<button onclick="renderVolChart('${m}')"
+        style="padding:4px 12px;border-radius:16px;border:1.5px solid ${sel?c.bd:'var(--border)'};
+          background:${sel?c.bg:'transparent'};color:${sel?c.tx:'var(--muted)'};
+          font-family:var(--font-body);font-size:.74rem;font-weight:${sel?700:500};cursor:pointer;transition:all .18s">${m}</button>`;
+    }).join('');
+  }
+
+  const svg=document.getElementById('vol-chart-svg');
+  const emptyEl=document.getElementById('vol-chart-empty');
+  if(!svg) return;
+
+  // 데이터 포인트 계산
+  const points=filtered.map(k=>{
+    const data=workouts[k].filter(p=>p.done);
+    let vol=0;
+    data.forEach(p=>{
+      if(muscle&&muscle!=='전체'&&getMuscle(p.name)!==muscle) return;
+      const v=calcVolume(p);
+      if(v&&!v.isBW) vol+=v.val;
+    });
+    return {date:k, val:vol};
+  }).filter(p=>p.val>0);
+
+  if(!points.length){
+    svg.style.display='none';
+    if(emptyEl) emptyEl.style.display='block';
+    return;
+  }
+  svg.style.display='block';
+  if(emptyEl) emptyEl.style.display='none';
+
+  // SVG 크기
+  const W=svg.parentElement?.offsetWidth||300;
+  const H=160, PAD={top:16,right:16,bottom:36,left:52};
+  const innerW=W-PAD.left-PAD.right;
+  const innerH=H-PAD.top-PAD.bottom;
+  svg.setAttribute('width',W);
+  svg.setAttribute('height',H);
+
+  const maxVal=Math.max(...points.map(p=>p.val));
+  const minVal=0;
+  const range=maxVal-minVal||1;
+
+  // 스케일
+  const xScale=(i)=>PAD.left+( points.length===1 ? innerW/2 : i/(points.length-1)*innerW);
+  const yScale=(v)=>PAD.top+innerH-(v-minVal)/range*innerH;
+
+  // Y축 그리드 (3단계)
+  const yTicks=[0, Math.round(maxVal*0.5), maxVal];
+  let gridLines=yTicks.map(t=>`
+    <line x1="${PAD.left}" y1="${yScale(t)}" x2="${PAD.left+innerW}" y2="${yScale(t)}"
+      stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="${PAD.left-6}" y="${yScale(t)+4}" text-anchor="end" font-size="9" fill="var(--muted)">
+      ${t>=1000?(t/1000).toFixed(1)+'t':t+'kg'}</text>`).join('');
+
+  // 라인 패스
+  const linePts=points.map((p,i)=>`${xScale(i)},${yScale(p.val)}`).join(' ');
+  const areaBot=`${xScale(points.length-1)},${PAD.top+innerH} ${xScale(0)},${PAD.top+innerH}`;
+  const areaPath=`${linePts} ${areaBot}`;
+
+  // 선택 부위 색
+  const mc=MC[muscle]||{tx:'var(--accent)',bd:'rgba(232,134,58,.5)'};
+  const lineColor=muscle&&muscle!=='전체'?mc.tx:'var(--accent)';
+  const areaColor=muscle&&muscle!=='전체'?mc.bd:'rgba(232,134,58,.25)';
+
+  // X축 날짜 레이블 (최대 5개)
+  const step=Math.max(1,Math.floor(points.length/5));
+  const xLabels=points.filter((_,i)=>i%step===0||i===points.length-1).map((p,_,arr)=>{
+    const idx=points.indexOf(p);
+    const d=new Date(p.date+'T00:00:00');
+    const lbl=`${d.getMonth()+1}/${d.getDate()}`;
+    return `<text x="${xScale(idx)}" y="${H-6}" text-anchor="middle" font-size="9" fill="var(--muted)">${lbl}</text>`;
+  }).join('');
+
+  // 데이터 포인트 원
+  const dots=points.map((p,i)=>{
+    const x=xScale(i), y=yScale(p.val);
+    const d=new Date(p.date+'T00:00:00');
+    const tip=`${d.getMonth()+1}/${d.getDate()} ${p.val>=1000?(p.val/1000).toFixed(1)+'t':p.val+'kg'}`;
+    return `<circle cx="${x}" cy="${y}" r="3.5" fill="${lineColor}" stroke="var(--surface)" stroke-width="1.5"/>`;
+  }).join('');
+
+  svg.innerHTML=`
+    <defs>
+      <linearGradient id="volGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${lineColor}" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="${lineColor}" stop-opacity="0.02"/>
+      </linearGradient>
+    </defs>
+    ${gridLines}
+    <polyline points="${areaPath}" fill="url(#volGrad)" stroke="none"/>
+    <polyline points="${linePts}" fill="none" stroke="${lineColor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}
+    ${xLabels}`;
+}
+
 function updateStats(){
+  // 그래프 렌더 (뷰 전환 후 DOM이 준비된 시점에)
+  setTimeout(()=>renderVolChart(chartFilterMuscle),50);
+
   const keys=Object.keys(workouts).sort().reverse();
   document.getElementById('stat-total').textContent=keys.length;
   const now=new Date(), ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
