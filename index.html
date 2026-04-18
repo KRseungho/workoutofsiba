@@ -864,7 +864,10 @@ input[type="date"]:focus{border-color:var(--accent);}
   <div id="plan-section" style="display:none">
     <div class="prog-header">
       <div class="prog-label">오늘의 계획</div>
-      <div class="prog-count"><strong id="done-count">0</strong> / <span id="total-count">0</span> 완료</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="prog-count"><strong id="done-count">0</strong> / <span id="total-count">0</span> 완료</div>
+        <button onclick="clearAllPlan()" style="padding:3px 10px;border-radius:14px;border:1px solid rgba(255,76,59,.4);background:transparent;color:var(--red);font-family:var(--font-body);font-size:.72rem;cursor:pointer;white-space:nowrap;">전체 삭제</button>
+      </div>
     </div>
     <div class="prog-bar-wrap"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
     <div class="kcal-bar" id="kcal-bar" style="display:none">
@@ -2253,17 +2256,33 @@ function renderPlanItem(item,idx){
 }
 
 function toggleDone(idx){
-  plan[idx].done=!plan[idx].done;
-  // 슈퍼세트는 파트너도 함께 done 처리
-  if(plan[idx].superset){
-    const pairId=plan[idx].pairId;
-    const partner=plan.find((p,i)=>i!==idx&&p.pairId===pairId);
-    if(partner) partner.done=plan[idx].done;
+  const item=plan[idx];
+  const newDone=!item.done;
+  item.done=newDone;
+
+  // 모든 세트도 동시에 완료/취소
+  if(item.sets){
+    item.sets.forEach(s=>{ s.done=newDone; });
   }
+
+  // 슈퍼세트 파트너도 함께 처리
+  if(item.superset){
+    const partner=plan.find((p,i)=>i!==idx&&p.pairId===item.pairId);
+    if(partner){
+      partner.done=newDone;
+      if(partner.sets) partner.sets.forEach(s=>{ s.done=newDone; });
+    }
+  }
+
+  // 완료 취소 시 타이머 멈춤
+  if(!newDone) stopTimer();
+
   renderPlanList();
-  if(plan.length>0&&plan.every(p=>p.done)){
+
+  if(newDone && plan.length>0 && plan.every(p=>p.done)){
+    stopTimer();
     const totalKcal=plan.reduce((s,p)=>s+(calcKcal(p)||0),0);
-    showCongrats(totalKcal);
+    setTimeout(()=>showCongrats(totalKcal),300);
   }
 }
 function deletePlanItem(idx){
@@ -2279,9 +2298,18 @@ function deletePlanItem(idx){
   renderPlanList();
 }
 
-/* ══════════════════════════════════
-   루틴 저장 / 불러오기
-══════════════════════════════════ */
+function clearAllPlan(){
+  if(!plan.length) return;
+  openConfirm(
+    `운동 계획 ${plan.length}개를 모두 삭제할까요?`,
+    ()=>{
+      plan=[];
+      stopTimer();
+      renderPlanList();
+      showToast('🗑 전체 계획이 삭제됐어요');
+    }
+  );
+}
 const ROUTINE_KEY = 'worksiba_routines';
 const MAX_ROUTINES = 10;
 
