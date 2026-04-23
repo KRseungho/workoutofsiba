@@ -2437,8 +2437,12 @@ function loadRoutine(id){
 }
 
 function _applyRoutine(routine){
-  // done 상태 초기화하고 불러옴
-  plan = JSON.parse(JSON.stringify(routine.items)).map(it=>({...it, done:false}));
+  // item.done + 각 세트의 done 모두 초기화
+  plan = JSON.parse(JSON.stringify(routine.items)).map(it=>({
+    ...it,
+    done: false,
+    sets: it.sets ? it.sets.map(s=>({...s, done:false})) : it.sets
+  }));
   renderPlanList();
   document.getElementById('routine-overlay').classList.remove('open');
   showToast(`📁 "${routine.name}" 루틴을 불러왔어요!`);
@@ -2475,16 +2479,60 @@ function saveWorkout(){
 /* ══════════════════════════════════
    EDIT MODAL
 ══════════════════════════════════ */
+let editPartnerIdx = -1;   // 슈퍼세트 파트너 인덱스
+let modalSetRowsB = [];    // 슈퍼세트 B 세트 rows
+
 function openEditModal(idx){
-  editIdx=idx; const item=plan[idx];
+  editIdx=idx; editPartnerIdx=-1; modalSetRowsB=[];
+  const item=plan[idx];
   document.getElementById('modal-title').textContent='수정: '+item.name;
   const body=document.getElementById('modal-body');
+
   if(isCardio(item.name)){
     body.innerHTML=`<div class="cardio-grid">
       <div class="field"><label>시간 (분)</label><input class="cardio-input" type="number" id="m-min" inputmode="numeric" value="${item.cardioMin||''}" placeholder="30"></div>
       <div class="field"><label>칼로리 (kcal)</label><input class="cardio-input" type="number" id="m-kcal" inputmode="numeric" value="${item.cardioKcal||''}" placeholder="300"></div>
     </div>`;
+
+  } else if(item.superset){
+    // ── 슈퍼세트: A/B 동시 편집 ──
+    const partner=plan.find((p,i)=>i!==idx&&p.pairId===item.pairId);
+    if(partner) editPartnerIdx=plan.indexOf(partner);
+
+    const bwA=isBW(item.name);
+    const bwB=partner?isBW(partner.name):false;
+    modalSetRows=(item.sets||[]).map(s=>({weight:s.weight??'',reps:s.reps??'',done:s.done??false}));
+    modalSetRowsB=partner?(partner.sets||[]).map(s=>({weight:s.weight??'',reps:s.reps??'',done:s.done??false})):[];
+
+    body.innerHTML=`
+      <!-- A 운동 -->
+      <div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:8px">A · ${item.name}</div>
+      <div style="display:grid;grid-template-columns:${bwA?'28px 1fr 28px':'28px 1fr 1fr 28px'};gap:7px;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--border)">
+        <div></div>
+        ${!bwA?'<div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">무게(kg)</div>':''}
+        <div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">횟수(회)</div>
+        <div></div>
+      </div>
+      <div id="modal-set-rows"></div>
+      <button class="btn-add-set" style="margin-top:5px;margin-bottom:16px" onclick="addModalSetRow()">+ 세트 추가</button>
+      ${partner?`
+      <!-- B 운동 -->
+      <div style="height:1px;background:var(--border);margin:10px 0 14px"></div>
+      <div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:8px">B · ${partner.name}</div>
+      <div style="display:grid;grid-template-columns:${bwB?'28px 1fr 28px':'28px 1fr 1fr 28px'};gap:7px;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--border)">
+        <div></div>
+        ${!bwB?'<div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">무게(kg)</div>':''}
+        <div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">횟수(회)</div>
+        <div></div>
+      </div>
+      <div id="modal-set-rows-b"></div>
+      <button class="btn-add-set" style="margin-top:5px" onclick="addModalSetRowB()">+ 세트 추가</button>
+      `:''}`;
+    renderModalSetRows(bwA);
+    if(partner) renderModalSetRowsB(bwB);
+
   } else {
+    // ── 일반 운동 ──
     const bw=isBW(item.name);
     const cols=bw?'28px 1fr 28px':'28px 1fr 1fr 28px';
     const hdr=bw?'<div></div><div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding-left:8px">횟수 (회)</div><div></div>'
@@ -2495,13 +2543,15 @@ function openEditModal(idx){
       <button class="btn-add-set" style="margin-top:5px" onclick="addModalSetRow()">+ 세트 추가</button>`;
     renderModalSetRows(bw);
   }
+
   document.getElementById('modal-overlay').classList.add('open');
   document.body.style.overflow='hidden';
 }
+
 function renderModalSetRows(bw){
-  if(bw===undefined)bw=isBW(editIdx>=0?plan[editIdx]?.name:'');
+  if(bw===undefined) bw=isBW(editIdx>=0?plan[editIdx]?.name:'');
   const cols=bw?'28px 1fr 28px':'28px 1fr 1fr 28px';
-  const el=document.getElementById('modal-set-rows'); if(!el)return;
+  const el=document.getElementById('modal-set-rows'); if(!el) return;
   el.innerHTML=modalSetRows.map((s,i)=>`
     <div class="set-row" style="grid-template-columns:${cols}">
       <div class="set-num">${i+1}</div>
@@ -2510,15 +2560,45 @@ function renderModalSetRows(bw){
       <button class="btn-del-set" onclick="removeModalSetRow(${i})" ${modalSetRows.length===1?'disabled':''}>✕</button>
     </div>`).join('');
 }
-function addModalSetRow(){const last=modalSetRows[modalSetRows.length-1];modalSetRows.push({weight:last.weight,reps:last.reps});renderModalSetRows();}
-function removeModalSetRow(i){if(modalSetRows.length<=1)return;modalSetRows.splice(i,1);renderModalSetRows();}
+
+function renderModalSetRowsB(bw){
+  if(bw===undefined) bw=editPartnerIdx>=0?isBW(plan[editPartnerIdx]?.name):false;
+  const cols=bw?'28px 1fr 28px':'28px 1fr 1fr 28px';
+  const el=document.getElementById('modal-set-rows-b'); if(!el) return;
+  el.innerHTML=modalSetRowsB.map((s,i)=>`
+    <div class="set-row" style="grid-template-columns:${cols}">
+      <div class="set-num">${i+1}</div>
+      ${bw?'':`<input type="number" inputmode="decimal" placeholder="kg" min="0" step="0.5" value="${s.weight}" oninput="modalSetRowsB[${i}].weight=this.value">`}
+      <input type="number" inputmode="numeric" placeholder="회" min="1" value="${s.reps}" oninput="modalSetRowsB[${i}].reps=this.value">
+      <button class="btn-del-set" onclick="removeModalSetRowB(${i})" ${modalSetRowsB.length===1?'disabled':''}>✕</button>
+    </div>`).join('');
+}
+
+function addModalSetRow(){
+  const last=modalSetRows[modalSetRows.length-1];
+  modalSetRows.push({weight:last.weight,reps:last.reps,done:false});
+  renderModalSetRows();
+}
+function removeModalSetRow(i){
+  if(modalSetRows.length<=1) return;
+  modalSetRows.splice(i,1); renderModalSetRows();
+}
+function addModalSetRowB(){
+  const last=modalSetRowsB[modalSetRowsB.length-1];
+  modalSetRowsB.push({weight:last.weight,reps:last.reps,done:false});
+  renderModalSetRowsB();
+}
+function removeModalSetRowB(i){
+  if(modalSetRowsB.length<=1) return;
+  modalSetRowsB.splice(i,1); renderModalSetRowsB();
+}
+
 function saveModal(){
   const item=plan[editIdx];
   if(isCardio(item.name)){
     item.cardioMin=+document.getElementById('m-min').value||null;
     item.cardioKcal=+document.getElementById('m-kcal').value||null;
   } else {
-    // 기존 세트의 done 상태 보존: 같은 인덱스면 유지, 새로 추가된 세트는 false
     const prevSets=item.sets||[];
     item.sets=modalSetRows.map((s,i)=>({
       setNum:i+1,
@@ -2526,13 +2606,25 @@ function saveModal(){
       reps:s.reps!==''?+s.reps:null,
       done: s.done ?? (prevSets[i]?.done ?? false)
     }));
-    // 모든 세트가 완료된 경우 item.done도 true로 갱신
     item.done=item.sets.length>0 && item.sets.every(s=>s.done);
+
+    // 슈퍼세트 파트너도 저장
+    if(item.superset && editPartnerIdx>=0){
+      const partner=plan[editPartnerIdx];
+      const prevB=partner.sets||[];
+      partner.sets=modalSetRowsB.map((s,i)=>({
+        setNum:i+1,
+        weight:s.weight!==''?+s.weight:null,
+        reps:s.reps!==''?+s.reps:null,
+        done: s.done ?? (prevB[i]?.done ?? false)
+      }));
+      partner.done=partner.sets.length>0 && partner.sets.every(s=>s.done);
+    }
   }
   renderPlanList(); closeModal(); showToast('✅ 수정 완료!');
 }
 function onOverlayClick(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
-function closeModal(){document.getElementById('modal-overlay').classList.remove('open');document.body.style.overflow='';editIdx=-1;}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');document.body.style.overflow='';editIdx=-1;editPartnerIdx=-1;}
 
 /* ══════════════════════════════════
    CONFIRM MODAL (삭제용 - confirm() 대체)
