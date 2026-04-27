@@ -1136,7 +1136,7 @@ const EXERCISE_DB = {
   '하체':['스쿼트','프론트 스쿼트','레그프레스','런지','불가리안 스플릿 스쿼트','힙 쓰러스트','레그 컬','레그 익스텐션','카프 레이즈','핵 스쿼트',
     '스미스 스쿼트','스미스 런지','스미스 힙 쓰러스트','스미스 카프 레이즈'],
   '어깨':['오버헤드 프레스','덤벨 숄더 프레스','머신 숄더 프레스','사이드 레터럴 레이즈','프론트 레이즈','리어 델트 플라이','벤트 오버 레이즈','페이스 풀','업라이트 로우',
-    '스미스 오버헤드 프레스','스미스 업라이트 로우'],
+    '스미스 오버헤드 프레스','스미스 업라이트 로우','시티드 스미스 밀리터리 프레스'],
   '팔':['바벨 컬','덤벨 컬','해머 컬','이두 컬 머신','인클라인 덤벨 컬','컨센트레이션 컬','케이블 컬','트라이셉 푸시다운','스컬 크러셔','오버헤드 트라이셉 익스텐션','트라이셉 킥백','클로즈 그립 벤치프레스','딥스(팔)',
     '스미스 클로즈 그립 벤치프레스'],
   '복근':['크런치','레그 레이즈','플랭크','케이블 크런치','싯업','바이시클 크런치'],
@@ -1173,7 +1173,7 @@ const CALORIE_DB = {
   '오버헤드 프레스':{t:'w',v:.083},'덤벨 숄더 프레스':{t:'w',v:.080},'머신 숄더 프레스':{t:'w',v:.078},
   '사이드 레터럴 레이즈':{t:'w',v:.060},'프론트 레이즈':{t:'w',v:.060},'리어 델트 플라이':{t:'w',v:.063},
   '벤트 오버 레이즈':{t:'w',v:.061},'페이스 풀':{t:'w',v:.065},'업라이트 로우':{t:'w',v:.074},
-  '스미스 오버헤드 프레스':{t:'w',v:.080},'스미스 업라이트 로우':{t:'w',v:.072},
+  '스미스 오버헤드 프레스':{t:'w',v:.080},'스미스 업라이트 로우':{t:'w',v:.072},'시티드 스미스 밀리터리 프레스':{t:'w',v:.081},
   /* 팔 */
   '바벨 컬':{t:'w',v:.065},'덤벨 컬':{t:'w',v:.063},'해머 컬':{t:'w',v:.063},
   '인클라인 덤벨 컬':{t:'w',v:.061},'컨센트레이션 컬':{t:'w',v:.061},'케이블 컬':{t:'w',v:.060},
@@ -1283,6 +1283,7 @@ const TIPS = {
   '스미스 카프 레이즈':'발볼을 받침대 끝에 올리고 최대 범위로 수축·이완해요. 천천히 내려오는 게 중요해요.',
   '스미스 오버헤드프레스':'바 궤도가 고정되어 어깨 집중에 유리해요. 코어를 잡고 허리 반동을 줄이세요.',
   '스미스 업라이트 로우':'팔꿈치를 손목보다 높게 유지하며 어깨 높이까지 당겨요.',
+  '시티드 스미스 밀리터리 프레스':'앉은 자세로 허리 부담을 줄이고 삼각근을 고립 훈련해요. 바를 이마 앞에서 수직으로 밀어 올리세요.',
   '스미스 클로즈 그립 벤치프레스':'그립을 좁혀 삼두근에 집중해요. 팔꿈치가 벌어지지 않게 주의하세요.',
   '와이드 랫풀다운':'그립을 어깨 1.5배 너비로 넓게 잡아요. 팔꿈치를 옆구리 바깥으로 당기며 광배근 외측을 자극해요.',
   '이두 컬 머신':'팔꿈치 위치를 패드에 고정하고 손목을 중립으로 유지해요. 고립 운동으로 이두근 피크를 강화해요.',
@@ -1404,18 +1405,71 @@ function getPrevRecord(name){
   }
   return null;
 }
-function formatCmp(curSets,prev){
+function formatCmp(curSets, prev){
   if(!prev) return null;
-  const maxC=Math.max(...curSets.map(s=>s.weight||0));
-  const maxP=Math.max(...prev.sets.map(s=>s.weight||0));
-  const repC=curSets.reduce((s,r)=>s+(r.reps||0),0);
-  const repP=prev.sets.reduce((s,r)=>s+(r.reps||0),0);
-  const d=new Date(prev.date+'T00:00:00');
-  const parts=[];
-  if(maxC>0&&maxP>0){const diff=maxC-maxP;if(diff>0)parts.push(`무게 +${diff}kg↑`);else if(diff<0)parts.push(`무게 ${diff}kg↓`);else parts.push('무게 동일');}
-  if(repC>0&&repP>0){const diff=repC-repP;if(diff>0)parts.push(`횟수 +${diff}↑`);else if(diff<0)parts.push(`횟수 ${diff}↓`);}
+  const bw = isBW(prev.sets[0]?.name ?? '');
+
+  // 총 중량 (weight × reps 합산, 완료된 세트 우선, 없으면 전체)
+  const volOf = sets => sets.reduce((s,r) => {
+    const w = r.weight ?? 0;
+    const rp = r.reps ?? 0;
+    return s + (w > 0 ? w * rp : 0);
+  }, 0);
+  const repsOf = sets => sets.reduce((s,r) => s + (r.reps ?? 0), 0);
+
+  const curVol  = volOf(curSets);
+  const prevVol = volOf(prev.sets);
+  const curReps  = repsOf(curSets);
+  const prevReps = repsOf(prev.sets);
+  const curMax  = Math.max(...curSets.map(s => s.weight ?? 0));
+  const prevMax = Math.max(...prev.sets.map(s => s.weight ?? 0));
+  const curSets_ = curSets.length;
+  const prevSets_ = prev.sets.length;
+
+  const d = new Date(prev.date + 'T00:00:00');
+  const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+  const parts = [];
+  let up = false, dn = false;
+
+  if(!bw){
+    // 총 중량 비교
+    if(curVol > 0 && prevVol > 0){
+      const diff = curVol - prevVol;
+      const pct  = Math.round(Math.abs(diff) / prevVol * 100);
+      if(diff > 0){ parts.push(`총 중량 +${diff.toLocaleString()}kg↑(${pct}%)`); up = true; }
+      else if(diff < 0){ parts.push(`총 중량 ${diff.toLocaleString()}kg↓(${pct}%)`); dn = true; }
+      else parts.push(`총 중량 동일 ${curVol.toLocaleString()}kg`);
+    }
+    // 최고 무게 비교
+    if(curMax > 0 && prevMax > 0 && curMax !== prevMax){
+      const diff = curMax - prevMax;
+      if(diff > 0){ parts.push(`최고 무게 +${diff}kg↑`); up = true; }
+      else         { parts.push(`최고 무게 ${diff}kg↓`); dn = dn || (!up); }
+    }
+  } else {
+    // 맨몸 — 총 횟수 비교
+    if(curReps > 0 && prevReps > 0){
+      const diff = curReps - prevReps;
+      if(diff > 0){ parts.push(`총 횟수 +${diff}회↑`); up = true; }
+      else if(diff < 0){ parts.push(`총 횟수 ${diff}회↓`); dn = true; }
+      else parts.push(`총 횟수 동일 ${curReps}회`);
+    }
+  }
+
+  // 세트 수 비교
+  if(curSets_ !== prevSets_){
+    const diff = curSets_ - prevSets_;
+    if(diff > 0){ parts.push(`세트 +${diff}↑`); up = true; }
+    else         { parts.push(`세트 ${diff}↓`); }
+  } else {
+    parts.push(`${curSets_}세트`);
+  }
+
   if(!parts.length) return null;
-  return {text:`vs ${d.getMonth()+1}/${d.getDate()} — ${parts.join(' · ')}`,up:parts.some(p=>p.includes('↑')),dn:parts.some(p=>p.includes('↓'))&&!parts.some(p=>p.includes('↑'))};
+  return {
+    text: `vs ${dateStr} — ${parts.join(' · ')}`,
+    up, dn: dn && !up
+  };
 }
 
 /* ══════════════════════════════════
