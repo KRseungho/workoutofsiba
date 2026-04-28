@@ -493,6 +493,34 @@ input[type="date"]:focus{border-color:var(--accent);}
 .btn-timer-skip:hover{border-color:var(--teal);color:var(--teal);}
 .btn-timer-stop{background:transparent;border:1px solid rgba(255,76,59,.4);color:var(--red);padding:6px 18px;border-radius:20px;font-family:var(--font-body);font-size:.78rem;cursor:pointer;}
 
+/* ─── 점진적 과부하 추천 배너 ─── */
+.prog-rec-banner{
+  background:linear-gradient(135deg,rgba(78,205,196,.08),rgba(242,196,106,.08));
+  border:1px solid rgba(78,205,196,.3);
+  border-radius:10px;padding:10px 14px;margin-bottom:10px;
+}
+.prog-rec-title{
+  font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:6px;display:flex;align-items:center;gap:5px;
+}
+.prog-rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+.prog-rec-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:8px 10px;cursor:pointer;transition:all .18s;
+}
+.prog-rec-card:hover,.prog-rec-card.sel{
+  border-color:var(--teal);background:rgba(78,205,196,.08);
+}
+.prog-rec-card-label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+.prog-rec-card-val{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent2);letter-spacing:.04em;}
+.prog-rec-card-sub{font-size:.6rem;color:var(--muted);margin-top:1px;}
+.prog-rec-reason{font-size:.72rem;color:var(--muted);line-height:1.6;border-top:1px solid rgba(78,205,196,.15);padding-top:7px;margin-top:4px;}
+.prog-rec-apply{
+  width:100%;background:linear-gradient(135deg,var(--teal),#38b2a8);color:#fff;
+  border:none;padding:8px;border-radius:7px;font-family:var(--font-body);
+  font-size:.8rem;font-weight:700;cursor:pointer;margin-top:6px;
+}
+
 /* ─── 루틴 모달 ─── */
 .routine-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:280;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;}
 .routine-overlay.open{opacity:1;pointer-events:all;}
@@ -1395,6 +1423,179 @@ function fmtVol(v){
   if(!v) return '';
   return v.isBW ? `${v.val.toLocaleString()}회` : `${v.val.toLocaleString()}kg`;
 }
+/* ══════════════════════════════════
+   점진적 과부하 추천 (Progressive Overload)
+   근거: NSCA 2-for-2 Rule, Helms 2016, Schoenfeld 2017
+══════════════════════════════════ */
+function calcProgressionRec(name){
+  const prev = getPrevRecord(name);
+  if(!prev) return null;
+
+  const bw  = isBW(name);
+  const sets = prev.sets.filter(s => s.reps != null);
+  if(!sets.length) return null;
+
+  // ── 기초 통계 ──
+  const prevSetCount = sets.length;
+  const maxWeight    = Math.max(...sets.map(s => s.weight ?? 0));
+  const avgWeight    = sets.reduce((a,s)=>a+(s.weight??0),0) / prevSetCount;
+  const avgReps      = sets.reduce((a,s)=>a+(s.reps??0),0)  / prevSetCount;
+  const totalVol     = sets.reduce((a,s)=>a+((s.weight??0)*(s.reps??0)),0);
+  const targetReps   = sets[0].reps ?? 10; // 첫 세트 횟수 기준
+
+  // ── 날짜 간격 (회복 상태 판단) ──
+  const daysSince = Math.round((new Date() - new Date(prev.date+'T00:00:00')) / 86400000);
+
+  let recWeight = null, recReps = null, recSets = prevSetCount;
+  let rule = '', detail = '';
+
+  if(bw){
+    // ── 맨몸 운동: 횟수 점진적 과부하 ──
+    // 2-for-2 Rule 적용: 목표 횟수를 초과했으면 +2회
+    const allHitTarget = sets.every(s => (s.reps ?? 0) >= targetReps);
+    if(allHitTarget){
+      recReps  = targetReps + 2;
+      recSets  = prevSetCount;
+      rule     = '2-for-2 Rule 적용';
+      detail   = `모든 세트에서 목표 횟수(${targetReps}회)를 달성했어요. 다음 세션은 +2회 늘리는 것이 최적입니다.`;
+    } else {
+      recReps  = targetReps;
+      recSets  = prevSetCount;
+      rule     = '목표 횟수 유지';
+      detail   = `아직 모든 세트에서 ${targetReps}회를 달성하지 못했어요. 같은 목표를 유지하고 완전 달성을 목표로 하세요.`;
+    }
+  } else {
+    // ── 웨이트 운동: 중량 + 세트 점진적 과부하 ──
+    // 1) 2-for-2 Rule: 마지막 2세트 모두 목표 초과 시 중량 증가
+    const last2 = sets.slice(-2);
+    const last2AllOver = last2.length >= 2 && last2.every(s => (s.reps ?? 0) >= targetReps + 2);
+
+    // 2) 중량 스텝: 소근육(팔/복근) 1.25kg, 대근육 2.5kg
+    const muscle = getMuscle(name);
+    const smallMuscle = ['팔','복근','어깨'].includes(muscle);
+    const weightStep = maxWeight < 20 ? 1.25 : smallMuscle ? 1.25 : 2.5;
+
+    // 3) 회복 충분 여부 (48시간 이상)
+    const recovered = daysSince >= 2;
+
+    if(last2AllOver && recovered){
+      // 중량 증가 추천
+      recWeight = Math.round((maxWeight + weightStep) * 4) / 4; // 0.25 단위 반올림
+      recReps   = targetReps;
+      recSets   = prevSetCount;
+      rule      = '2-for-2 Rule → 중량 증가';
+      detail    = `지난 세션에서 마지막 2세트 모두 목표 횟수 +2회를 초과했어요. ${maxWeight}kg → ${recWeight}kg (+${weightStep}kg) 증가를 권장합니다. (NSCA 2-for-2 Rule)`;
+    } else if(!recovered){
+      // 회복 미흡: 동일 중량, 세트 감소
+      recWeight = maxWeight;
+      recReps   = Math.max(Math.round(avgReps - 1), 6);
+      recSets   = Math.max(prevSetCount - 1, 2);
+      rule      = '회복 부족 — 볼륨 조정';
+      detail    = `마지막 운동이 ${daysSince}일 전이에요. 충분한 회복(48~72h)이 이뤄지지 않았을 수 있어 볼륨을 소폭 줄이는 것을 권장합니다.`;
+    } else {
+      // 중량 유지, 볼륨 점진 가능
+      const canAddSet = prevSetCount < 6; // 최대 6세트
+      recWeight = maxWeight;
+      recReps   = targetReps;
+      recSets   = canAddSet ? prevSetCount + 1 : prevSetCount;
+      if(canAddSet){
+        rule   = '볼륨 점진 → 세트 추가';
+        detail = `중량은 동일하게 유지하고 세트를 1개 추가해 총 볼륨을 늘리세요. 볼륨 축적은 근비대의 핵심 변수입니다. (Schoenfeld 2017, J Strength Cond Res)`;
+      } else {
+        rule   = '중량 유지 — 자세 집중';
+        detail = `이미 충분한 세트(${prevSetCount}세트)를 수행했어요. 이번 세션은 중량·세트 유지 하에 신장성 구간(2~3초) 컨트롤에 집중하세요. (Douglas 2017, Front Physiol)`;
+      }
+    }
+  }
+
+  // ── 이전 기록 요약 ──
+  const prevSummary = bw
+    ? `이전(${prev.date.slice(5)}) · ${prevSetCount}세트 · 평균 ${Math.round(avgReps)}회`
+    : `이전(${prev.date.slice(5)}) · ${prevSetCount}세트 · ${maxWeight}kg · 총 ${totalVol.toLocaleString()}kg`;
+
+  return {
+    bw, recWeight, recReps, recSets, rule, detail,
+    prevSummary, maxWeight, avgReps, prevSetCount, daysSince
+  };
+}
+
+function showProgressionRec(name){
+  const rec = calcProgressionRec(name);
+  // 기존 배너 제거
+  const old = document.getElementById('prog-rec-banner');
+  if(old) old.remove();
+  if(!rec) return;
+
+  const bw = rec.bw;
+
+  // 추천 카드 2종: A) 추천값 / B) 이전과 동일
+  const optA_weight = rec.recWeight;
+  const optA_reps   = rec.recReps;
+  const optA_sets   = rec.recSets;
+  const optB_weight = rec.maxWeight;
+  const optB_reps   = Math.round(rec.avgReps);
+  const optB_sets   = rec.prevSetCount;
+
+  const fmtOpt = (w, r, s, bw) => bw
+    ? `${s}세트 × ${r}회`
+    : `${s}세트 × ${w}kg × ${r}회`;
+
+  const banner = document.createElement('div');
+  banner.id = 'prog-rec-banner';
+  banner.className = 'prog-rec-banner';
+  banner.innerHTML = `
+    <div class="prog-rec-title">📊 점진적 과부하 추천 <span style="font-size:.6rem;color:var(--muted);font-weight:400;text-transform:none">${rec.prevSummary}</span></div>
+    <div class="prog-rec-grid">
+      <div class="prog-rec-card sel" id="prog-opt-a" onclick="applyProgRec('a')">
+        <div class="prog-rec-card-label">🚀 추천</div>
+        <div class="prog-rec-card-val">${fmtOpt(optA_weight, optA_reps, optA_sets, bw)}</div>
+        <div class="prog-rec-card-sub">${rec.rule}</div>
+      </div>
+      <div class="prog-rec-card" id="prog-opt-b" onclick="applyProgRec('b')">
+        <div class="prog-rec-card-label">🔄 이전과 동일</div>
+        <div class="prog-rec-card-val">${fmtOpt(optB_weight, optB_reps, optB_sets, bw)}</div>
+        <div class="prog-rec-card-sub">현상 유지</div>
+      </div>
+    </div>
+    <div class="prog-rec-reason">${rec.detail}</div>
+    <button class="prog-rec-apply" onclick="applyProgRec('a')">✅ 추천값으로 자동 입력</button>`;
+
+  // weight-area 앞에 삽입
+  const weightArea = document.getElementById('weight-area');
+  weightArea.parentNode.insertBefore(banner, weightArea);
+
+  // 전역 상태로 저장 (applyProgRec에서 사용)
+  window._progRecData = {
+    a: {weight: optA_weight, reps: optA_reps, sets: optA_sets},
+    b: {weight: optB_weight, reps: optB_reps, sets: optB_sets},
+    bw
+  };
+}
+
+function applyProgRec(opt){
+  const d = window._progRecData;
+  if(!d) return;
+  const {weight, reps, sets} = d[opt];
+  const bw = d.bw;
+
+  // 옵션 카드 하이라이트
+  ['a','b'].forEach(o=>{
+    const el=document.getElementById(`prog-opt-${o}`);
+    if(el) el.className='prog-rec-card'+(o===opt?' sel':'');
+  });
+
+  // setRows 업데이트
+  setRows = Array.from({length: sets}, () => ({
+    weight: bw ? '' : (weight ?? ''),
+    reps:   reps ?? ''
+  }));
+  renderSetRows(bw);
+  showToast(`✅ ${opt==='a'?'추천값':'이전 기록'}으로 입력됐어요`);
+}
+
+/* ══════════════════════════════════
+   이전 기록 조회
+══════════════════════════════════ */
 function getPrevRecord(name){
   const today=document.getElementById('record-date').value;
   const keys=Object.keys(workouts).sort().reverse();
@@ -1758,6 +1959,8 @@ function selectEx(name){
   const tip=TIPS[name], box=document.getElementById('tip-box');
   if(tip){document.getElementById('tip-text').textContent=tip;box.style.display='flex';}
   else box.style.display='none';
+  // 점진적 과부하 추천 표시
+  showProgressionRec(name);
 }
 
 /* ══════════════════════════════════
@@ -1826,6 +2029,9 @@ function resetForm(){
   selMuscle=null; selEx=null; setRows=[{weight:'',reps:''}];
   document.getElementById('input-area').style.display='none';
   document.getElementById('tip-box').style.display='none';
+  const banner=document.getElementById('prog-rec-banner');
+  if(banner) banner.remove();
+  window._progRecData=null;
   renderMuscleChips(); renderExButtons();
 }
 
