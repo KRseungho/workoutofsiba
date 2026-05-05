@@ -2479,38 +2479,28 @@ function renderPlanList(){
   if(totalKcal>0){kb.style.display='flex';document.getElementById('kcal-bar-val').textContent=totalKcal+' kcal';}
   else kb.style.display='none';
 
-  // 슈퍼세트 쌍 + 일반 그룹 분리
+  // plan 순서 그대로 렌더 — 슈퍼세트 쌍은 A가 나올 때 B를 인라인으로 같이 출력
   const rendered=new Set();
-  const ssBlocks=[], normalGroups={};
+  let html='';
   plan.forEach((item,idx)=>{
     if(rendered.has(idx)) return;
-    if(item.superset&&item.pairRole==='A'){
+    if(item.superset && item.pairRole==='A'){
       const bIdx=plan.findIndex((p,i)=>i>idx&&p.pairId===item.pairId&&p.pairRole==='B');
-      if(bIdx>=0){rendered.add(idx);rendered.add(bIdx);ssBlocks.push({idxA:idx,idxB:bIdx,itemA:item,itemB:plan[bIdx]});return;}
+      if(bIdx>=0){
+        rendered.add(idx); rendered.add(bIdx);
+        html+=`<div style="margin-bottom:14px">
+          <div style="font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:7px;background:rgba(78,205,196,.12);border:1px solid rgba(78,205,196,.35);color:var(--teal)">🔗 슈퍼세트</div>
+          ${renderPlanItem(item,idx)}
+          <div style="text-align:center;font-size:.7rem;color:var(--teal);margin:-3px 0 3px;opacity:.75">↕ 쉬지 않고</div>
+          ${renderPlanItem(plan[bIdx],bIdx)}
+        </div>`;
+        return;
+      }
     }
+    if(item.superset && item.pairRole==='B' && rendered.has(idx)) return;
     rendered.add(idx);
-    const m=getMuscle(item.name);
-    if(!normalGroups[m]) normalGroups[m]=[];
-    normalGroups[m].push({item,idx});
+    html+=renderPlanItem(item,idx);
   });
-  const ORDER=['가슴','등','하체','어깨','팔','복근','유산소','기타'];
-  let html='';
-  if(ssBlocks.length){
-    html+=ssBlocks.map(b=>`
-      <div style="margin-bottom:14px">
-        <div style="font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:7px;background:rgba(78,205,196,.12);border:1px solid rgba(78,205,196,.35);color:var(--teal)">🔗 슈퍼세트</div>
-        ${renderPlanItem(b.itemA,b.idxA)}
-        <div style="text-align:center;font-size:.7rem;color:var(--teal);margin:-3px 0 3px;opacity:.75">↕ 쉬지 않고</div>
-        ${renderPlanItem(b.itemB,b.idxB)}
-      </div>`).join('');
-  }
-  html+=ORDER.filter(m=>normalGroups[m]).map(m=>{
-    const c=MC[m]||MC['기타'];
-    return `<div class="plan-group">
-      <div class="plan-group-label" style="background:${c.bg};border:1px solid ${c.bd};color:${c.tx}">${m}</div>
-      ${normalGroups[m].map(({item,idx})=>renderPlanItem(item,idx)).join('')}
-    </div>`;
-  }).join('');
   document.getElementById('plan-list').innerHTML=html;
 }
 
@@ -2685,12 +2675,15 @@ function saveRoutine(){
   const existIdx = list.findIndex(r=>r.name===name);
 
   const muscles = [...new Set(plan.map(p=>getMuscle(p.name)))];
+  // 슈퍼세트 쌍 수 계산
+  const ssPairIds = [...new Set(plan.filter(p=>p.superset).map(p=>p.pairId))];
   const routine = {
     id: existIdx>=0 ? list[existIdx].id : 'rt_'+Date.now(),
     name,
     createdAt: new Date().toISOString().slice(0,10),
     muscles,
-    items: JSON.parse(JSON.stringify(plan))  // 깊은 복사, done 상태 포함
+    ssPairs: ssPairIds.length,
+    items: JSON.parse(JSON.stringify(plan))
   };
 
   if(existIdx>=0){
@@ -2716,13 +2709,45 @@ function renderRoutineList(isSaveMode){
     return;
   }
 
-  el.innerHTML = list.map((r,i)=>{
+  el.innerHTML = list.map((r)=>{
     const muscleTags = r.muscles.map(m=>{
       const c=MC[m]||MC['기타'];
       return `<span class="routine-item-tag" style="background:${c.bg};border-color:${c.bd};color:${c.tx}">${m}</span>`;
     }).join('');
-    const exCount = r.items.length;
-    const setCount = r.items.reduce((s,it)=>s+(it.sets?.length||1),0);
+
+    // 슈퍼세트 쌍 수 (저장 당시 또는 실시간 계산)
+    const ssPairs = r.ssPairs ?? [...new Set(
+      (r.items||[]).filter(p=>p.superset).map(p=>p.pairId)
+    )].length;
+
+    // 일반 종목 수 (슈퍼세트 항목 제외)
+    const normalCount = (r.items||[]).filter(p=>!p.superset).length;
+    const totalItems  = (r.items||[]).length;
+    const setCount    = (r.items||[]).reduce((s,it)=>s+(it.sets?.length||1),0);
+
+    // 운동 목록 미리보기 (슈퍼세트는 A+B 묶어서)
+    const previewed = new Set();
+    const previewItems = [];
+    (r.items||[]).forEach((it,i)=>{
+      if(previewed.has(i)) return;
+      if(it.superset && it.pairRole==='A'){
+        const bIdx = r.items.findIndex((p,j)=>j>i&&p.pairId===it.pairId&&p.pairRole==='B');
+        if(bIdx>=0){
+          previewed.add(i); previewed.add(bIdx);
+          previewItems.push(`<span style="color:var(--teal)">🔗 ${it.name}+${r.items[bIdx].name}</span>`);
+          return;
+        }
+      }
+      previewed.add(i);
+      if(!it.superset) previewItems.push(`<span>${it.name}</span>`);
+    });
+
+    const metaStr = [
+      `${totalItems}종목`,
+      `${setCount}세트`,
+      ssPairs>0?`슈퍼세트 ${ssPairs}쌍`:null
+    ].filter(Boolean).join(' · ');
+
     return `
       <div class="routine-item" onclick="loadRoutine('${r.id}')">
         <div class="routine-item-actions" onclick="event.stopPropagation()">
@@ -2730,8 +2755,11 @@ function renderRoutineList(isSaveMode){
         </div>
         <div class="routine-item-name">${r.name}</div>
         <div class="routine-item-meta">
-          <span style="font-size:.72rem;color:var(--muted)">${r.createdAt} · ${exCount}종목 · ${setCount}세트</span>
+          <span style="font-size:.72rem;color:var(--muted)">${r.createdAt} · ${metaStr}</span>
           ${muscleTags}
+        </div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;line-height:1.6">
+          ${previewItems.join('<span style="color:var(--border)"> · </span>')}
         </div>
       </div>`;
   }).join('');
