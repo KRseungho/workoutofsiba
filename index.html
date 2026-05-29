@@ -493,6 +493,25 @@ input[type="date"]:focus{border-color:var(--accent);}
 .btn-timer-skip:hover{border-color:var(--teal);color:var(--teal);}
 .btn-timer-stop{background:transparent;border:1px solid rgba(255,76,59,.4);color:var(--red);padding:6px 18px;border-radius:20px;font-family:var(--font-body);font-size:.78rem;cursor:pointer;}
 
+/* ─── 데이터 내보내기/가져오기 ─── */
+.data-io-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:290;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;}
+.data-io-overlay.open{opacity:1;pointer-events:all;}
+.data-io-box{background:var(--surface);border:1px solid var(--border);border-radius:18px 18px 0 0;width:100%;max-width:820px;padding:22px 20px 40px;transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);max-height:80vh;overflow-y:auto;}
+.data-io-overlay.open .data-io-box{transform:translateY(0);}
+.data-io-box::before{content:'';display:block;width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
+.data-io-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);margin-bottom:4px;}
+.data-io-sub{font-size:.76rem;color:var(--muted);margin-bottom:18px;line-height:1.6;}
+.data-io-btn{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;margin-bottom:10px;transition:all .18s;text-align:left;}
+.data-io-btn:hover{border-color:var(--accent);background:rgba(232,134,58,.07);}
+.data-io-btn-icon{font-size:1.4rem;flex-shrink:0;}
+.data-io-btn-text{flex:1;}
+.data-io-btn-label{font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:2px;}
+.data-io-btn-desc{font-size:.72rem;color:var(--muted);}
+.data-io-warn{background:rgba(255,76,59,.07);border:1px solid rgba(255,76,59,.25);border-radius:10px;padding:12px 14px;font-size:.76rem;color:var(--muted);line-height:1.6;margin-top:14px;}
+.data-io-stats{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;}
+.data-io-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--accent);}
+.data-io-stat-label{font-size:.62rem;color:var(--muted);}
+
 /* ─── 점진적 과부하 추천 배너 ─── */
 .prog-rec-banner{
   background:linear-gradient(135deg,rgba(78,205,196,.08),rgba(242,196,106,.08));
@@ -782,7 +801,13 @@ input[type="date"]:focus{border-color:var(--accent);}
         <button class="gender-btn" id="btn-female" onclick="setGender('f')">♀ 여성</button>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+      <div class="field">
+        <label>나이</label>
+        <input type="number" id="user-age" inputmode="numeric" placeholder="25" min="10" max="100"
+          style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:9px;font-family:var(--font-body);font-size:.92rem;outline:none;width:100%;-webkit-appearance:none;transition:border-color .2s;"
+          oninput="saveUserProfile()" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+      </div>
       <div class="field">
         <label>키 (cm)</label>
         <input type="number" id="user-height" inputmode="decimal" placeholder="170" min="100" max="250"
@@ -813,10 +838,16 @@ input[type="date"]:focus{border-color:var(--accent);}
   </div>
 
   <!-- 빠른 이동 -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
     <button class="btn-plan" style="margin:0;font-size:1rem" onclick="showView('record')">📋 운동 기록</button>
     <button class="btn-plan" style="margin:0;font-size:1rem;background:linear-gradient(135deg,var(--teal),#38b2a8)" onclick="showView('calendar')">📅 달력 보기</button>
   </div>
+  <!-- 데이터 관리 -->
+  <button onclick="openDataIO()" style="width:100%;padding:11px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;"
+    onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+    onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+    💾 데이터 내보내기 / 가져오기
+  </button>
 </div>
 <!-- ══════ RECORD VIEW ══════ -->
 <div class="view" id="view-record">
@@ -1043,6 +1074,49 @@ input[type="date"]:focus{border-color:var(--accent);}
         </div>
       </div>
       <button class="btn-ss-submit" onclick="addSupersetToPlan()">🔗 슈퍼세트로 추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ 데이터 내보내기/가져오기 모달 ══════ -->
+<div class="data-io-overlay" id="data-io-overlay" onclick="closeDataIO(event)">
+  <div class="data-io-box">
+    <div class="data-io-title">💾 데이터 관리</div>
+    <div class="data-io-sub">운동 기록과 루틴을 JSON 파일로 백업하거나 복원할 수 있어요.<br>브라우저 데이터가 초기화되기 전에 정기적으로 백업하세요.</div>
+
+    <!-- 현재 데이터 통계 -->
+    <div class="data-io-stats" id="data-io-stats"></div>
+
+    <!-- 내보내기 -->
+    <button class="data-io-btn" onclick="exportData()">
+      <span class="data-io-btn-icon">📤</span>
+      <div class="data-io-btn-text">
+        <div class="data-io-btn-label">전체 데이터 내보내기</div>
+        <div class="data-io-btn-desc">운동 기록·루틴·신체 정보를 JSON 파일로 저장</div>
+      </div>
+    </button>
+
+    <!-- 가져오기 -->
+    <button class="data-io-btn" onclick="document.getElementById('import-file-input').click()">
+      <span class="data-io-btn-icon">📥</span>
+      <div class="data-io-btn-text">
+        <div class="data-io-btn-label">데이터 가져오기</div>
+        <div class="data-io-btn-desc">백업 JSON 파일을 불러와 복원 (기존 데이터에 병합)</div>
+      </div>
+    </button>
+    <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="importData(event)">
+
+    <!-- 기록만 초기화 -->
+    <button class="data-io-btn" onclick="clearAllData()" style="border-color:rgba(255,76,59,.3)">
+      <span class="data-io-btn-icon">🗑</span>
+      <div class="data-io-btn-text">
+        <div class="data-io-btn-label" style="color:var(--red)">전체 데이터 초기화</div>
+        <div class="data-io-btn-desc">모든 운동 기록·루틴·설정 삭제 (복구 불가)</div>
+      </div>
+    </button>
+
+    <div class="data-io-warn">
+      ⚠️ 가져오기는 기존 데이터에 <strong>병합</strong>합니다. 같은 날짜의 기록은 가져온 파일로 덮어써집니다. 루틴은 이름이 다르면 추가됩니다.
     </div>
   </div>
 </div>
@@ -1325,6 +1399,7 @@ function isBW(n){return BWNAME_SET.has(n);}
 function getUserWeight(){ return parseFloat(_store.get('siba_weight'))||70; }
 function getUserHeight(){ return parseFloat(_store.get('siba_height'))||170; }
 function getUserGender(){ return _store.get('siba_gender')||'m'; }
+function getUserAge()   { return parseInt(_store.get('siba_age'))||25; }
 
 function setGender(g){
   _store.set('siba_gender', g);
@@ -1334,15 +1409,18 @@ function setGender(g){
 }
 
 function saveUserProfile(){
+  const a=document.getElementById('user-age')?.value;
   const h=document.getElementById('user-height')?.value;
   const w=document.getElementById('user-weight')?.value;
+  if(a) _store.set('siba_age',a);
   if(h) _store.set('siba_height',h);
   if(w) _store.set('siba_weight',w);
   updateBMIDisplay();
 }
 
 function updateBMIDisplay(){
-  const h=getUserHeight(), w=getUserWeight(), g=getUserGender();
+  const h=getUserHeight(), w=getUserWeight(), g=getUserGender(), age=getUserAge();
+  if(!h||!w){ document.getElementById('bmi-display').style.display='none'; return; }
   const bmi=w/((h/100)**2);
   const el=document.getElementById('bmi-display'); if(!el) return;
   let cat='', col='';
@@ -1351,36 +1429,71 @@ function updateBMIDisplay(){
   else if(bmi<25){cat='과체중';col='#f2c46a';}
   else if(bmi<30){cat='비만';col='#e8863a';}
   else{cat='고도비만';col='#ff4c3b';}
-  // Mifflin-St Jeor BMR (성별 반영)
+  // Mifflin-St Jeor BMR — 나이 실제값 반영
   const bmr = g==='m'
-    ? Math.round(10*w + 6.25*h - 5*30 + 5)
-    : Math.round(10*w + 6.25*h - 5*30 - 161);
-  const tdee = Math.round(bmr*1.55);
+    ? Math.round(10*w + 6.25*h - 5*age + 5)
+    : Math.round(10*w + 6.25*h - 5*age - 161);
+  // TDEE 활동 계수별 표
+  const tdeeLight    = Math.round(bmr*1.375);
+  const tdeeMod      = Math.round(bmr*1.55);
+  const tdeeActive   = Math.round(bmr*1.725);
   const gLabel = g==='m' ? '남성' : '여성';
   el.style.display='block';
   el.innerHTML=`
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-      <span style="font-weight:700;color:${col}">BMI ${bmi.toFixed(1)}</span>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <span style="font-weight:700;color:${col};font-size:.95rem">BMI ${bmi.toFixed(1)}</span>
       <span style="background:${col}22;border:1px solid ${col}44;color:${col};font-size:.72rem;padding:2px 8px;border-radius:20px;font-weight:700">${cat}</span>
-      <span style="color:var(--muted);font-size:.74rem">${gLabel} · 체중 ${w}kg · 키 ${h}cm</span>
+      <span style="color:var(--muted);font-size:.72rem">${gLabel} · ${age}세 · ${w}kg · ${h}cm</span>
     </div>
-    <div style="font-size:.78rem;color:var(--muted);line-height:1.7">
+    <div style="font-size:.78rem;margin-bottom:8px">
       기초대사량(BMR) <strong style="color:var(--accent2)">${bmr.toLocaleString()} kcal</strong>
-      &nbsp;·&nbsp; 1일 권장 칼로리(중등도) <strong style="color:var(--accent)">${tdee.toLocaleString()} kcal</strong>
+      <span style="font-size:.66rem;color:var(--muted);margin-left:4px">(Mifflin-St Jeor)</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 8px;text-align:center">
+        <div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">가벼운 활동</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--text)">${tdeeLight.toLocaleString()}</div>
+        <div style="font-size:.58rem;color:var(--muted)">kcal/일</div>
+      </div>
+      <div style="background:rgba(232,134,58,.08);border:1px solid rgba(232,134,58,.3);border-radius:8px;padding:7px 8px;text-align:center">
+        <div style="font-size:.6rem;color:var(--accent);margin-bottom:2px">중등도 활동</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--accent)">${tdeeMod.toLocaleString()}</div>
+        <div style="font-size:.58rem;color:var(--muted)">kcal/일</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 8px;text-align:center">
+        <div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">고강도 활동</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--text)">${tdeeActive.toLocaleString()}</div>
+        <div style="font-size:.58rem;color:var(--muted)">kcal/일</div>
+      </div>
     </div>`;
 }
 
 function calcKcal(item){
   if(item.cardioKcal!=null) return item.cardioKcal;
-  const db=CALORIE_DB[item.name]; const arr=item.sets||[];
+  const db=CALORIE_DB[item.name];
+  const arr=item.sets||[];
   const BW=getUserWeight();
   let total=0;
   arr.forEach(s=>{
-    const w=s.weight!=null?+s.weight:20, r=s.reps!=null?+s.reps:8;
-    if(!db){if(w&&r)total+=Math.round(r*w*.07);return;}
-    if(db.t==='w')  total+=Math.round(r*w*db.v);
-    if(db.t==='bw') total+=Math.round(r*db.v*(BW/70));
-    if(db.t==='c')  total+=Math.round(db.v*BW*(r/60));
+    const r=s.reps!=null?+s.reps:0;
+    if(!r) return; // 횟수 없으면 스킵
+    if(!db){
+      // DB 없는 종목: 웨이트만 계산
+      const w=s.weight!=null?+s.weight:0;
+      if(w&&r) total+=Math.round(r*w*.07);
+      return;
+    }
+    if(db.t==='w'){
+      // 웨이트 운동: 무게 반드시 필요
+      const w=s.weight!=null?+s.weight:0;
+      if(w) total+=Math.round(r*w*db.v);
+    } else if(db.t==='bw'){
+      // 맨몸 운동: 체중 기반, 무게 불필요
+      total+=Math.round(r*db.v*(BW/70));
+    } else if(db.t==='c'){
+      // 유산소: 분당 MET 기반
+      total+=Math.round(db.v*BW*(r/60));
+    }
   });
   return total>0?total:null;
 }
@@ -1435,13 +1548,17 @@ function calcProgressionRec(name){
   const sets = prev.sets.filter(s => s.reps != null);
   if(!sets.length) return null;
 
-  // ── 기초 통계 ──
+  // ── 기초 통계 (세트별 실제값 참조) ──
   const prevSetCount = sets.length;
-  const maxWeight    = Math.max(...sets.map(s => s.weight ?? 0));
-  const avgWeight    = sets.reduce((a,s)=>a+(s.weight??0),0) / prevSetCount;
-  const avgReps      = sets.reduce((a,s)=>a+(s.reps??0),0)  / prevSetCount;
-  const totalVol     = sets.reduce((a,s)=>a+((s.weight??0)*(s.reps??0)),0);
-  const targetReps   = sets[0].reps ?? 10; // 첫 세트 횟수 기준
+  // 세트별 실제 무게 배열 (맨몸은 null → 0 처리)
+  const weights = sets.map(s => s.weight ?? 0);
+  const maxWeight = Math.max(...weights);
+  const avgWeight = weights.reduce((a,b)=>a+b,0) / prevSetCount;
+  const repsArr   = sets.map(s => s.reps ?? 0);
+  const avgReps   = repsArr.reduce((a,b)=>a+b,0) / prevSetCount;
+  const totalVol  = sets.reduce((a,s)=>a+((s.weight??0)*(s.reps??0)),0);
+  // 각 세트별 목표 횟수 (세트마다 다를 수 있으므로 첫 세트 기준)
+  const targetReps = repsArr[0] || 10;
 
   // ── 날짜 간격 (회복 상태 판단) ──
   const daysSince = Math.round((new Date() - new Date(prev.date+'T00:00:00')) / 86400000);
@@ -1449,73 +1566,73 @@ function calcProgressionRec(name){
   let recWeight = null, recReps = null, recSets = prevSetCount;
   let rule = '', detail = '';
 
+  // ── 세트별 무게 배열 (추천값 계산용) ──
+  // 각 세트 무게를 기반으로 추천 (마지막 세트 무게 기준)
+  const lastSetWeight = weights[weights.length-1] || maxWeight;
+
   if(bw){
     // ── 맨몸 운동: 횟수 점진적 과부하 ──
-    // 2-for-2 Rule 적용: 목표 횟수를 초과했으면 +2회
-    const allHitTarget = sets.every(s => (s.reps ?? 0) >= targetReps);
+    const allHitTarget = repsArr.every(r => r >= targetReps);
+    const minReps = Math.min(...repsArr);
     if(allHitTarget){
       recReps  = targetReps + 2;
       recSets  = prevSetCount;
       rule     = '2-for-2 Rule 적용';
-      detail   = `모든 세트에서 목표 횟수(${targetReps}회)를 달성했어요. 다음 세션은 +2회 늘리는 것이 최적입니다.`;
+      detail   = `모든 세트에서 목표 횟수(${targetReps}회)를 달성했어요. 다음 세션은 +2회를 권장합니다. (NSCA 2-for-2 Rule)`;
     } else {
       recReps  = targetReps;
       recSets  = prevSetCount;
       rule     = '목표 횟수 유지';
-      detail   = `아직 모든 세트에서 ${targetReps}회를 달성하지 못했어요. 같은 목표를 유지하고 완전 달성을 목표로 하세요.`;
+      detail   = `이전 세션 최소 ${minReps}회로, 아직 모든 세트에서 ${targetReps}회를 달성하지 못했어요. 같은 목표를 유지하고 완전 달성을 목표로 하세요.`;
     }
   } else {
-    // ── 웨이트 운동: 중량 + 세트 점진적 과부하 ──
-    // 1) 2-for-2 Rule: 마지막 2세트 모두 목표 초과 시 중량 증가
-    const last2 = sets.slice(-2);
-    const last2AllOver = last2.length >= 2 && last2.every(s => (s.reps ?? 0) >= targetReps + 2);
+    // ── 웨이트 운동: 세트별 실제 무게 기반 추천 ──
+    const last2Reps = repsArr.slice(-2);
+    const last2AllOver = last2Reps.length >= 2 && last2Reps.every(r => r >= targetReps + 2);
 
-    // 2) 중량 스텝: 소근육(팔/복근) 1.25kg, 대근육 2.5kg
     const muscle = getMuscle(name);
     const smallMuscle = ['팔','복근','어깨'].includes(muscle);
-    const weightStep = maxWeight < 20 ? 1.25 : smallMuscle ? 1.25 : 2.5;
+    // 중량 스텝: 현재 무게 기준으로 결정
+    const weightStep = lastSetWeight < 20 ? 1.25 : smallMuscle ? 1.25 : 2.5;
 
-    // 3) 회복 충분 여부 (48시간 이상)
     const recovered = daysSince >= 2;
 
     if(last2AllOver && recovered){
-      // 중량 증가 추천
-      recWeight = Math.round((maxWeight + weightStep) * 4) / 4; // 0.25 단위 반올림
+      recWeight = Math.round((lastSetWeight + weightStep) * 4) / 4;
       recReps   = targetReps;
       recSets   = prevSetCount;
       rule      = '2-for-2 Rule → 중량 증가';
-      detail    = `지난 세션에서 마지막 2세트 모두 목표 횟수 +2회를 초과했어요. ${maxWeight}kg → ${recWeight}kg (+${weightStep}kg) 증가를 권장합니다. (NSCA 2-for-2 Rule)`;
+      detail    = `마지막 2세트 모두 ${targetReps+2}회 이상 달성! ${lastSetWeight}kg → ${recWeight}kg (+${weightStep}kg) 증가를 권장합니다.\n각 세트: ${sets.map((s,i)=>`${i+1}세트 ${s.weight}kg×${s.reps}회`).join(', ')}`;
     } else if(!recovered){
-      // 회복 미흡: 동일 중량, 세트 감소
-      recWeight = maxWeight;
+      recWeight = lastSetWeight;
       recReps   = Math.max(Math.round(avgReps - 1), 6);
       recSets   = Math.max(prevSetCount - 1, 2);
       rule      = '회복 부족 — 볼륨 조정';
-      detail    = `마지막 운동이 ${daysSince}일 전이에요. 충분한 회복(48~72h)이 이뤄지지 않았을 수 있어 볼륨을 소폭 줄이는 것을 권장합니다.`;
+      detail    = `마지막 운동이 ${daysSince}일 전이에요. 충분한 회복(48~72h) 전 재훈련 시 볼륨을 소폭 줄이는 것을 권장합니다.`;
     } else {
-      // 중량 유지, 볼륨 점진 가능
-      const canAddSet = prevSetCount < 6; // 최대 6세트
-      recWeight = maxWeight;
+      const canAddSet = prevSetCount < 6;
+      recWeight = lastSetWeight;
       recReps   = targetReps;
       recSets   = canAddSet ? prevSetCount + 1 : prevSetCount;
       if(canAddSet){
         rule   = '볼륨 점진 → 세트 추가';
-        detail = `중량은 동일하게 유지하고 세트를 1개 추가해 총 볼륨을 늘리세요. 볼륨 축적은 근비대의 핵심 변수입니다. (Schoenfeld 2017, J Strength Cond Res)`;
+        detail = `세트를 1개 추가해 총 볼륨을 늘리세요. 이전 기록: ${sets.map((s,i)=>`${s.weight}kg×${s.reps}회`).join(' / ')} (Schoenfeld 2017)`;
       } else {
         rule   = '중량 유지 — 자세 집중';
-        detail = `이미 충분한 세트(${prevSetCount}세트)를 수행했어요. 이번 세션은 중량·세트 유지 하에 신장성 구간(2~3초) 컨트롤에 집중하세요. (Douglas 2017, Front Physiol)`;
+        detail = `이미 ${prevSetCount}세트를 수행했어요. 신장성 구간(2~3초) 컨트롤에 집중하세요. (Douglas 2017, Front Physiol)`;
       }
     }
   }
 
   // ── 이전 기록 요약 ──
   const prevSummary = bw
-    ? `이전(${prev.date.slice(5)}) · ${prevSetCount}세트 · 평균 ${Math.round(avgReps)}회`
-    : `이전(${prev.date.slice(5)}) · ${prevSetCount}세트 · ${maxWeight}kg · 총 ${totalVol.toLocaleString()}kg`;
+    ? `이전(${prev.date.slice(5)}) · ${prevSetCount}세트 · 합계 ${repsArr.reduce((a,b)=>a+b,0)}회`
+    : `이전(${prev.date.slice(5)}) · ${sets.map(s=>`${s.weight}kg×${s.reps}`).join('/')}`;
 
   return {
     bw, recWeight, recReps, recSets, rule, detail,
-    prevSummary, maxWeight, avgReps, prevSetCount, daysSince
+    prevSummary, maxWeight: lastSetWeight, avgReps, prevSetCount, daysSince,
+    prevSets: sets  // 세트별 실제 기록 전달
   };
 }
 
@@ -1825,11 +1942,14 @@ function showView(v){
 
 function renderHome(){
   // 저장된 프로필 값 복원
+  const savedA=_store.get('siba_age');
   const savedH=_store.get('siba_height');
   const savedW=_store.get('siba_weight');
   const savedG=getUserGender();
+  const aEl=document.getElementById('user-age');
   const hEl=document.getElementById('user-height');
   const wEl=document.getElementById('user-weight');
+  if(aEl&&savedA) aEl.value=savedA;
   if(hEl&&savedH) hEl.value=savedH;
   if(wEl&&savedW) wEl.value=savedW;
   // 성별 버튼 상태 복원
@@ -2530,16 +2650,22 @@ function renderPlanItem(item,idx){
       </button>`;
     }).join('');
 
-    // 총 중량 계산 (완료된 세트만)
-    const doneSetsArr=item.sets.filter(s=>s.done&&s.weight!=null&&s.reps!=null);
-    const totalVol=doneSetsArr.reduce((sum,s)=>sum+(s.weight*s.reps),0);
+    // 총 중량(웨이트) 또는 총 횟수(맨몸) 계산 (완료된 세트만)
+    const bwItem = isBW(item.name);
+    const doneSetsArr = item.sets.filter(s=>s.done);
+    const totalVol = bwItem
+      ? doneSetsArr.reduce((sum,s)=>sum+(s.reps??0), 0)          // 맨몸: 총 횟수
+      : doneSetsArr.reduce((sum,s)=>sum+((s.weight??0)*(s.reps??0)), 0); // 웨이트: 총 중량
 
-    // 진행 상태 + 총 중량
+    // 진행 상태 + 총 중량/횟수
     let statusLine='';
     if(doneSets>0){
       statusLine+=`<span style="font-size:.7rem;color:var(--accent)">${doneSets}/${totalSets} 완료</span>`;
       if(totalVol>0){
-        statusLine+=`<span style="font-size:.68rem;color:var(--muted);margin-left:6px">총 중량 <strong style="color:var(--accent2)">${totalVol.toLocaleString()}kg</strong></span>`;
+        const volLabel = bwItem
+          ? `총 횟수 <strong style="color:var(--accent2)">${totalVol}회</strong>`
+          : `총 중량 <strong style="color:var(--accent2)">${totalVol.toLocaleString()}kg</strong>`;
+        statusLine+=`<span style="font-size:.68rem;color:var(--muted);margin-left:6px">${volLabel}</span>`;
       }
     }
     if(item.restSec){
@@ -3348,6 +3474,122 @@ function goToCalendarDate(ds){
 }
 
 /* ══════════════════════════════════
+   데이터 내보내기 / 가져오기
+══════════════════════════════════ */
+function openDataIO(){
+  // 현재 통계 업데이트
+  const statEl=document.getElementById('data-io-stats');
+  if(statEl){
+    const dayCount=Object.keys(workouts).length;
+    const routines=getRoutines();
+    const totalSets=Object.values(workouts).flat().reduce((s,p)=>s+(p.sets?.length||0),0);
+    statEl.innerHTML=`
+      <div><div class="data-io-stat-val">${dayCount}</div><div class="data-io-stat-label">운동 기록일</div></div>
+      <div><div class="data-io-stat-val">${totalSets.toLocaleString()}</div><div class="data-io-stat-label">총 세트 수</div></div>
+      <div><div class="data-io-stat-val">${routines.length}</div><div class="data-io-stat-label">저장된 루틴</div></div>`;
+  }
+  document.getElementById('data-io-overlay').classList.add('open');
+}
+function closeDataIO(e){
+  if(!e||e.target===document.getElementById('data-io-overlay'))
+    document.getElementById('data-io-overlay').classList.remove('open');
+}
+
+function exportData(){
+  const payload={
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    profile:{
+      gender: _store.get('siba_gender'),
+      age:    _store.get('siba_age'),
+      height: _store.get('siba_height'),
+      weight: _store.get('siba_weight'),
+    },
+    workouts,
+    routines: getRoutines(),
+  };
+  const json=JSON.stringify(payload, null, 2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=new Date().toISOString().slice(0,10);
+  a.href=url; a.download=`worksiba_backup_${date}.json`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast(`📤 백업 완료! (${Object.keys(workouts).length}일치 기록)`);
+}
+
+function importData(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=evt=>{
+    try{
+      const data=JSON.parse(evt.target.result);
+      // 버전 확인
+      if(!data.workouts && !data.routines){
+        showToast('❌ 올바른 백업 파일이 아니에요'); return;
+      }
+      let importedDays=0, importedRoutines=0;
+
+      // 운동 기록 병합 (같은 날 덮어쓰기)
+      if(data.workouts && typeof data.workouts==='object'){
+        Object.keys(data.workouts).forEach(k=>{
+          workouts[k]=data.workouts[k]; importedDays++;
+        });
+        _store.set('worksiba',JSON.stringify(workouts));
+      }
+
+      // 루틴 병합 (이름이 다른 것만 추가)
+      if(Array.isArray(data.routines)){
+        const existing=getRoutines();
+        const existNames=new Set(existing.map(r=>r.name));
+        const toAdd=data.routines.filter(r=>!existNames.has(r.name));
+        const merged=[...existing,...toAdd].slice(0,MAX_ROUTINES);
+        saveRoutines(merged); importedRoutines=toAdd.length;
+      }
+
+      // 신체 정보 복원 (기존 값이 없을 때만)
+      if(data.profile){
+        if(data.profile.gender && !_store.get('siba_gender')) _store.set('siba_gender',data.profile.gender);
+        if(data.profile.age    && !_store.get('siba_age'))    _store.set('siba_age',data.profile.age);
+        if(data.profile.height && !_store.get('siba_height')) _store.set('siba_height',data.profile.height);
+        if(data.profile.weight && !_store.get('siba_weight')) _store.set('siba_weight',data.profile.weight);
+      }
+
+      document.getElementById('data-io-overlay').classList.remove('open');
+      showToast(`📥 ${importedDays}일치 기록, 루틴 ${importedRoutines}개 가져오기 완료!`);
+      // UI 갱신
+      renderHome(); updateStats(); renderCalendar();
+    } catch(err){
+      showToast('❌ 파일을 읽는 중 오류가 발생했어요');
+      console.error(err);
+    }
+    // input 초기화 (같은 파일 재선택 가능)
+    e.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+function clearAllData(){
+  openConfirm(
+    '⚠️ 모든 운동 기록·루틴·설정이 삭제됩니다.\n이 작업은 되돌릴 수 없어요.\n\n정말 초기화할까요?',
+    ()=>{
+      workouts={};
+      _store.set('worksiba','{}');
+      saveRoutines([]);
+      _store.remove('siba_gender');
+      _store.remove('siba_age');
+      _store.remove('siba_height');
+      _store.remove('siba_weight');
+      plan=[];
+      document.getElementById('data-io-overlay').classList.remove('open');
+      renderHome(); renderPlanList(); updateStats(); renderCalendar();
+      showToast('🗑 전체 데이터가 초기화됐어요');
+    }
+  );
+}
+
+/* ══════════════════════════════════
    SPLASH
 ══════════════════════════════════ */
 function hideSplash(){
@@ -3470,6 +3712,7 @@ document.addEventListener('keydown',e=>{
     if(document.getElementById('recommend-overlay').classList.contains('open'))document.getElementById('recommend-overlay').classList.remove('open');
     if(document.getElementById('ss-overlay').classList.contains('open'))document.getElementById('ss-overlay').classList.remove('open');
     if(document.getElementById('routine-overlay').classList.contains('open'))document.getElementById('routine-overlay').classList.remove('open');
+    if(document.getElementById('data-io-overlay').classList.contains('open'))document.getElementById('data-io-overlay').classList.remove('open');
   }
 });
 
