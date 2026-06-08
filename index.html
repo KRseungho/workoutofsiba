@@ -29,7 +29,6 @@ html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;}
 
 /* ─── SHIBA SVG (reusable inline) ─── */
-.siba-icon{display:inline-block;vertical-align:middle;}
 
 /* ─── HEADER ─── */
 header{
@@ -191,11 +190,6 @@ input[type="date"]:focus{border-color:var(--accent);}
 .prog-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s cubic-bezier(.34,1.2,.64,1);}
 
 /* ─── PLAN GROUPS ─── */
-.plan-group{margin-bottom:16px;}
-.plan-group-label{
-  font-size:.65rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
-  padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:7px;
-}
 
 /* ─── PLAN ITEM ─── */
 .plan-item{
@@ -265,7 +259,7 @@ input[type="date"]:focus{border-color:var(--accent);}
 .btn-save-all:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 8px 28px rgba(232,134,58,.4);}
 
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted);border:1px dashed var(--border);border-radius:var(--radius);}
-.empty-icon{font-size:2.2rem;margin-bottom:10px;}
+
 .empty-text{font-size:.84rem;line-height:1.7;}
 
 /* ─── CALENDAR ─── */
@@ -551,7 +545,7 @@ input[type="date"]:focus{border-color:var(--accent);}
 .routine-name-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:var(--font-body);font-size:.96rem;outline:none;transition:border-color .2s;-webkit-appearance:none;margin-bottom:12px;}
 .routine-name-input:focus{border-color:var(--accent2);}
 .btn-routine-save{width:100%;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;cursor:pointer;margin-bottom:20px;}
-.routine-list-title{font-size:.68rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+
 .routine-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;margin-bottom:8px;cursor:pointer;transition:all .18s;position:relative;}
 .routine-item:hover{border-color:var(--accent2);background:rgba(242,196,106,.06);}
 .routine-item-name{font-weight:700;font-size:.9rem;color:var(--accent2);margin-bottom:5px;}
@@ -601,10 +595,7 @@ input[type="date"]:focus{border-color:var(--accent);}
 .ss-ex-btn{padding:8px 10px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--font-body);font-size:.8rem;cursor:pointer;transition:all .18s;text-align:left;}
 .ss-ex-btn:hover{border-color:var(--teal);}
 .ss-ex-btn.sel{border-color:var(--teal);background:rgba(78,205,196,.12);color:var(--teal);font-weight:700;}
-.ss-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
-.ss-pair-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;}
-.ss-pair-name{font-size:.8rem;font-weight:700;color:var(--teal);margin-bottom:8px;}
-.ss-set-row{display:grid;grid-template-columns:22px 1fr 1fr 22px;gap:5px;align-items:center;margin-bottom:5px;}
+
 .ss-set-row input{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-family:var(--font-body);font-size:.82rem;outline:none;-webkit-appearance:none;width:100%;}
 .ss-set-row input:focus{border-color:var(--teal);}
 .ss-add-set-btn{background:transparent;border:1px dashed rgba(78,205,196,.5);color:var(--teal);font-size:.72rem;padding:3px 8px;border-radius:5px;cursor:pointer;font-family:var(--font-body);}
@@ -661,11 +652,6 @@ input[type="date"]:focus{border-color:var(--accent);}
 .plan-tip-icon-wrap .ti{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
 
 /* ─── 달력 피드백 카드 ─── */
-.cal-feedback{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);padding:18px;margin-top:14px;
-  animation:fadeUp .3s ease;
-}
 .cal-fb-muscles{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
 .cal-fb-msg{font-size:.84rem;color:var(--text);line-height:1.65;padding:12px 14px;background:rgba(232,134,58,.06);border:1px solid rgba(232,134,58,.2);border-radius:9px;}
 .cal-no-workout{
@@ -1231,9 +1217,9 @@ input[type="date"]:focus{border-color:var(--accent);}
    DB
 ══════════════════════════════════ */
 const EXERCISE_DB = {
-  '가슴':['벤치프레스','인클라인 벤치프레스','디클라인 벤치프레스','덤벨 플라이','인클라인 덤벨 플라이','케이블 크로스오버','체스트 프레스 머신','딥스','푸시업','펙 덱 플라이',
+  '가슴':['벤치프레스','인클라인 벤치프레스','디클라인 벤치프레스','덤벨 플라이','인클라인 덤벨 플라이','케이블 크로스오버','체스트 프레스 머신','딥스','어시스트 딥스','푸시업','펙 덱 플라이',
     '스미스 벤치프레스','스미스 인클라인 벤치프레스'],
-  '등':['데드리프트','루마니안 데드리프트','바벨 로우','덤벨 로우','원암 덤벨 로우','원암 로우 머신','케이블 로우','T바 로우','풀업','친업','랫 풀다운','와이드 랫 풀다운','시티드 케이블 로우','시티드 로우 머신','스트레이트 암 풀다운',
+  '등':['데드리프트','루마니안 데드리프트','바벨 로우','덤벨 로우','원암 덤벨 로우','원암 로우 머신','케이블 로우','T바 로우','풀업','어시스트 풀업','친업','어시스트 친업','랫 풀다운','와이드 랫 풀다운','시티드 케이블 로우','시티드 로우 머신','스트레이트 암 풀다운',
     '스미스 데드리프트','스미스 로우'],
   '하체':['스쿼트','프론트 스쿼트','레그프레스','런지','불가리안 스플릿 스쿼트','힙 쓰러스트','레그 컬','레그 익스텐션','카프 레이즈','핵 스쿼트',
     '스미스 스쿼트','스미스 런지','스미스 힙 쓰러스트','스미스 카프 레이즈'],
@@ -1248,24 +1234,24 @@ const CARDIO_SET = new Set(EXERCISE_DB['유산소']);
 const BWNAME_SET = new Set(['풀업','친업','딥스','딥스(팔)','푸시업','크런치','싯업','레그 레이즈','바이시클 크런치','버피','플랭크']);
 
 /* ── 칼로리 DB (MET 기반 최신화) ──
-   w  = 웨이트: kcal = reps × weight × v
-   bw = 자체중량: kcal = reps × v (체중 70kg 기준)
-   c  = 유산소: kcal = MET × 70 × (reps / 60)
-   단위: v = kcal/rep/kg (웨이트), kcal/rep (자체중량), MET (유산소)
+   w   = 웨이트: kcal = reps × weight × v
+   bw  = 자체중량: kcal = reps × v × (BW/70)
+   abw = 어시스트 자체중량: kcal = reps × v × max((BW-assist),1)/70
+         실효부하 = BW - 어시스트무게 (weight 입력란에 어시스트kg 입력)
+   c   = 유산소: kcal = MET × BW × (reps/60)
 */
 const CALORIE_DB = {
   /* 가슴 */
   '벤치프레스':{t:'w',v:.085},'인클라인 벤치프레스':{t:'w',v:.090},'디클라인 벤치프레스':{t:'w',v:.087},
   '덤벨 플라이':{t:'w',v:.072},'인클라인 덤벨 플라이':{t:'w',v:.075},'케이블 크로스오버':{t:'w',v:.070},
-  '체스트 프레스 머신':{t:'w',v:.078},'딥스':{t:'bw',v:.55},'푸쉬업':{t:'bw',v:.45},'펙 덱 플라이':{t:'w',v:.070},
+  '체스트 프레스 머신':{t:'w',v:.078},'딥스':{t:'bw',v:.55},'어시스트 딥스':{t:'abw',v:.55},'푸쉬업':{t:'bw',v:.45},'펙 덱 플라이':{t:'w',v:.070},
   '스미스 벤치프레스':{t:'w',v:.083},'스미스 인클라인 벤치프레스':{t:'w',v:.087},
   /* 등 */
   '데드리프트':{t:'w',v:.105},'루마니안 데드리프트':{t:'w',v:.095},'바벨 로우':{t:'w',v:.092},
   '덤벨 로우':{t:'w',v:.086},'원암 로우 머신':{t:'w',v:.080},'케이블 로우':{t:'w',v:.077},
-  'T바 로우':{t:'w',v:.095},'풀업':{t:'bw',v:.65},'친업':{t:'bw',v:.62},'랫 풀다운':{t:'w',v:.078},
+  'T바 로우':{t:'w',v:.095},'풀업':{t:'bw',v:.65},'어시스트 풀업':{t:'abw',v:.65},'친업':{t:'bw',v:.62},'어시스트 친업':{t:'abw',v:.62},'랫 풀다운':{t:'w',v:.078},
   '시티드 케이블 로우':{t:'w',v:.076},'스트레이트 암 풀다운':{t:'w',v:.067},
   '스미스 데드리프트':{t:'w',v:.100},'스미스 로우':{t:'w',v:.088},
-  '와이드 랫풀다운':{t:'w',v:.080},'이두 컬 머신':{t:'w',v:.063},
   /* 하체 */
   '스쿼트':{t:'w',v:.100},'프론트 스쿼트':{t:'w',v:.098},'레그프레스':{t:'w',v:.087},
   '런지':{t:'w',v:.090},'불가리안 스플릿 스쿼트':{t:'w',v:.094},'힙 쓰러스트':{t:'w',v:.085},
@@ -1288,9 +1274,9 @@ const CALORIE_DB = {
   /* 유산소 */
   '러닝':{t:'c',v:10.0},'사이클':{t:'c',v:7.8},'로잉머신':{t:'c',v:8.8},'스텝밀':{t:'c',v:9.5},
   '줄넘기':{t:'c',v:11.5},'일립티컬':{t:'c',v:6.5},'버피':{t:'bw',v:1.0},
-  /* 등 추가 */
-  '와이드 랫 풀다운':{t:'w',v:.080},'이두 컬 머신':{t:'w',v:.063},'시티드 로우 머신':{t:'w',v:.077},
-  '원암 덤벨 로우':{t:'w',v:.086},'푸시업':{t:'bw',v:.45},
+  /* 등 추가 운동 */
+  '와이드 랫 풀다운':{t:'w',v:.080},'시티드 로우 머신':{t:'w',v:.077},
+  '원암 덤벨 로우':{t:'w',v:.086},'이두 컬 머신':{t:'w',v:.063},'푸시업':{t:'bw',v:.45},
 };
 
 const MUSCLE_MAP = {};
@@ -1327,6 +1313,9 @@ const TIPS = {
   '케이블 로우':'몸통을 고정하고 팔꿈치를 옆구리 방향으로 당겨요.',
   'T바 로우':'가슴을 패드에 고정하고 광배근 수축을 의식하며 천천히 내려주세요.',
   '풀업':'데드행에서 출발해 완전히 당겨올리세요. 천천히 내려오는 게 근육 발달에 더 좋아요.',
+  '어시스트 풀업':'어시스트 무게를 입력하면 실효 부하(체중-어시스트)와 칼로리가 자동 계산돼요. 목표는 어시스트 무게를 점진적으로 줄여나가는 것입니다.',
+  '어시스트 친업':'언더그립으로 이두박근과 등을 함께 자극해요. 어시스트를 줄여가며 풀업 전환을 목표로 하세요.',
+  '어시스트 딥스':'삼두근과 가슴을 함께 자극하는 복합 운동이에요. 어시스트 무게를 줄이면서 자체 체중 딥스를 목표로 하세요.',
   '친업':'언더그립으로 이두박근과 등을 함께 자극해요. 턱이 바 위로 올라오게 당기세요.',
   '랫 풀다운':'어깨를 먼저 내리고 팔꿈치를 가슴 윗부분으로 당기는 느낌으로 진행하세요.',
   '시티드 케이블 로우':'허리를 곧게 세우고 팔꿈치를 옆구리 쪽으로 당겨요.',
@@ -1341,7 +1330,7 @@ const TIPS = {
   '레그 익스텐션':'천천히 내려오는 게 중요해요. 무릎 상태에 따라 가동 범위를 조절하세요.',
   '카프 레이즈':'발볼로 밀어올려 최대 수축하고, 내릴 때는 완전히 늘려주세요.',
   '핵 스쿼트':'발 위치로 자극 부위를 조절하세요. 무게보다 자세에 집중하면 무릎 보호에 좋아요.',
-  '오버헤드프레스':'코어를 잡고 허리 반동을 줄이세요. 바를 귀 옆으로 수직 이동하는 느낌으로 올리세요.',
+  '오버헤드 프레스':'코어를 잡고 허리 반동을 줄이세요. 바를 귀 옆으로 수직 이동하는 느낌으로 올리세요.',
   '덤벨 숄더프레스':'팔꿈치가 90° 이하로 내려오지 않게 해요.',
   '머신 숄더프레스':'등을 패드에 밀착하고 천장 방향으로 밀어올리세요.',
   '사이드 레터럴 레이즈':'새끼손가락이 먼저 올라가도록 살짝 회전해요. 반동을 최소화하세요.',
@@ -1383,17 +1372,18 @@ const TIPS = {
   '스미스 런지':'바 무게로 균형 잡기 쉬워요. 앞무릎이 발끝을 넘지 않도록 보폭을 조절하세요.',
   '스미스 힙 쓰러스트':'바를 골반에 올리고 어깨를 벤치에 고정해요. 정점에서 1초 수축하면 효과가 배가돼요.',
   '스미스 카프 레이즈':'발볼을 받침대 끝에 올리고 최대 범위로 수축·이완해요. 천천히 내려오는 게 중요해요.',
-  '스미스 오버헤드프레스':'바 궤도가 고정되어 어깨 집중에 유리해요. 코어를 잡고 허리 반동을 줄이세요.',
+  '스미스 오버헤드 프레스':'바 궤도가 고정되어 어깨 집중에 유리해요. 코어를 잡고 허리 반동을 줄이세요.',
   '스미스 업라이트 로우':'팔꿈치를 손목보다 높게 유지하며 어깨 높이까지 당겨요.',
   '시티드 스미스 밀리터리 프레스':'앉은 자세로 허리 부담을 줄이고 삼각근을 고립 훈련해요. 바를 이마 앞에서 수직으로 밀어 올리세요.',
   '스미스 클로즈 그립 벤치프레스':'그립을 좁혀 삼두근에 집중해요. 팔꿈치가 벌어지지 않게 주의하세요.',
-  '와이드 랫풀다운':'그립을 어깨 1.5배 너비로 넓게 잡아요. 팔꿈치를 옆구리 바깥으로 당기며 광배근 외측을 자극해요.',
+  '와이드 랫 풀다운':'그립을 어깨 1.5배 너비로 넓게 잡아요. 팔꿈치를 옆구리 바깥으로 당기며 광배근 외측을 자극해요.',
   '이두 컬 머신':'팔꿈치 위치를 패드에 고정하고 손목을 중립으로 유지해요. 고립 운동으로 이두근 피크를 강화해요.',
 };
 
 function getMuscle(n){return MUSCLE_MAP[n]||'기타';}
 function isCardio(n){return CARDIO_SET.has(n);}
 function isBW(n){return BWNAME_SET.has(n);}
+function isAssist(n){return CALORIE_DB[n]?.t==='abw';}
 
 /* ── 사용자 프로필 ── */
 function getUserWeight(){ return parseFloat(_store.get('siba_weight'))||70; }
@@ -1476,22 +1466,23 @@ function calcKcal(item){
   let total=0;
   arr.forEach(s=>{
     const r=s.reps!=null?+s.reps:0;
-    if(!r) return; // 횟수 없으면 스킵
+    if(!r) return;
     if(!db){
-      // DB 없는 종목: 웨이트만 계산
       const w=s.weight!=null?+s.weight:0;
       if(w&&r) total+=Math.round(r*w*.07);
       return;
     }
     if(db.t==='w'){
-      // 웨이트 운동: 무게 반드시 필요
       const w=s.weight!=null?+s.weight:0;
       if(w) total+=Math.round(r*w*db.v);
     } else if(db.t==='bw'){
-      // 맨몸 운동: 체중 기반, 무게 불필요
       total+=Math.round(r*db.v*(BW/70));
+    } else if(db.t==='abw'){
+      // 어시스트: 실효부하 = BW - 어시스트무게 (최소 1kg)
+      const assist=s.weight!=null?+s.weight:0;
+      const effectiveLoad=Math.max(BW-assist, 1);
+      total+=Math.round(r*db.v*(effectiveLoad/70));
     } else if(db.t==='c'){
-      // 유산소: 분당 MET 기반
       total+=Math.round(db.v*BW*(r/60));
     }
   });
@@ -1517,20 +1508,7 @@ function calcVolume(item){
   });
   return hasData ? {val:vol, isBW:bw} : null;
 }
-/* 완료된 세트만으로 볼륨 계산 */
-function calcDoneVolume(item){
-  if(!item.sets||item.sets.length===0) return null;
-  const bw=isBW(item.name);
-  let vol=0, hasData=false;
-  item.sets.filter(s=>s.done).forEach(s=>{
-    if(bw){
-      if(s.reps!=null){vol+=s.reps; hasData=true;}
-    } else {
-      if(s.weight!=null&&s.reps!=null){vol+=s.weight*s.reps; hasData=true;}
-    }
-  });
-  return hasData ? {val:vol, isBW:bw} : null;
-}
+
 /* 볼륨 표시 문자열 */
 function fmtVol(v){
   if(!v) return '';
@@ -1544,7 +1522,8 @@ function calcProgressionRec(name){
   const prev = getPrevRecord(name);
   if(!prev) return null;
 
-  const bw  = isBW(name);
+  const bw     = isBW(name);
+  const assist = isAssist(name);
   const sets = prev.sets.filter(s => s.reps != null);
   if(!sets.length) return null;
 
@@ -1563,14 +1542,34 @@ function calcProgressionRec(name){
   // ── 날짜 간격 (회복 상태 판단) ──
   const daysSince = Math.round((new Date() - new Date(prev.date+'T00:00:00')) / 86400000);
 
-  let recWeight = null, recReps = null, recSets = prevSetCount;
-  let rule = '', detail = '';
+  if(assist){
+    // ── 어시스트 운동: 어시스트 무게 감소로 점진적 과부하 ──
+    const BW_VAL = getUserWeight();
+    const assistWeights = sets.map(s=>s.weight??0);
+    const avgAssist = assistWeights.reduce((a,b)=>a+b,0)/prevSetCount;
+    const avgEffLoad = Math.max(BW_VAL-avgAssist,1);
+    const avgEffPct  = Math.round(avgEffLoad/BW_VAL*100);
+    const allHitTarget = sets.every(s=>(s.reps??0)>=targetReps);
+    const step = 2.5;
 
-  // ── 세트별 무게 배열 (추천값 계산용) ──
-  // 각 세트 무게를 기반으로 추천 (마지막 세트 무게 기준)
-  const lastSetWeight = weights[weights.length-1] || maxWeight;
+    let recWeight2=avgAssist, recReps2=targetReps, recSets2=prevSetCount, rule2='', detail2='';
+    if(allHitTarget && daysSince>=2){
+      recWeight2 = Math.max(Math.round((avgAssist-step)*4)/4, 0);
+      const newEffPct = Math.round(Math.max(BW_VAL-recWeight2,1)/BW_VAL*100);
+      rule2   = `어시스트 감소 (${avgAssist}kg→${recWeight2}kg)`;
+      detail2 = `모든 세트 목표 달성! 어시스트를 ${step}kg 줄여 실효 부하 ${avgEffPct}% → ${newEffPct}%로 높이세요.`;
+    } else if(daysSince<2){
+      rule2   = '회복 부족 — 동일 어시스트';
+      detail2 = `마지막 운동이 ${daysSince}일 전이에요. 동일 어시스트(${avgAssist}kg)로 유지하세요.`;
+    } else {
+      recReps2 = targetReps+1;
+      rule2   = '횟수 +1 목표';
+      detail2 = `어시스트 유지, 횟수를 1회 늘려보세요. 모든 세트 ${targetReps+1}회 달성 후 어시스트를 줄이세요.`;
+    }
+    const prevSummary2 = `이전(${prev.date.slice(5)}) · ${prevSetCount}세트 · 어시스트${avgAssist.toFixed(1)}kg · 실효${avgEffPct}%`;
+    return {bw:false,assist:true,recWeight:recWeight2,recReps:recReps2,recSets:recSets2,rule:rule2,detail:detail2,prevSummary:prevSummary2,maxWeight:avgAssist,avgReps,prevSetCount,daysSince,prevSets:sets};
 
-  if(bw){
+  } else if(bw){
     // ── 맨몸 운동: 횟수 점진적 과부하 ──
     const allHitTarget = repsArr.every(r => r >= targetReps);
     const minReps = Math.min(...repsArr);
@@ -1644,8 +1643,17 @@ function showProgressionRec(name){
   if(!rec) return;
 
   const bw = rec.bw;
+  const assist = rec.assist || false;
 
-  // 추천 카드 2종: A) 추천값 / B) 이전과 동일
+  const fmtOpt = (w, r, s, bw, assist) => {
+    if(assist) return `${s}세트 × 어시스트${w??0}kg × ${r}회`;
+    if(bw)     return `${s}세트 × ${r}회`;
+    return `${s}세트 × ${w}kg × ${r}회`;
+  };
+
+  const banner = document.createElement('div');
+  banner.id = 'prog-rec-banner';
+  banner.className = 'prog-rec-banner';
   const optA_weight = rec.recWeight;
   const optA_reps   = rec.recReps;
   const optA_sets   = rec.recSets;
@@ -1653,24 +1661,17 @@ function showProgressionRec(name){
   const optB_reps   = Math.round(rec.avgReps);
   const optB_sets   = rec.prevSetCount;
 
-  const fmtOpt = (w, r, s, bw) => bw
-    ? `${s}세트 × ${r}회`
-    : `${s}세트 × ${w}kg × ${r}회`;
-
-  const banner = document.createElement('div');
-  banner.id = 'prog-rec-banner';
-  banner.className = 'prog-rec-banner';
   banner.innerHTML = `
     <div class="prog-rec-title">📊 점진적 과부하 추천 <span style="font-size:.6rem;color:var(--muted);font-weight:400;text-transform:none">${rec.prevSummary}</span></div>
     <div class="prog-rec-grid">
       <div class="prog-rec-card sel" id="prog-opt-a" onclick="applyProgRec('a')">
         <div class="prog-rec-card-label">🚀 추천</div>
-        <div class="prog-rec-card-val">${fmtOpt(optA_weight, optA_reps, optA_sets, bw)}</div>
+        <div class="prog-rec-card-val">${fmtOpt(optA_weight, optA_reps, optA_sets, bw, assist)}</div>
         <div class="prog-rec-card-sub">${rec.rule}</div>
       </div>
       <div class="prog-rec-card" id="prog-opt-b" onclick="applyProgRec('b')">
         <div class="prog-rec-card-label">🔄 이전과 동일</div>
-        <div class="prog-rec-card-val">${fmtOpt(optB_weight, optB_reps, optB_sets, bw)}</div>
+        <div class="prog-rec-card-val">${fmtOpt(optB_weight, optB_reps, optB_sets, bw, assist)}</div>
         <div class="prog-rec-card-sub">현상 유지</div>
       </div>
     </div>
@@ -2088,15 +2089,22 @@ function selectEx(name){
 ══════════════════════════════════ */
 function showInputArea(name){
   document.getElementById('input-area').style.display='block';
-  const c=isCardio(name), bw=isBW(name);
+  const c=isCardio(name), bw=isBW(name), assist=isAssist(name);
   document.getElementById('weight-area').style.display=c?'none':'block';
   document.getElementById('cardio-area').style.display=c?'block':'none';
   if(!c){
     const hdr=document.getElementById('set-col-heads');
-    if(bw){hdr.style.gridTemplateColumns='28px 1fr 28px';hdr.innerHTML='<div></div><div>횟수 (회)</div><div></div>';}
-    else{hdr.style.gridTemplateColumns='28px 1fr 1fr 28px';hdr.innerHTML='<div></div><div>무게 (kg)</div><div>횟수 (회)</div><div></div>';}
+    if(bw){
+      hdr.style.gridTemplateColumns='28px 1fr 28px';
+      hdr.innerHTML='<div></div><div>횟수 (회)</div><div></div>';
+    } else if(assist){
+      hdr.style.gridTemplateColumns='28px 1fr 1fr 28px';
+      hdr.innerHTML='<div></div><div>어시스트 (kg)</div><div>횟수 (회)</div><div></div>';
+    } else {
+      hdr.style.gridTemplateColumns='28px 1fr 1fr 28px';
+      hdr.innerHTML='<div></div><div>무게 (kg)</div><div>횟수 (회)</div><div></div>';
+    }
     setRows=[{weight:'',reps:''}]; renderSetRows(bw);
-    // 현재 selRestSec에 맞게 chip 표시
     setRestSec(selRestSec);
   } else {
     document.getElementById('cardio-min').value='';
@@ -2169,7 +2177,7 @@ const RECOMMEND_DB = {
   '등':[
     {name:'데드리프트',       sets:4,reps:'6~8', rest:'120초'},
     {name:'바벨 로우',        sets:4,reps:'8~10',rest:'90초'},
-    {name:'와이드 랫풀다운',   sets:3,reps:'10~12',rest:'60초'},
+    {name:'와이드 랫 풀다운',   sets:3,reps:'10~12',rest:'60초'},
     {name:'시티드 케이블 로우', sets:3,reps:'12~15',rest:'60초'},
     {name:'스트레이트 암 풀다운',sets:3,reps:'12~15',rest:'60초'},
   ],
@@ -2181,7 +2189,7 @@ const RECOMMEND_DB = {
     {name:'카프 레이즈',      sets:4,reps:'15~20',rest:'45초'},
   ],
   '어깨':[
-    {name:'오버헤드프레스',   sets:4,reps:'8~10', rest:'90초'},
+    {name:'오버헤드 프레스',   sets:4,reps:'8~10', rest:'90초'},
     {name:'사이드 레터럴 레이즈',sets:4,reps:'12~15',rest:'60초'},
     {name:'리어 델트 플라이', sets:3,reps:'12~15',rest:'60초'},
     {name:'페이스풀',        sets:3,reps:'12~15',rest:'60초'},
@@ -2332,7 +2340,7 @@ function addAllRecToPlan(){
 
 /* ═══ 슈퍼세트 모달 ═══ */
 let ssMuscle=null, ssExA=null, ssExB=null, ssSetRows=[{wA:'',rA:'',wB:'',rB:''}];
-let ssRestSec=60; // 슈퍼세트 전용 휴식 기본값
+let ssRestSec=60;
 
 function setSSRestSec(sec){
   ssRestSec=sec;
@@ -2638,11 +2646,28 @@ function renderPlanItem(item,idx){
     const totalSets=item.sets.length;
 
     // 세트별 완료 버튼
+    const bwItem   = isBW(item.name);
+    const assistItem = isAssist(item.name);
+    const BW_VAL   = getUserWeight();
     const setButtons=item.sets.map((s,si)=>{
-      const p=[];
-      if(s.weight!=null) p.push(s.weight+'kg');
-      if(s.reps!=null)   p.push(s.reps+'회');
-      const label=p.length ? p.join('×') : `${si+1}세트`;
+      let label='';
+      if(bwItem){
+        label = s.reps!=null ? `${s.reps}회` : `${si+1}세트`;
+      } else if(assistItem){
+        // 어시스트: "어시스트Nkg · 실효M%" 표시
+        const assist = s.weight!=null ? +s.weight : 0;
+        const eff    = Math.max(BW_VAL-assist,1);
+        const pct    = Math.round(eff/BW_VAL*100);
+        const rep    = s.reps!=null ? `×${s.reps}회` : '';
+        label = assist>0
+          ? `어시스트${assist}kg${rep} (실효${pct}%)`
+          : (s.reps!=null ? `${s.reps}회` : `${si+1}세트`);
+      } else {
+        const p=[];
+        if(s.weight!=null) p.push(s.weight+'kg');
+        if(s.reps!=null)   p.push(s.reps+'회');
+        label = p.length ? p.join('×') : `${si+1}세트`;
+      }
       const isDone=!!s.done;
       return `<button class="set-complete-btn${isDone?' done':''}"
         onclick="event.stopPropagation();completeSet(${idx},${si})">
@@ -2650,27 +2675,44 @@ function renderPlanItem(item,idx){
       </button>`;
     }).join('');
 
-    // 총 중량(웨이트) 또는 총 횟수(맨몸) 계산 (완료된 세트만)
-    const bwItem = isBW(item.name);
+    // 총 중량(웨이트) 또는 총 횟수(맨몸/어시스트) 계산 (완료된 세트만)
     const doneSetsArr = item.sets.filter(s=>s.done);
-    const totalVol = bwItem
-      ? doneSetsArr.reduce((sum,s)=>sum+(s.reps??0), 0)          // 맨몸: 총 횟수
-      : doneSetsArr.reduce((sum,s)=>sum+((s.weight??0)*(s.reps??0)), 0); // 웨이트: 총 중량
+    let totalVol=0, volLabel='';
+    if(bwItem){
+      totalVol = doneSetsArr.reduce((sum,s)=>sum+(s.reps??0),0);
+      if(totalVol>0) volLabel=`총 횟수 <strong style="color:var(--accent2)">${totalVol}회</strong>`;
+    } else if(assistItem){
+      // 어시스트: 실효부하 기준 총 중량 + 평균 실효 %
+      const effLoads = doneSetsArr.map(s=>Math.max(BW_VAL-(s.weight??0),1));
+      const avgEffPct = effLoads.length
+        ? Math.round(effLoads.reduce((a,b)=>a+b,0)/effLoads.length/BW_VAL*100) : 0;
+      const effVol = doneSetsArr.reduce((sum,s)=>{
+        const eff=Math.max(BW_VAL-(s.weight??0),1);
+        return sum+eff*(s.reps??0);
+      },0);
+      if(effVol>0) volLabel=`실효 총 중량 <strong style="color:var(--accent2)">${effVol.toLocaleString()}kg</strong><span style="font-size:.62rem;color:var(--muted);margin-left:4px">(평균 실효${avgEffPct}%)</span>`;
+    } else {
+      totalVol = doneSetsArr.reduce((sum,s)=>sum+((s.weight??0)*(s.reps??0)),0);
+      if(totalVol>0) volLabel=`총 중량 <strong style="color:var(--accent2)">${totalVol.toLocaleString()}kg</strong>`;
+    }
 
     // 진행 상태 + 총 중량/횟수
     let statusLine='';
     if(doneSets>0){
       statusLine+=`<span style="font-size:.7rem;color:var(--accent)">${doneSets}/${totalSets} 완료</span>`;
-      if(totalVol>0){
-        const volLabel = bwItem
-          ? `총 횟수 <strong style="color:var(--accent2)">${totalVol}회</strong>`
-          : `총 중량 <strong style="color:var(--accent2)">${totalVol.toLocaleString()}kg</strong>`;
+      if(volLabel){
         statusLine+=`<span style="font-size:.68rem;color:var(--muted);margin-left:6px">${volLabel}</span>`;
       }
     }
     if(item.restSec){
-      const restLabel=item.restSec<60?item.restSec+'초':Math.floor(item.restSec/60)+'분';
-      statusLine+=`<span style="font-size:.68rem;color:var(--teal);margin-left:6px">🕐 ${restLabel} 휴식</span>`;
+      const rs=item.restSec;
+      const restLabel = rs<60 ? `${rs}초`
+        : rs%60===0 ? `${rs/60}분`
+        : `${Math.floor(rs/60)}분 ${rs%60}초`;
+      // 슈퍼세트 B에는 중복 표기 안 함 (A에서만 표시)
+      if(!item.superset || item.pairRole==='A'){
+        statusLine+=`<span style="font-size:.68rem;color:var(--teal);margin-left:6px">🕐 ${restLabel} 휴식</span>`;
+      }
     }
 
     detail=`<div class="set-complete-row">${setButtons}</div>`;
@@ -2950,8 +2992,8 @@ function saveWorkout(){
 /* ══════════════════════════════════
    EDIT MODAL
 ══════════════════════════════════ */
-let editPartnerIdx = -1;   // 슈퍼세트 파트너 인덱스
-let modalSetRowsB = [];    // 슈퍼세트 B 세트 rows
+let editPartnerIdx = -1;
+let modalSetRowsB = [];
 
 function openEditModal(idx){
   editIdx=idx; editPartnerIdx=-1; modalSetRowsB=[];
