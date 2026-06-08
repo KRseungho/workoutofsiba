@@ -508,30 +508,44 @@ input[type="date"]:focus{border-color:var(--accent);}
 
 /* ─── 점진적 과부하 추천 배너 ─── */
 .prog-rec-banner{
-  background:linear-gradient(135deg,rgba(78,205,196,.08),rgba(242,196,106,.08));
-  border:1px solid rgba(78,205,196,.3);
-  border-radius:10px;padding:10px 14px;margin-bottom:10px;
+  background:linear-gradient(135deg,rgba(78,205,196,.06),rgba(242,196,106,.06));
+  border:1px solid rgba(78,205,196,.28);
+  border-radius:10px;padding:12px 14px;margin-bottom:10px;
 }
 .prog-rec-title{
-  font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--teal);margin-bottom:6px;display:flex;align-items:center;gap:5px;
+  font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:3px;
+}
+.prog-rec-prev{
+  font-size:.64rem;color:var(--muted);font-weight:400;
+  margin-bottom:8px;line-height:1.5;
 }
 .prog-rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
 .prog-rec-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:8px;
-  padding:8px 10px;cursor:pointer;transition:all .18s;
+  background:var(--surface);border:1.5px solid var(--border);border-radius:8px;
+  padding:9px 10px;cursor:pointer;transition:all .18s;
 }
 .prog-rec-card:hover,.prog-rec-card.sel{
-  border-color:var(--teal);background:rgba(78,205,196,.08);
+  border-color:var(--teal);background:rgba(78,205,196,.07);
 }
-.prog-rec-card-label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
-.prog-rec-card-val{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent2);letter-spacing:.04em;}
-.prog-rec-card-sub{font-size:.6rem;color:var(--muted);margin-top:1px;}
-.prog-rec-reason{font-size:.72rem;color:var(--muted);line-height:1.6;border-top:1px solid rgba(78,205,196,.15);padding-top:7px;margin-top:4px;}
+.prog-rec-card-label{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.prog-rec-card-val{
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--accent2);
+  letter-spacing:.03em;line-height:1.25;word-break:keep-all;
+}
+.prog-rec-card-sub{font-size:.6rem;color:var(--muted);margin-top:3px;line-height:1.4;}
+.prog-rec-reason{
+  font-size:.72rem;color:var(--muted);line-height:1.7;
+  border-top:1px solid rgba(78,205,196,.15);
+  padding-top:8px;margin-top:2px;
+  white-space:pre-line;   /* \n 줄바꿈 적용 */
+  word-break:keep-all;
+}
 .prog-rec-apply{
   width:100%;background:linear-gradient(135deg,var(--teal),#38b2a8);color:#fff;
-  border:none;padding:8px;border-radius:7px;font-family:var(--font-body);
-  font-size:.8rem;font-weight:700;cursor:pointer;margin-top:6px;
+  border:none;padding:9px;border-radius:8px;font-family:var(--font-body);
+  font-size:.82rem;font-weight:700;cursor:pointer;margin-top:8px;
+  letter-spacing:.02em;
 }
 
 /* ─── 루틴 모달 ─── */
@@ -1337,7 +1351,7 @@ const TIPS = {
   '프론트 레이즈':'어깨 높이까지만 올리세요.',
   '리어 델트 플라이':'팔꿈치를 살짝 구부려 후면 삼각근을 집중 자극해요.',
   '벤트 오버 레이즈':'상체를 45~90° 숙이고 양옆으로 올려요. 후면 삼각근·능형근 발달에 탁월해요.',
-  '페이스풀':'얼굴 쪽으로 당기며 팔꿈치를 높게 유지해요. 회전근개 강화에 매우 효과적이에요.',
+  '페이스 풀':'얼굴 쪽으로 당기며 팔꿈치를 높게 유지해요. 회전근개 강화에 매우 효과적이에요.',
   '업라이트 로우':'팔꿈치를 손목보다 높게 유지하며 턱 아래까지 당겨요.',
   '바벨 컬':'팔꿈치를 옆구리에 고정하고 이두근만 사용해요.',
   '덤벨 컬':'정점에서 손목을 바깥으로 비틀면 이두근 수축이 강해져요.',
@@ -1542,6 +1556,12 @@ function calcProgressionRec(name){
   // ── 날짜 간격 (회복 상태 판단) ──
   const daysSince = Math.round((new Date() - new Date(prev.date+'T00:00:00')) / 86400000);
 
+  // ── 공통 return 변수 (bw/weight 분기에서 사용) ──
+  let recWeight = null, recReps = targetReps, recSets = prevSetCount;
+  let rule = '', detail = '';
+  // 마지막 세트 무게 (웨이트 운동 추천 기준점)
+  const lastSetWeight = weights[weights.length - 1] || maxWeight;
+
   if(assist){
     // ── 어시스트 운동: 어시스트 무게 감소로 점진적 과부하 ──
     const BW_VAL = getUserWeight();
@@ -1557,14 +1577,14 @@ function calcProgressionRec(name){
       recWeight2 = Math.max(Math.round((avgAssist-step)*4)/4, 0);
       const newEffPct = Math.round(Math.max(BW_VAL-recWeight2,1)/BW_VAL*100);
       rule2   = `어시스트 감소 (${avgAssist}kg→${recWeight2}kg)`;
-      detail2 = `모든 세트 목표 달성! 어시스트를 ${step}kg 줄여 실효 부하 ${avgEffPct}% → ${newEffPct}%로 높이세요.`;
+      detail2 = `모든 세트 목표 달성!\n어시스트 ${step}kg 감소 → 실효 부하 ${avgEffPct}% → ${newEffPct}%`;
     } else if(daysSince<2){
       rule2   = '회복 부족 — 동일 어시스트';
-      detail2 = `마지막 운동이 ${daysSince}일 전이에요. 동일 어시스트(${avgAssist}kg)로 유지하세요.`;
+      detail2 = `마지막 운동이 ${daysSince}일 전이에요.\n동일 어시스트(${avgAssist}kg)로 유지하세요.`;
     } else {
       recReps2 = targetReps+1;
       rule2   = '횟수 +1 목표';
-      detail2 = `어시스트 유지, 횟수를 1회 늘려보세요. 모든 세트 ${targetReps+1}회 달성 후 어시스트를 줄이세요.`;
+      detail2 = `어시스트 유지, 횟수를 1회 늘려보세요.\n모든 세트 ${targetReps+1}회 달성 후 어시스트를 줄이세요.`;
     }
     const prevSummary2 = `이전(${prev.date.slice(5)}) · ${prevSetCount}세트 · 어시스트${avgAssist.toFixed(1)}kg · 실효${avgEffPct}%`;
     return {bw:false,assist:true,recWeight:recWeight2,recReps:recReps2,recSets:recSets2,rule:rule2,detail:detail2,prevSummary:prevSummary2,maxWeight:avgAssist,avgReps,prevSetCount,daysSince,prevSets:sets};
@@ -1577,12 +1597,12 @@ function calcProgressionRec(name){
       recReps  = targetReps + 2;
       recSets  = prevSetCount;
       rule     = '2-for-2 Rule 적용';
-      detail   = `모든 세트에서 목표 횟수(${targetReps}회)를 달성했어요. 다음 세션은 +2회를 권장합니다. (NSCA 2-for-2 Rule)`;
+      detail   = `모든 세트에서 목표 횟수(${targetReps}회)를 달성했어요.\n다음 세션은 +2회를 권장합니다. (NSCA 2-for-2 Rule)`;
     } else {
       recReps  = targetReps;
       recSets  = prevSetCount;
       rule     = '목표 횟수 유지';
-      detail   = `이전 세션 최소 ${minReps}회로, 아직 모든 세트에서 ${targetReps}회를 달성하지 못했어요. 같은 목표를 유지하고 완전 달성을 목표로 하세요.`;
+      detail   = `이전 최소 ${minReps}회로, 아직 모든 세트에서\n${targetReps}회를 달성하지 못했어요.\n같은 목표를 유지하며 완전 달성을 목표로 하세요.`;
     }
   } else {
     // ── 웨이트 운동: 세트별 실제 무게 기반 추천 ──
@@ -1601,24 +1621,26 @@ function calcProgressionRec(name){
       recReps   = targetReps;
       recSets   = prevSetCount;
       rule      = '2-for-2 Rule → 중량 증가';
-      detail    = `마지막 2세트 모두 ${targetReps+2}회 이상 달성! ${lastSetWeight}kg → ${recWeight}kg (+${weightStep}kg) 증가를 권장합니다.\n각 세트: ${sets.map((s,i)=>`${i+1}세트 ${s.weight}kg×${s.reps}회`).join(', ')}`;
+      const setLog = sets.map((s,i)=>`  ${i+1}세트 ${s.weight}kg × ${s.reps}회`).join('\n');
+      detail    = `마지막 2세트 모두 ${targetReps+2}회 이상 달성!\n${lastSetWeight}kg → ${recWeight}kg (+${weightStep}kg) 증가 권장 (NSCA 2-for-2 Rule)\n\n이전 기록:\n${setLog}`;
     } else if(!recovered){
       recWeight = lastSetWeight;
       recReps   = Math.max(Math.round(avgReps - 1), 6);
       recSets   = Math.max(prevSetCount - 1, 2);
       rule      = '회복 부족 — 볼륨 조정';
-      detail    = `마지막 운동이 ${daysSince}일 전이에요. 충분한 회복(48~72h) 전 재훈련 시 볼륨을 소폭 줄이는 것을 권장합니다.`;
+      detail    = `마지막 운동이 ${daysSince}일 전이에요.\n충분한 회복(48~72h) 전 재훈련 시 볼륨을 소폭 줄이는 것을 권장합니다.`;
     } else {
       const canAddSet = prevSetCount < 6;
       recWeight = lastSetWeight;
       recReps   = targetReps;
       recSets   = canAddSet ? prevSetCount + 1 : prevSetCount;
       if(canAddSet){
+        const setLog = sets.map((s,i)=>`  ${i+1}세트 ${s.weight}kg × ${s.reps}회`).join('\n');
         rule   = '볼륨 점진 → 세트 추가';
-        detail = `세트를 1개 추가해 총 볼륨을 늘리세요. 이전 기록: ${sets.map((s,i)=>`${s.weight}kg×${s.reps}회`).join(' / ')} (Schoenfeld 2017)`;
+        detail = `세트를 1개 추가해 총 볼륨을 늘리세요.\n볼륨 축적은 근비대의 핵심 변수입니다. (Schoenfeld 2017)\n\n이전 기록:\n${setLog}`;
       } else {
         rule   = '중량 유지 — 자세 집중';
-        detail = `이미 ${prevSetCount}세트를 수행했어요. 신장성 구간(2~3초) 컨트롤에 집중하세요. (Douglas 2017, Front Physiol)`;
+        detail = `이미 ${prevSetCount}세트를 수행했어요.\n신장성 구간(2~3초) 컨트롤에 집중하세요.\n(Douglas 2017, Front Physiol)`;
       }
     }
   }
@@ -1662,7 +1684,8 @@ function showProgressionRec(name){
   const optB_sets   = rec.prevSetCount;
 
   banner.innerHTML = `
-    <div class="prog-rec-title">📊 점진적 과부하 추천 <span style="font-size:.6rem;color:var(--muted);font-weight:400;text-transform:none">${rec.prevSummary}</span></div>
+    <div class="prog-rec-title">📊 점진적 과부하 추천</div>
+    <div class="prog-rec-prev">${rec.prevSummary}</div>
     <div class="prog-rec-grid">
       <div class="prog-rec-card sel" id="prog-opt-a" onclick="applyProgRec('a')">
         <div class="prog-rec-card-label">🚀 추천</div>
@@ -1675,7 +1698,7 @@ function showProgressionRec(name){
         <div class="prog-rec-card-sub">현상 유지</div>
       </div>
     </div>
-    <div class="prog-rec-reason">${rec.detail}</div>
+    <div class="prog-rec-reason">${rec.detail.replace(/\\n/g,'\n')}</div>
     <button class="prog-rec-apply" onclick="applyProgRec('a')">✅ 추천값으로 자동 입력</button>`;
 
   // weight-area 앞에 삽입
@@ -1821,6 +1844,12 @@ function init(){
   const t=new Date(); calYear=t.getFullYear(); calMonth=t.getMonth();
   document.getElementById('record-date').value=toDateStr(t);
   updateDateDisplay(); renderMuscleChips(); renderCalendar(); updateStats();
+  renderHome(); // 홈 탭 초기 렌더
+  // 홈 탭 활성화
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-home').classList.add('active');
+  document.querySelectorAll('.nav-tab')[0].classList.add('active');
   document.addEventListener('touchstart',e=>{if(!e.target.closest('input,select,textarea,button'))blurAll();},{passive:true});
   document.addEventListener('click',e=>{if(!e.target.closest('input,select,textarea,button'))blurAll();});
 }
@@ -2192,7 +2221,7 @@ const RECOMMEND_DB = {
     {name:'오버헤드 프레스',   sets:4,reps:'8~10', rest:'90초'},
     {name:'사이드 레터럴 레이즈',sets:4,reps:'12~15',rest:'60초'},
     {name:'리어 델트 플라이', sets:3,reps:'12~15',rest:'60초'},
-    {name:'페이스풀',        sets:3,reps:'12~15',rest:'60초'},
+    {name:'페이스 풀',        sets:3,reps:'12~15',rest:'60초'},
     {name:'업라이트 로우',    sets:3,reps:'10~12',rest:'60초'},
   ],
   '팔':[
